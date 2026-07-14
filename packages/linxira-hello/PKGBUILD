@@ -1,0 +1,57 @@
+# Maintainer: Linxira OS <admin@linxira.org>
+
+pkgname=linxira-hello
+pkgver=0.26.0.linxira1
+pkgrel=1
+pkgdesc='Welcome application for Linxira OS'
+arch=('x86_64')
+groups=('linxira')
+url='https://github.com/Linxira-OS/linxira-hello'
+license=('GPL-3.0-or-later')
+depends=(
+  glib2
+  gtk3
+  pciutils
+  procps-ng
+  libusb
+  libusb-1.0.so
+)
+makedepends=(
+  cargo
+  clang
+  git
+  lld
+  llvm
+  meson
+)
+provides=('cachyos-hello')
+conflicts=('cachyos-hello')
+replaces=('cachyos-hello')
+
+_commit=6e88bb8b25c5891ce73555bd008cbdee4fec5750
+source=("$pkgname::git+$url.git#commit=$_commit")
+sha256sums=('SKIP')
+
+build() {
+  cd "$srcdir/$pkgname"
+
+  export AR=llvm-ar
+  export CC=clang
+  export CXX=clang++
+  export NM=llvm-nm
+  export RANLIB=llvm-ranlib
+  export RUSTFLAGS='-Cembed-bitcode -C opt-level=3 -Ccodegen-units=1 -Clinker=clang -C link-arg=-flto -C link-arg=-fuse-ld=/usr/bin/ld.lld'
+  export CFLAGS+=" -fno-integrated-as"
+  export CXXFLAGS+=" -fno-integrated-as"
+
+  meson setup --buildtype=release --prefix=/usr build
+  meson compile -C build
+}
+
+package() {
+  cd "$srcdir/$pkgname"
+
+  DESTDIR="$pkgdir" meson install -C build
+  install -Dm644 linxira-hello.desktop \
+    "$pkgdir/etc/skel/.config/autostart/linxira-hello.desktop"
+}

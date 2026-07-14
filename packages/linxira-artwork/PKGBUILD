@@ -1,0 +1,20 @@
+# Maintainer: Linxira OS <admin@linxira.org>
+
+pkgname=linxira-artwork
+pkgver=1.0.0
+pkgrel=1
+pkgdesc='Canonical artwork and visual identity for Linxira OS'
+arch=('any')
+groups=('linxira')
+url='https://github.com/Linxira-OS/linxira-artwork'
+license=('GPL-3.0-or-later')
+makedepends=('git')
+
+_commit=e453edd799d4c2aff5e9779f65c8a70e247a4533
+source=("$pkgname::git+$url.git#commit=$_commit")
+sha256sums=('SKIP')
+
+package() {
+  cd "$srcdir/$pkgname"
+  cp -a usr "$pkgdir/"
+}
