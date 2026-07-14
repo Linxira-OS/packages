@@ -51,6 +51,15 @@ build() {
 package() {
   cd "$srcdir/$pkgname"
 
+  export AR=llvm-ar
+  export CC=clang
+  export CXX=clang++
+  export NM=llvm-nm
+  export RANLIB=llvm-ranlib
+  export RUSTFLAGS='-Cembed-bitcode -C opt-level=3 -Ccodegen-units=1 -Clinker=clang -C link-arg=-flto -C link-arg=-fuse-ld=/usr/bin/ld.lld'
+  export CFLAGS+=" -fno-integrated-as"
+  export CXXFLAGS+=" -fno-integrated-as"
+
   DESTDIR="$pkgdir" meson install -C build
   install -Dm644 linxira-hello.desktop \
     "$pkgdir/etc/skel/.config/autostart/linxira-hello.desktop"
