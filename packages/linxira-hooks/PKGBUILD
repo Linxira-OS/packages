@@ -11,7 +11,7 @@ license=('GPL-3.0-or-later')
 depends=('bash')
 makedepends=('git')
 
-_commit=04a6c6ee87482f9cf7d07bd16c92dc3d751096d1
+_commit=25355105174646260fdb464cbdbe526055c825ae
 source=("$pkgname::git+$url.git#commit=$_commit")
 sha256sums=('SKIP')
 

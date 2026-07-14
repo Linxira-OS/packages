@@ -8,13 +8,14 @@ Linxira OS.
 - `packages/`: one pinned PKGBUILD per Linxira-owned package
 - `scripts/check-boundaries.sh`: rejects accidental replacement of upstream
   CachyOS packages and tool identities
-- `.github/workflows/packages.yml`: clean-chroot build, signing, `repo-add`, and
-  GitHub Pages deployment
+- `.github/workflows/packages.yml`: isolated Arch container build, signing,
+  `repo-add`, and GitHub Pages deployment
 
 ## Trust model
 
-Every source package is pinned to a Git commit. CI builds packages in a clean
-Arch chroot. Publishing is disabled unless the repository has these secrets:
+Every source package is pinned to a Git commit. Each CI matrix job starts from
+a fresh official `archlinux:base-devel` image and runs a clean `makepkg` build.
+Publishing is disabled unless the repository has these secrets:
 
 - `LINXIRA_GPG_PRIVATE_KEY`: armored export of a dedicated package-signing
   subkey
