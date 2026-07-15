@@ -10,7 +10,7 @@ contains no private keys, passwords, tokens, SSH keys, or signing secrets.
 |---|---|---|
 | Package definitions and Pages publishing | https://github.com/Linxira-OS/packages | `67762110de6b169c06f300d7f5e6fec8b27e6587` |
 | Linxira Hello | https://github.com/Linxira-OS/linxira-hello | `6e88bb8b25c5891ce73555bd008cbdee4fec5750` |
-| Canonical artwork | https://github.com/Linxira-OS/linxira-artwork | `e453edd799d4c2aff5e9779f65c8a70e247a4533` |
+| Canonical artwork | https://github.com/Linxira-OS/linxira-artwork | `f195975aed632663364f1527c68ec6b472a7a7f1` |
 | Linxira pacman hooks | https://github.com/Linxira-OS/linxira-hooks | `25355105174646260fdb464cbdbe526055c825ae` |
 
 The package CI is known good at:
@@ -149,6 +149,10 @@ It uses official `cachyos-calamares 3.4.2-4`, official `cachyos-hooks`, and the
 rebased Linxira Hello binary. BIOS and UEFI splash images still require one
 final visual correction because the current boot bitmap retains CachyOS logo
 geometry.
+
+The reproducible but unfinished splash source is committed at
+`linxira-artwork/tools/boot-splash.html`. It has not generated or overwritten
+the ISO splash PNG files.
 
 ## Resume order
 
