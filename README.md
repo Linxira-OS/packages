@@ -3,6 +3,9 @@
 Official Arch Linux package definitions and repository publishing workflow for
 Linxira OS.
 
+Maintainer recovery, workstation rebuild, and release handoff instructions are
+in [`docs/MAINTAINER_HANDOFF.md`](docs/MAINTAINER_HANDOFF.md).
+
 ## Repository layout
 
 - `packages/`: one pinned PKGBUILD per Linxira-owned package
