@@ -48,7 +48,7 @@ if [[ -f packages/linxira-welcome/PKGBUILD ]]; then
 fi
 
 if [[ -f packages/linxira-catalog/PKGBUILD ]]; then
-  grep -q '26eee173123602b1a6244d5be8640c331bf030dd' packages/linxira-catalog/PKGBUILD
+  grep -q '791d56fd8dea84a397488977e953732e61b5e0b9' packages/linxira-catalog/PKGBUILD
 fi
 
 for package in packages/*/PKGBUILD; do

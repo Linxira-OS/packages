@@ -11,7 +11,7 @@ contains no private keys, passwords, tokens, SSH keys, or signing secrets.
 | Package definitions and Pages publishing | https://github.com/Linxira-OS/packages | `main` |
 | Direct-Arch ISO profile | https://github.com/Linxira-OS/linxira-iso-direct | `e0f8697` |
 | Linxira Welcome | https://github.com/Linxira-OS/linxira-welcome | `fe2aebdb32520da752834a3dc3bdf195b530fc14` |
-| Reviewed catalog | https://github.com/Linxira-OS/linxira-catalog | `26eee173123602b1a6244d5be8640c331bf030dd` |
+| Reviewed catalog | https://github.com/Linxira-OS/linxira-catalog | `791d56fd8dea84a397488977e953732e61b5e0b9` |
 | Canonical artwork | https://github.com/Linxira-OS/linxira-artwork | `614dfb33e4aec9fa96adff28a8fa077cad8a8901` |
 | Linxira pacman hooks | https://github.com/Linxira-OS/linxira-hooks | `25355105174646260fdb464cbdbe526055c825ae` |
 
