@@ -1,11 +1,10 @@
+       LL|--
+       LL|
+       LL|-
+       LL|
+       LL|--
+       LL|
+       LL+--+--+--o
        LL
-       LL
-       LL
-       LL
-       LL          o
-       LL         /
-       LL       /
-       LL     /
-       LL   /
-       LLLLLLLLLLL
-       LLLLLLLLLLL
+       LLLLLLLLLLLLL
+       LLLLLLLLLLLLL

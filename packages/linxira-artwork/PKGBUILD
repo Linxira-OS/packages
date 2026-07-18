@@ -2,18 +2,18 @@
 
 pkgname=linxira-artwork
 pkgver=1.0.3
-pkgrel=1
+pkgrel=2
 pkgdesc='Canonical artwork and visual identity for Linxira OS'
 arch=('any')
 groups=('linxira')
 url='https://github.com/Linxira-OS/linxira-artwork'
 license=('GPL-3.0-or-later')
 
-_commit=dec4d7c47f2dfa1885cb984332d024a12da22a67
+_commit=614dfb33e4aec9fa96adff28a8fa077cad8a8901
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit"
         'logo-ascii.txt')
-sha256sums=('a55149cf525edb2bfe28565313a2ac920a4cc2cfab09f104041ac05376facbd3'
-            '07c38deeefafbcfe89bca768546d6030ff032d2fe35ee46a8812072734a918de')
+sha256sums=('62f6dc123f302b818812528e503e0d7d8d406f264846fecda05adf641006daa5'
+            '3cd1171e26c9773d0625499e1cedae4d2f36b505f37f198d8ba798af3129e307')
 
 package() {
   cd "$srcdir/$pkgname-$_commit"
