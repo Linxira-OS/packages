@@ -1,0 +1,188 @@
+# Maintainer: Linxira OS <admin@linxira.org>
+
+pkgname=shelly
+pkgver=2.4.1.4
+pkgrel=1
+pkgdesc='Modern graphical package manager for Arch Linux'
+arch=('x86_64')
+groups=('linxira')
+url='https://github.com/Seafoam-Labs/Shelly-ALPM'
+license=('GPL-3.0-only')
+depends=(
+  bash
+  dbus
+  dconf
+  git
+  glib2
+  glibc
+  gnupg
+  gtk4
+  hicolor-icon-theme
+  json-glib
+  libarchive
+  pacman
+  polkit
+  sudo
+  tar
+  zstd
+)
+makedepends=(
+  clang
+  dotnet-sdk-10.0
+  gettext
+  meson
+  ninja
+  vala
+)
+optdepends=(
+  'base-devel: build AUR packages after explicit opt-in'
+  'flatpak: manage Flatpak applications'
+  'fuse2: run legacy AppImage applications'
+  'fuse3: run current AppImage applications'
+  'fish: install Fish shell completions'
+  'zsh: install Zsh shell completions'
+)
+options=('!strip' '!debug')
+
+_commit=9b96a7efb7fcd37e5331710edfc5f22db22f2323
+source=(
+  "${pkgname}-${pkgver}-${_commit}.tar.gz::https://github.com/Seafoam-Labs/Shelly-ALPM/archive/${_commit}.tar.gz"
+  'linxira-safety-policy.patch'
+)
+sha256sums=(
+  '1d6e71a4ec86cb9a8ee5c6db3b39a2a3937b3b8aadaf96243ac8858304e224d4'
+  'f96cf56c1284046c472b8b72eb64d1e95dc4b1650f0d950ec0caa5554da9a7a1'
+)
+
+prepare() {
+  cd "${srcdir}/Shelly-ALPM-${_commit}"
+  git apply --no-index --ignore-space-change "${srcdir}/linxira-safety-policy.patch"
+
+  ! grep -R -q -E 'RunPrivilegedSystemCommandAsync|RemoveDbLockAsync|rm_db_lock_button|rm -f /var/lib/pacman/db\.lck' \
+    Shelly.Gtk/Services Shelly.Gtk/Windows Shelly.Gtk/UiFiles
+  ! grep -q 'GetRequiredService<IIConDownloadService>().DownloadAndUnpackIcons' Shelly.Gtk/Program.cs
+  ! grep -R -q 'check-updates.*-al' Shelly.Gtk Shelly.Notifications/src
+}
+
+build() {
+  cd "${srcdir}/Shelly-ALPM-${_commit}"
+
+  dotnet restore Shelly.Cli/Shelly.Cli.csproj --runtime linux-x64 --nologo --disable-parallel
+  dotnet restore Shelly.Gtk/Shelly.Gtk.csproj --runtime linux-x64 --nologo --disable-parallel
+  dotnet publish Shelly.Cli/Shelly.Cli.csproj -c Release -o out-cli --no-restore --nologo \
+    -p:InstructionSet=x86-64
+  dotnet publish Shelly.Gtk/Shelly.Gtk.csproj -c Release -r linux-x64 -o out --no-restore --nologo \
+    -p:InstructionSet=x86-64
+  meson setup --buildtype=release --prefix=/usr build-notify Shelly.Notifications
+  meson compile -C build-notify
+
+  ./out-cli/shelly completions fish > shelly.fish
+  ./out-cli/shelly completions zsh > _shelly
+
+  for po_file in Shelly.Gtk/po/*.po; do
+    [[ -f "$po_file" ]] || continue
+    lang=$(basename "$po_file" .po)
+    msgfmt "$po_file" -o "shelly-ui-${lang}.mo"
+  done
+
+  for po_file in Shelly.Notifications/po/*.po; do
+    [[ -f "$po_file" ]] || continue
+    lang=$(basename "$po_file" .po)
+    msgfmt "$po_file" -o "shelly-notifications-${lang}.mo"
+  done
+}
+
+check() {
+  cd "${srcdir}/Shelly-ALPM-${_commit}"
+  dotnet test PackageManager.Tests/PackageManager.Tests.csproj -c Release --nologo
+  dotnet test Shelly.Cli.Tests/Shelly.Cli.Tests.csproj -c Release --nologo
+  dotnet test Shelly.Gtk.Tests/Shelly.Gtk.Tests.csproj -c Release --nologo
+
+  local config_home
+  config_home=$(mktemp -d)
+  trap 'rm -rf "$config_home"' RETURN
+  for key in AurEnabled AurWarningConfirmed FlatPackEnabled AppImageEnabled TrayEnabled; do
+    test "$(HOME="$config_home" XDG_CONFIG_HOME="$config_home/.config" ./out-cli/shelly config get "$key")" = 'False'
+  done
+}
+
+package() {
+  cd "${srcdir}/Shelly-ALPM-${_commit}"
+
+  install -Dm755 out/shelly-ui "${pkgdir}/usr/bin/shelly-ui"
+  install -Dm755 build-notify/shelly-notifications "${pkgdir}/usr/bin/shelly-notifications"
+  install -Dm755 out-cli/shelly "${pkgdir}/usr/bin/shelly"
+
+  install -Dm644 Shelly.Gtk/Assets/shellylogo.png "${pkgdir}/usr/share/icons/hicolor/256x256/apps/shelly.png"
+  install -Dm644 Shelly.Gtk/Assets/shellylogo-tray.png "${pkgdir}/usr/share/icons/hicolor/256x256/apps/shelly-tray.png"
+  install -Dm644 Shelly.Gtk/Assets/shellylogo-update.png "${pkgdir}/usr/share/icons/hicolor/256x256/apps/shelly-update.png"
+  install -Dm644 Shelly.Gtk/Assets/svg/arch-symbolic.svg "${pkgdir}/usr/share/icons/hicolor/symbolic/apps/arch-symbolic.svg"
+  install -Dm644 Shelly.Gtk/Assets/svg/flatpak-symbolic.svg "${pkgdir}/usr/share/icons/hicolor/symbolic/apps/flatpak-symbolic.svg"
+  install -Dm644 Shelly.Gtk/Assets/svg/shelly-shell-symbolic.svg "${pkgdir}/usr/share/icons/hicolor/symbolic/apps/shelly-shell-symbolic.svg"
+  install -Dm644 Shelly.Gtk/Assets/svg/shelly-updates-symbolic.svg "${pkgdir}/usr/share/icons/hicolor/symbolic/apps/shelly-updates-symbolic.svg"
+
+  install -Dm644 shelly.fish "${pkgdir}/usr/share/fish/vendor_completions.d/shelly.fish"
+  install -Dm644 _shelly "${pkgdir}/usr/share/zsh/site-functions/_shelly"
+
+  for mo_file in shelly-ui-*.mo; do
+    lang=${mo_file#shelly-ui-}
+    lang=${lang%.mo}
+    install -Dm644 "$mo_file" "${pkgdir}/usr/share/locale/${lang}/LC_MESSAGES/shelly-ui.mo"
+  done
+
+  for mo_file in shelly-notifications-*.mo; do
+    lang=${mo_file#shelly-notifications-}
+    lang=${lang%.mo}
+    install -Dm644 "$mo_file" "${pkgdir}/usr/share/locale/${lang}/LC_MESSAGES/shelly-notifications.mo"
+  done
+
+  install -Dm644 /dev/stdin "${pkgdir}/usr/share/applications/com.shellyorg.shelly.desktop" <<'EOF'
+[Desktop Entry]
+Name=Shelly
+Comment=Modern Arch package manager
+Exec=/usr/bin/shelly-ui %u
+Icon=shelly
+Type=Application
+Categories=System;Utility;
+Keywords=software;package;repository;install;uninstall;update;flatpak;pacman;aur;appimage;
+MimeType=x-scheme-handler/appstream;x-scheme-handler/flatpak+https;
+Terminal=false
+Actions=FlatpakInstall;FlatpakUpdate;FlatpakRemove;
+
+[Desktop Action FlatpakInstall]
+Name=Flatpak Install
+Icon=flatpak-symbolic
+Exec=/usr/bin/shelly-ui --page flatpak-install
+
+[Desktop Action FlatpakUpdate]
+Name=Flatpak Update
+Icon=flatpak-symbolic
+Exec=/usr/bin/shelly-ui --page flatpak-update
+
+[Desktop Action FlatpakRemove]
+Name=Flatpak Remove
+Icon=flatpak-symbolic
+Exec=/usr/bin/shelly-ui --page flatpak-remove
+EOF
+
+  install -Dm644 /dev/stdin "${pkgdir}/usr/share/polkit-1/actions/com.shellyorg.shelly.policy" <<'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policyconfig PUBLIC "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
+ "http://www.freedesktop.org/standards/PolicyKit/1.0/policyconfig.dtd">
+<policyconfig>
+  <vendor>Shelly</vendor>
+  <vendor_url>https://github.com/Seafoam-Labs/Shelly-ALPM</vendor_url>
+  <action id="com.shellyorg.shelly.pkexec.cli">
+    <description>Run Shelly CLI as administrator</description>
+    <message>Run Shelly CLI with administrator privileges.</message>
+    <icon_name>shelly</icon_name>
+    <defaults>
+      <allow_any>auth_admin</allow_any>
+      <allow_inactive>auth_admin</allow_inactive>
+      <allow_active>auth_admin_keep</allow_active>
+    </defaults>
+    <annotate key="org.freedesktop.policykit.exec.path">/usr/bin/shelly</annotate>
+  </action>
+</policyconfig>
+EOF
+}

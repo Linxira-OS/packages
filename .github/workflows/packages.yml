@@ -19,7 +19,7 @@ jobs:
   boundaries:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
       - run: bash scripts/check-boundaries.sh
 
   build:
@@ -29,11 +29,14 @@ jobs:
       fail-fast: false
       matrix:
         package:
+          - calamares
           - linxira-artwork
-          - linxira-hello
+          - linxira-catalog
           - linxira-hooks
+          - linxira-welcome
+          - shelly
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
       - name: Build in clean Arch container
         env:
           PACKAGE: ${{ matrix.package }}
@@ -48,7 +51,7 @@ jobs:
               chown -R builder:builder "/workspace/packages/$PACKAGE"
               su builder -c "cd /workspace/packages/$PACKAGE && makepkg --syncdeps --noconfirm --clean --cleanbuild"
             '
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: ${{ matrix.package }}
           path: packages/${{ matrix.package }}/*.pkg.tar.zst
@@ -66,8 +69,8 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/download-artifact@v8
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           path: artifacts
       - name: Install repository tools
@@ -85,13 +88,13 @@ jobs:
             -e LINXIRA_GPG_FINGERPRINT \
             -v "$PWD:/workspace" \
             archlinux:base bash -euxo pipefail -c '
-              pacman -Sy --noconfirm gnupg pacman
+              pacman -Syu --noconfirm gnupg pacman
               cd /workspace
               scripts/publish-repo.sh public
             '
-      - uses: actions/upload-pages-artifact@v5
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5
         with:
           path: public
       - name: Deploy GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v5
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5

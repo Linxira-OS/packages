@@ -1,0 +1,35 @@
+# Maintainer: Linxira OS <admin@linxira.org>
+
+pkgname=linxira-welcome
+pkgver=1.0.0
+pkgrel=1
+pkgdesc='Safe Plasma-native workstation control center for Linxira OS'
+arch=('any')
+groups=('linxira')
+url='https://github.com/Linxira-OS/linxira-welcome'
+license=('MIT')
+depends=('python' 'pyside6')
+optdepends=(
+  'calamares: install Linxira OS from the live environment'
+  'kinfocenter: inspect system information'
+  'konsole: open a terminal'
+  'linxira-catalog: curated software profile metadata'
+  'shelly: manage software after installation'
+  'systemsettings: configure Plasma'
+  'timeshift: manage recovery snapshots'
+)
+
+_commit=fe2aebdb32520da752834a3dc3bdf195b530fc14
+source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
+sha256sums=('1ebfb16e4269a5ad9454e2b97be0e677d34fc01be392ad1243720c036efbcc5b')
+
+package() {
+  cd "$srcdir/$pkgname-$_commit"
+  install -Dm755 src/linxira-welcome "$pkgdir/usr/bin/linxira-welcome"
+  install -Dm644 data/org.linxira.Welcome.desktop \
+    "$pkgdir/usr/share/applications/org.linxira.Welcome.desktop"
+  install -Dm644 data/autostart/org.linxira.Welcome.desktop \
+    "$pkgdir/etc/xdg/autostart/org.linxira.Welcome.desktop"
+  install -Dm644 data/i18n/*.json -t "$pkgdir/usr/share/linxira/welcome/i18n"
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}

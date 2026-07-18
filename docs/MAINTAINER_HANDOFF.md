@@ -8,17 +8,19 @@ contains no private keys, passwords, tokens, SSH keys, or signing secrets.
 
 | Purpose | Repository | Known-good revision |
 |---|---|---|
-| Package definitions and Pages publishing | https://github.com/Linxira-OS/packages | `67762110de6b169c06f300d7f5e6fec8b27e6587` |
-| Linxira Hello | https://github.com/Linxira-OS/linxira-hello | `6e88bb8b25c5891ce73555bd008cbdee4fec5750` |
-| Canonical artwork | https://github.com/Linxira-OS/linxira-artwork | `f195975aed632663364f1527c68ec6b472a7a7f1` |
+| Package definitions and Pages publishing | https://github.com/Linxira-OS/packages | `main` |
+| Direct-Arch ISO profile | https://github.com/Linxira-OS/linxira-iso-direct | `e0f8697` |
+| Linxira Welcome | https://github.com/Linxira-OS/linxira-welcome | `fe2aebdb32520da752834a3dc3bdf195b530fc14` |
+| Reviewed catalog | https://github.com/Linxira-OS/linxira-catalog | `26eee173123602b1a6244d5be8640c331bf030dd` |
+| Canonical artwork | https://github.com/Linxira-OS/linxira-artwork | `dec4d7c47f2dfa1885cb984332d024a12da22a67` |
 | Linxira pacman hooks | https://github.com/Linxira-OS/linxira-hooks | `25355105174646260fdb464cbdbe526055c825ae` |
 
 The package CI is known good at:
 
 https://github.com/Linxira-OS/packages/actions/runs/29335712348
 
-It builds `linxira-artwork`, `linxira-hello`, and `linxira-hooks` in fresh
-official Arch containers. The publish job remains disabled until signing
+It builds Calamares, Shelly, Linxira artwork, catalog, hooks, and Welcome in
+fresh official Arch containers. The publish job remains disabled until signing
 secrets and `linxira-keyring` are ready.
 
 ## Signing identity
@@ -138,27 +140,24 @@ installed and the first signed Pages deployment has been independently tested.
 
 ## ISO baseline
 
-The verified upstream-first ISO produced on 2026-07-14 is:
+The Direct-Arch RC6 candidate produced on 2026-07-18 is:
 
 ```text
-linxira-desktop-linux-260714-upstream.iso
-SHA-256: AD8DEEA0AB4F6D0124A44CF3C119E87D9DF95F12480B2C942EFFDA650D8AD3E6
+linxira-2026.07.18-direct-arch-welcome-rc6-x86_64.iso
+SHA-256: CC6C80D145845D6831D1208F46BE4B2AE54D6202D8C8DF6C3362E1A5DA3BE32D
 ```
 
-It uses official `cachyos-calamares 3.4.2-4`, official `cachyos-hooks`, and the
-rebased Linxira Hello binary. BIOS and UEFI splash images still require one
-final visual correction because the current boot bitmap retains CachyOS logo
-geometry.
-
-The reproducible but unfinished splash source is committed at
-`linxira-artwork/tools/boot-splash.html`. It has not generated or overwritten
-the ISO splash PNG files.
+It uses official Arch repositories plus locally built upstream Calamares,
+Shelly, and Linxira artwork packages. Static checks, 22 source tests, SquashFS
+self-check, and QEMU BIOS/UEFI menu boots passed. Scale L appears in both boot
+menus. Full RC6 Plasma, Welcome, language switching, disk installation, first
+boot, and recovery acceptance remain outstanding.
 
 ## Resume order
 
-1. Replace the BIOS Syslinux and UEFI GRUB splash with canonical Linxira art.
+1. Complete RC6 Plasma, Welcome, language, installation, and recovery tests.
 2. Build `linxira-keyring` from the public key.
 3. Prepare a signing-subkey-only CI export and configure repository secrets.
 4. Publish and verify the first signed GitHub Pages repository.
-5. Replace ISO overlay binaries and assets with signed Linxira packages.
-6. Rebuild and test BIOS, UEFI, live-session, and installed-system workflows.
+5. Replace remaining ISO source overlays with signed Linxira packages.
+6. Rebuild and test the signed live and installed-system workflows.

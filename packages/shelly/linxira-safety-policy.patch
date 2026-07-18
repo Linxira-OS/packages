@@ -1,0 +1,311 @@
+diff --git a/Shelly.Gtk/Services/IProcessExecutor.cs b/Shelly.Gtk/Services/IProcessExecutor.cs
+--- a/Shelly.Gtk/Services/IProcessExecutor.cs
++++ b/Shelly.Gtk/Services/IProcessExecutor.cs
+@@ -9,6 +9,5 @@ public interface IProcessExecutor
+     Task<OperationResult> RunPrivilegedShellyCommandAsync(string description, string[] args);
+
+     Task<OperationResult> RunSystemCommandAsync(string command, string[] args);
+
+-    Task<OperationResult> RunPrivilegedSystemCommandAsync(string description, string[] args);
+ }
+diff --git a/Shelly.Gtk/Services/IPrivilegedOperationService.cs b/Shelly.Gtk/Services/IPrivilegedOperationService.cs
+--- a/Shelly.Gtk/Services/IPrivilegedOperationService.cs
++++ b/Shelly.Gtk/Services/IPrivilegedOperationService.cs
+@@ -15,8 +15,7 @@ public interface IPrivilegedOperationService
+     Task<OperationResult> UpdatePackagesAsync(IEnumerable<string> packages);
+     Task<OperationResult> UpgradeSystemAsync();
+     Task<OperationResult> UpgradeAllAsync();
+     Task<OperationResult> ForceSyncDatabaseAsync();
+-    Task<OperationResult> RemoveDbLockAsync();
+
+     Task<OperationResult> InstallAurPackagesAsync(IEnumerable<string> packages, bool useChroot = false,
+         bool runChecks = false);
+diff --git a/Shelly.Gtk/Services/PrivilegedOperationService.cs b/Shelly.Gtk/Services/PrivilegedOperationService.cs
+--- a/Shelly.Gtk/Services/PrivilegedOperationService.cs
++++ b/Shelly.Gtk/Services/PrivilegedOperationService.cs
+@@ -105,15 +105,9 @@ public class PrivilegedOperationService(
+     public async Task<OperationResult> ForceSyncDatabaseAsync()
+     {
+         var args = new[] { "sync", "--force" };
+         return await processExecutor.RunPrivilegedShellyCommandAsync("Force synchronize package databases", args);
+     }
+
+-    public async Task<OperationResult> RemoveDbLockAsync()
+-    {
+-        return await processExecutor.RunPrivilegedSystemCommandAsync(
+-            "Removing database lock", ["rm", "-f", "/var/lib/pacman/db.lck"]);
+-    }
+-
+     public async Task<OperationResult> InstallAurPackagesAsync(IEnumerable<string> packages, bool useChroot = false,
+         bool runChecks = false)
+     {
+diff --git a/Shelly.Gtk/Services/ProcessExecutor.cs b/Shelly.Gtk/Services/ProcessExecutor.cs
+--- a/Shelly.Gtk/Services/ProcessExecutor.cs
++++ b/Shelly.Gtk/Services/ProcessExecutor.cs
+@@ -52,15 +52,2 @@ public sealed class ProcessExecutor(
+
+-    public async Task<OperationResult> RunPrivilegedSystemCommandAsync(string description, string[] args)
+-    {
+-        ArgumentException.ThrowIfNullOrWhiteSpace(description);
+-
+-        var chosen = await _escalator.Value;
+-        return chosen switch
+-        {
+-            PrivilegeEscalator.Sudo => await RunSudoAsync(description, args),
+-            PrivilegeEscalator.Pkexec => await RunPkexecAsync(args),
+-            _ => MissingEscalatorResult(chosen)
+-        };
+-    }
+-
+     public async Task<OperationResult> RunShellyInteractiveCommandAsync(string[] args)
+@@ -104,55 +91,6 @@ public sealed class ProcessExecutor(
+     private static Task<bool> IsPolkitAvailableAsync()
+     {
+         return Task.FromResult(true);
+     }
+
+-    private async Task<OperationResult> RunSudoAsync(string description, string[] args)
+-    {
+-        var hasCredentials = await credentialManager.RequestCredentialsAsync(description);
+-        if (!hasCredentials) return AuthCancelledResult();
+-
+-        var password = credentialManager.GetPassword();
+-        var isPasswordless = password == CredentialManager.NoPassword;
+-
+-        using var process = CreateProcess("sudo", true, args);
+-        process.StartInfo.ArgumentList.Insert(0, "-k");
+-        if (!isPasswordless) process.StartInfo.ArgumentList.Insert(0, "-S");
+-
+-        LogCommand(process.StartInfo.FileName, process.StartInfo.ArgumentList);
+-
+-        try
+-        {
+-            process.Start();
+-
+-            if (!isPasswordless)
+-            {
+-                await process.StandardInput.WriteLineAsync(password);
+-                await process.StandardInput.FlushAsync();
+-                process.StandardInput.Close();
+-            }
+-
+-            return await ReadResultAsync(process);
+-        }
+-        catch (Exception ex)
+-        {
+-            return ErrorResult(ex);
+-        }
+-    }
+-
+-    private static async Task<OperationResult> RunPkexecAsync(string[] args)
+-    {
+-        using var process = CreateProcess("pkexec", false, args);
+-        LogCommand(process.StartInfo.FileName, process.StartInfo.ArgumentList);
+-
+-        try
+-        {
+-            process.Start();
+-            return await ReadResultAsync(process);
+-        }
+-        catch (Exception ex)
+-        {
+-            return ErrorResult(ex);
+-        }
+-    }
+-
+     private static async Task<OperationResult> ReadResultAsync(Process process)
+diff --git a/Shelly.Gtk/UiFiles/SettingWindow.ui b/Shelly.Gtk/UiFiles/SettingWindow.ui
+--- a/Shelly.Gtk/UiFiles/SettingWindow.ui
++++ b/Shelly.Gtk/UiFiles/SettingWindow.ui
+@@ -645,23 +645,13 @@
+                                                         <child>
+                                                             <object class="GtkButton" id="sync_button">
+                                                                 <property name="label" translatable="yes">Force Database Update</property>
+                                                                 <property name="tooltip-text" translatable="yes">Force a synchronization of the package database.</property>
+                                                                 <property name="margin-top">10</property>
+                                                                 <style>
+                                                                     <class name="suggested-action"/>
+                                                                 </style>
+                                                             </object>
+                                                         </child>
+-                                                        <child>
+-                                                            <object class="GtkButton" id="rm_db_lock_button">
+-                                                                <property name="label" translatable="yes">Remove db.lck</property>
+-                                                                <property name="tooltip-text" translatable="yes">Removes the db.lck file if it was left behind by an interrupted alpm process.</property>
+-                                                                <property name="margin-top">10</property>
+-                                                                <style>
+-                                                                    <class name="suggested-action"/>
+-                                                                </style>
+-                                                            </object>
+-                                                        </child>
+                                                         <child>
+                                                             <object class="GtkButton" id="view_pacfiles_button">
+                                                                 <property name="label" translatable="yes">View Pacfiles</property>
+diff --git a/Shelly.Gtk/Windows/Settings.cs b/Shelly.Gtk/Windows/Settings.cs
+--- a/Shelly.Gtk/Windows/Settings.cs
++++ b/Shelly.Gtk/Windows/Settings.cs
+@@ -155,12 +155,9 @@ public sealed class Settings(
+         var syncButton = (Button)builder.GetObject("sync_button")!;
+         syncButton.OnClicked += (_, _) => { _ = ForceSyncAsync(); };
+
+         var saveButton = (Button)builder.GetObject("save_button")!;
+         saveButton.OnClicked += (_, _) => { OnSaveClicked(); };
+
+-        var removeLockButton = (Button)builder.GetObject("rm_db_lock_button")!;
+-        removeLockButton.OnClicked += (_, _) => { _ = RemoveDbLockAsync(); };
+-
+         _sub = DirtySubscription.Attach(dirtyService, this);
+
+         var viewChangelogButton = (Button)builder.GetObject("changelog_button")!;
+@@ -823,35 +820,20 @@ public sealed class Settings(
+     private async Task ForceSyncAsync()
+     {
+         try
+         {
+             lockoutService.Show(Translations.T("Synchronizing databases..."));
+             await privilegedOperationService.SyncDatabasesAsync();
+         }
+         catch (Exception ex)
+         {
+             Console.WriteLine($"Error syncing databases: {ex.Message}");
+         }
+         finally
+         {
+             lockoutService.Hide();
+         }
+     }
+
+-    private async Task RemoveDbLockAsync()
+-    {
+-        var result = await privilegedOperationService.RemoveDbLockAsync();
+-
+-        if (result.Success)
+-        {
+-            genericQuestionService.RaiseToastMessage(
+-                new ToastMessageEventArgs(Translations.T("Database lock removed")));
+-        }
+-        else
+-        {
+-            await Console.Error.WriteLineAsync($"Failed to remove database lock: {result.Error}");
+-        }
+-    }
+-
+     private async Task FixXdgPermissionsAsync()
+     {
+         try
+diff --git a/Shelly.Gtk/Program.cs b/Shelly.Gtk/Program.cs
+--- a/Shelly.Gtk/Program.cs
++++ b/Shelly.Gtk/Program.cs
+@@ -10,7 +10,6 @@ using Shelly.Gtk.Windows.AUR;
+ using Shelly.Gtk.Windows.Dialog;
+ using Shelly.Gtk.Windows.Flatpak;
+ using Shelly.Gtk.Helpers;
+-using Shelly.Gtk.Services.Icons;
+ using Shelly.Gtk.UiModels;
+ using Shelly.Gtk.Windows.Packages;
+ using Shelly.Utilities;
+@@ -252,8 +251,6 @@ sealed class Program
+             var appMenu = (Menu)menuBuilder.GetObject("AppMenu")!;
+             application.Menubar = appMenu;
+
+-            Task.Run(async () => { await serviceProvider.GetRequiredService<IIConDownloadService>().DownloadAndUnpackIcons(); });
+-
+             _settingsStack = (Stack)mainBuilder.GetObject("settings_stack")!;
+             var recommendPageBox = (Box)mainBuilder.GetObject("recommend_page_box")!;
+             var packagesPageBox = (Box)mainBuilder.GetObject("packages_page_box")!;
+diff --git a/Shelly.Utilities/Models/ShellyConfig.cs b/Shelly.Utilities/Models/ShellyConfig.cs
+--- a/Shelly.Utilities/Models/ShellyConfig.cs
++++ b/Shelly.Utilities/Models/ShellyConfig.cs
+@@ -20,7 +20,7 @@ public class ShellyConfig
+     public double WindowHeight { get; set; } = 600;
+     public string DefaultView { get; set; } = "HomeScreen";
+     public bool UseOldMenu { get; set; }
+-    public bool TrayEnabled { get; set; } = true;
++    public bool TrayEnabled { get; set; }
+     public int TrayCheckIntervalHours { get; set; } = 72;
+     public bool NoConfirm { get; set; }
+     public bool NewInstall { get; set; } = true;
+diff --git a/Shelly.Gtk/Services/UnprivlegedOperationService.cs b/Shelly.Gtk/Services/UnprivlegedOperationService.cs
+--- a/Shelly.Gtk/Services/UnprivlegedOperationService.cs
++++ b/Shelly.Gtk/Services/UnprivlegedOperationService.cs
+@@ -12,6 +12,7 @@ public class UnprivilegedOperationService(
+     IProcessExecutor processExecutor,
+     ITrayDbus trayDbus,
+     IPackageUpdateNotifier packageUpdateNotifier,
++    IConfigService configService,
+     IDirtyService dirtyService) : IUnprivilegedOperationService
+ {
+     public async Task<List<FlatpakPackageDto>> ListFlatpakPackages()
+@@ -269,9 +270,14 @@ public class UnprivilegedOperationService(
+     }
+
+     public async Task<SyncModel> CheckForApplicationUpdates()
+     {
++        var config = configService.LoadConfig();
++        var args = new List<string> { "check-updates" };
++        if (config.AurEnabled) args.Add("-a");
++        if (config.FlatPackEnabled) args.Add("-l");
++
+         return await ExecuteJsonCommandLastAsync<SyncModel>("check application updates",
+-            () => RunShellyCommandAsync("check-updates", "-a", "-l"));
++            () => RunShellyCommandAsync(args.ToArray()));
+     }
+
+     public async Task<UnprivilegedOperationResult> AppImageInstallAsync(string filePath, string updateUrl = "",
+diff --git a/Shelly.Notifications/src/config_reader.vala b/Shelly.Notifications/src/config_reader.vala
+--- a/Shelly.Notifications/src/config_reader.vala
++++ b/Shelly.Notifications/src/config_reader.vala
+@@ -1,7 +1,9 @@
+ using GLib;
+
+ public class ShellyConfig {
+-    public bool tray_enabled = true;
++    public bool tray_enabled = false;
++    public bool aur_enabled = false;
++    public bool flatpak_enabled = false;
+     public int tray_check_interval_hours = 72;
+     public bool use_weekly_schedule = false;
+     public int[]   scheduled_days = {};
+@@ -49,6 +51,10 @@ public class ConfigReader : Object {
+
+             if (obj.has_member ("TrayEnabled"))
+                 cfg.tray_enabled = obj.get_boolean_member ("TrayEnabled");
++            if (obj.has_member ("AurEnabled"))
++                cfg.aur_enabled = obj.get_boolean_member ("AurEnabled");
++            if (obj.has_member ("FlatPackEnabled"))
++                cfg.flatpak_enabled = obj.get_boolean_member ("FlatPackEnabled");
+             if (obj.has_member ("TrayCheckIntervalHours"))
+                 cfg.tray_check_interval_hours = (int) obj.get_int_member ("TrayCheckIntervalHours");
+             if (obj.has_member ("UseWeeklySchedule"))
+diff --git a/Shelly.Notifications/src/update_service.vala b/Shelly.Notifications/src/update_service.vala
+--- a/Shelly.Notifications/src/update_service.vala
++++ b/Shelly.Notifications/src/update_service.vala
+@@ -55,10 +55,12 @@ public class UpdateService : Object {
+         return "shelly";
+     }
+
+-    public async SyncModel check_for_updates () throws Error {
++    public async SyncModel check_for_updates (ShellyConfig config) throws Error {
+         var cli = find_cli ();
+-        string[] argv = { cli, "check-updates", "-al", "--json" };
+-        stdout.printf ("[shelly-updates] Running: %s check-updates -al --json\n", cli);
++        string[] argv = { cli, "check-updates", "--json" };
++        if (config.aur_enabled) argv += "-a";
++        if (config.flatpak_enabled) argv += "-l";
++        stdout.printf ("[shelly-updates] Running configured update check\n");
+
+         var proc = new Subprocess.newv (
+                                         argv, SubprocessFlags.STDOUT_PIPE | SubprocessFlags.STDERR_PIPE
+diff --git a/Shelly.Notifications/src/main.vala b/Shelly.Notifications/src/main.vala
+--- a/Shelly.Notifications/src/main.vala
++++ b/Shelly.Notifications/src/main.vala
+@@ -132,7 +132,8 @@ public class ShellyApp : Object {
+     }
+
+     private async void run_update_check (bool notify = true) throws Error {
+-        var model = yield update_service.check_for_updates ();
++        var config = config_reader.load ();
++        var model = yield update_service.check_for_updates (config);
+
+         tray_item.set_updates_pending (model.total () > 0);
+         menu_handler.notify_updates (model);

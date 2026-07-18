@@ -1,0 +1,23 @@
+# Maintainer: Linxira OS <admin@linxira.org>
+
+pkgname=linxira-catalog
+pkgver=2.0.0
+pkgrel=1
+pkgdesc='Reviewed software catalog and schema for Linxira OS'
+arch=('any')
+groups=('linxira')
+url='https://github.com/Linxira-OS/linxira-catalog'
+license=('MIT')
+
+_commit=26eee173123602b1a6244d5be8640c331bf030dd
+source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
+sha256sums=('99e65ebb5b8069f2107ae57b7edeffd0b3b984ceffaeadc059c3bc6b1a93d48f')
+
+package() {
+  cd "$srcdir/$pkgname-$_commit"
+  install -Dm644 catalog/catalog-v2.json \
+    "$pkgdir/usr/share/linxira/catalog/catalog-v2.json"
+  install -Dm644 schema/catalog-v2.schema.json \
+    "$pkgdir/usr/share/linxira/catalog/catalog-v2.schema.json"
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}
