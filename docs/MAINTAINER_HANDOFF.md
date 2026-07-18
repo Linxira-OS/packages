@@ -140,22 +140,22 @@ installed and the first signed Pages deployment has been independently tested.
 
 ## ISO baseline
 
-The Direct-Arch RC6 candidate produced on 2026-07-18 is:
+The Direct-Arch RC7 candidate produced on 2026-07-18 is:
 
 ```text
-linxira-2026.07.18-direct-arch-welcome-rc6-x86_64.iso
-SHA-256: CC6C80D145845D6831D1208F46BE4B2AE54D6202D8C8DF6C3362E1A5DA3BE32D
+linxira-2026.07.18-direct-arch-welcome-rc7-x86_64.iso
+SHA-256: 02103E30BE4FBAC0F4E7296B58A30C56ED9EC47134116A38F3269DDE57CBD27F
 ```
 
 It uses official Arch repositories plus locally built upstream Calamares,
 Shelly, and Linxira artwork packages. Static checks, 22 source tests, SquashFS
 self-check, and QEMU BIOS/UEFI menu boots passed. Scale L appears in both boot
-menus. Full RC6 Plasma, Welcome, language switching, disk installation, first
+menus. Full RC7 Plasma, Welcome, language switching, disk installation, first
 boot, and recovery acceptance remain outstanding.
 
 ## Resume order
 
-1. Complete RC6 Plasma, Welcome, language, installation, and recovery tests.
+1. Complete RC7 Plasma, Welcome, language, installation, and recovery tests.
 2. Build `linxira-keyring` from the public key.
 3. Prepare a signing-subkey-only CI export and configure repository secrets.
 4. Publish and verify the first signed GitHub Pages repository.
