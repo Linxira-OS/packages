@@ -9,10 +9,10 @@ groups=('linxira')
 url='https://github.com/Linxira-OS/linxira-artwork'
 license=('GPL-3.0-or-later')
 
-_commit=83f0b55022fb72bb79cbd016e2228a426e57d61c
+_commit=6e56f3faac9d1cefed3d61ca46c75b99ad39cdbb
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit"
         'logo-ascii.txt')
-sha256sums=('dfdc360bf360a975e83c54505f7bd54ef98264151fd1885963151abb30b934c6'
+sha256sums=('d62183825f06274c64dce82f5b7ee62cfc6902932028d89942383835349fbbc3'
             '3cd1171e26c9773d0625499e1cedae4d2f36b505f37f198d8ba798af3129e307')
 
 package() {
