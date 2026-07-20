@@ -69,6 +69,10 @@ if [[ -f packages/linxira-catalog/PKGBUILD ]]; then
 fi
 
 grep -q 'a8134b4585e584fb596fc93641b77140481f0994' packages/linxira-components/PKGBUILD
+grep -q 'f4bcfa07c4b0810e1b8735c04867885d8b8662f5' packages/linxira-completion-agent/PKGBUILD
+grep -q 'c2bf2c3dca27d2257fb1ad921f101a235c13c2d5bed2d08d0003261eb1d317c6' \
+  packages/linxira-completion-agent/PKGBUILD
+grep -q "depends=.*'linxira-catalog'.*'linxira-components'" packages/linxira-completion-agent/PKGBUILD
 grep -q '5d78caaafa7e79d6e132f6071fc2aa59cae83bd0' packages/linxira-config-hub/PKGBUILD
 grep -q '374957b6a4bbe4b4a39dbab18789982fca1f097e' packages/linxira-component-manager/PKGBUILD
 grep -q '9569e94634050a7ddc7c439b07595ddf5037a81e' packages/linxira-gaming-manager/PKGBUILD

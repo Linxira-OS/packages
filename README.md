@@ -92,3 +92,11 @@ It discovers Steam and imported games, launches through fixed argument arrays,
 detects external compatibility tools, and delegates encrypted backups to
 restic. It contains no package manager, system service, Polkit policy, or root
 helper.
+
+## Completion Agent
+
+`linxira-completion-agent` reads the catalog-bound installer selection receipt
+and presents pending online work after first login. It delegates only reviewed
+Arch leaves to `linxira-components`; third-party and review-channel providers
+remain visible and deferred. The agent accepts no package names, commands, URLs,
+or repository definitions from the UI.

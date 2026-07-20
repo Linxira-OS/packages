@@ -1,0 +1,45 @@
+# Maintainer: Linxira OS <admin@linxira.org>
+
+pkgname=linxira-completion-agent
+pkgver=0.1.0
+pkgrel=1
+pkgdesc='First-online completion workflow for Linxira OS'
+arch=('any')
+groups=('linxira')
+url='https://github.com/Linxira-OS/linxira-completion-agent'
+license=('MIT')
+depends=('linxira-catalog' 'linxira-components' 'networkmanager' 'python' 'pyside6')
+makedepends=('python-build' 'python-installer' 'python-setuptools' 'python-wheel')
+checkdepends=('appstream' 'desktop-file-utils')
+
+_commit=f4bcfa07c4b0810e1b8735c04867885d8b8662f5
+source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
+sha256sums=('c2bf2c3dca27d2257fb1ad921f101a235c13c2d5bed2d08d0003261eb1d317c6')
+
+build() {
+  cd "$srcdir/$pkgname-$_commit"
+  python -m build --wheel --no-isolation
+}
+
+check() {
+  cd "$srcdir/$pkgname-$_commit"
+  [[ $(<VERSION) == "$pkgver" ]]
+  PYTHONPATH=src python -m unittest discover -s tests -v
+  python -m compileall -q src
+  desktop-file-validate data/org.linxira.Completion.desktop
+  desktop-file-validate data/autostart/org.linxira.Completion.desktop
+  appstreamcli validate --no-net data/org.linxira.Completion.metainfo.xml
+  ! grep -R -E -n 'shell=True|bash -c|sudo' src
+}
+
+package() {
+  cd "$srcdir/$pkgname-$_commit"
+  python -m installer --destdir="$pkgdir" dist/*.whl
+  install -Dm644 data/org.linxira.Completion.desktop \
+    "$pkgdir/usr/share/applications/org.linxira.Completion.desktop"
+  install -Dm644 data/autostart/org.linxira.Completion.desktop \
+    "$pkgdir/etc/xdg/autostart/org.linxira.Completion.desktop"
+  install -Dm644 data/org.linxira.Completion.metainfo.xml \
+    "$pkgdir/usr/share/metainfo/org.linxira.Completion.metainfo.xml"
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}

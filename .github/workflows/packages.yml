@@ -71,6 +71,7 @@ jobs:
               packages=(
                 linxira-catalog
                 linxira-components
+                linxira-completion-agent
                 linxira-config-hub
                 linxira-component-manager
                 linxira-gaming-manager
@@ -90,6 +91,7 @@ jobs:
           path: |
             packages/linxira-catalog/*.pkg.tar.zst
             packages/linxira-components/*.pkg.tar.zst
+            packages/linxira-completion-agent/*.pkg.tar.zst
             packages/linxira-config-hub/*.pkg.tar.zst
             packages/linxira-component-manager/*.pkg.tar.zst
             packages/linxira-gaming-manager/*.pkg.tar.zst
