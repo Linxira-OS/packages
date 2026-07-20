@@ -1,0 +1,579 @@
+diff --git a/src/modules/linxirasoftware/CMakeLists.txt b/src/modules/linxirasoftware/CMakeLists.txt
+new file mode 100644
+index 0000000..8df14af
+--- /dev/null
++++ b/src/modules/linxirasoftware/CMakeLists.txt
+@@ -0,0 +1,15 @@
++# SPDX-License-Identifier: BSD-2-Clause
++
++find_package(${qtname} COMPONENTS Core Gui Widgets REQUIRED)
++
++calamares_add_plugin(linxirasoftware
++    TYPE viewmodule
++    EXPORT_MACRO PLUGINDLLEXPORT_PRO
++    SOURCES
++        LinxiraSoftwareViewStep.cpp
++    LINK_PRIVATE_LIBRARIES
++        ${qtname}::Core
++        ${qtname}::Gui
++        ${qtname}::Widgets
++    SHARED_LIB
++)
+diff --git a/src/modules/linxirasoftware/LinxiraSoftwareViewStep.cpp b/src/modules/linxirasoftware/LinxiraSoftwareViewStep.cpp
+new file mode 100644
+index 0000000..eaf52a1
+--- /dev/null
++++ b/src/modules/linxirasoftware/LinxiraSoftwareViewStep.cpp
+@@ -0,0 +1,465 @@
++/* SPDX-License-Identifier: GPL-3.0-or-later */
++
++#include "LinxiraSoftwareViewStep.h"
++
++#include "GlobalStorage.h"
++#include "JobQueue.h"
++#include "utils/PluginFactory.h"
++
++#include <QCryptographicHash>
++#include <QFile>
++#include <QHeaderView>
++#include <QJsonArray>
++#include <QJsonDocument>
++#include <QJsonObject>
++#include <QLabel>
++#include <QLocale>
++#include <QSet>
++#include <QTabWidget>
++#include <QTreeWidget>
++#include <QVBoxLayout>
++
++namespace
++{
++constexpr int IdRole = Qt::UserRole;
++constexpr int KindRole = Qt::UserRole + 1;
++constexpr int CategoryRole = Qt::UserRole + 2;
++constexpr int OfflinePolicyRole = Qt::UserRole + 3;
++
++QString localized( const QJsonValue& value )
++{
++    if ( value.isString() )
++    {
++        return value.toString();
++    }
++    const auto object = value.toObject();
++    const auto locale = QLocale().name();
++    if ( object.contains( locale ) )
++    {
++        return object.value( locale ).toString();
++    }
++    const auto language = locale.section( QLatin1Char( '_' ), 0, 0 );
++    if ( object.contains( language ) )
++    {
++        return object.value( language ).toString();
++    }
++    return object.value( QStringLiteral( "en" ) ).toString();
++}
++
++QStringList stringList( const QJsonArray& array )
++{
++    QStringList values;
++    for ( const auto& value : array )
++    {
++        if ( value.isString() )
++        {
++            values.append( value.toString() );
++        }
++    }
++    return values;
++}
++}  // namespace
++
++CALAMARES_PLUGIN_FACTORY_DEFINITION( LinxiraSoftwareViewStepFactory,
++                                     registerPlugin< LinxiraSoftwareViewStep >(); )
++
++LinxiraSoftwareViewStep::LinxiraSoftwareViewStep( QObject* parent )
++    : Calamares::ViewStep( parent )
++{
++}
++
++LinxiraSoftwareViewStep::~LinxiraSoftwareViewStep()
++{
++    if ( m_widget && !m_widget->parent() )
++    {
++        m_widget->deleteLater();
++    }
++}
++
++QString LinxiraSoftwareViewStep::prettyName() const
++{
++    return tr( "Software" );
++}
++
++QString LinxiraSoftwareViewStep::prettyStatus() const
++{
++    return tr( "%1 software items selected" ).arg( selectedLeafIds().size() );
++}
++
++QWidget* LinxiraSoftwareViewStep::widget()
++{
++    if ( m_widget )
++    {
++        return m_widget;
++    }
++
++    m_widget = new QWidget;
++    auto* layout = new QVBoxLayout( m_widget );
++    auto* title = new QLabel( tr( "Choose software and system capabilities" ) );
++    QFont titleFont = title->font();
++    titleFont.setPointSize( titleFont.pointSize() + 4 );
++    titleFont.setBold( true );
++    title->setFont( titleFont );
++    layout->addWidget( title );
++
++    auto* description = new QLabel(
++        tr( "Included items are installed from the ISO. Other reviewed choices are recorded for completion after first boot." ) );
++    description->setWordWrap( true );
++    layout->addWidget( description );
++
++    auto* tabs = new QTabWidget;
++    m_applications = makeTree();
++    m_components = makeTree();
++    tabs->addTab( m_applications, tr( "Applications" ) );
++    tabs->addTab( m_components, tr( "Components" ) );
++    layout->addWidget( tabs, 1 );
++
++    m_status = new QLabel;
++    m_status->setWordWrap( true );
++    layout->addWidget( m_status );
++
++    QString error;
++    m_ready = loadCatalog( &error );
++    if ( !m_ready )
++    {
++        m_status->setText( tr( "Catalog could not be loaded: %1" ).arg( error ) );
++    }
++    else
++    {
++        updateStatus();
++    }
++    emit nextStatusChanged( m_ready );
++    return m_widget;
++}
++
++bool LinxiraSoftwareViewStep::isNextEnabled() const
++{
++    return m_ready;
++}
++
++bool LinxiraSoftwareViewStep::isBackEnabled() const
++{
++    return true;
++}
++
++bool LinxiraSoftwareViewStep::isAtBeginning() const
++{
++    return true;
++}
++
++bool LinxiraSoftwareViewStep::isAtEnd() const
++{
++    return true;
++}
++
++void LinxiraSoftwareViewStep::onActivate()
++{
++    if ( !m_widget )
++    {
++        widget();
++    }
++    restoreSelection();
++}
++
++void LinxiraSoftwareViewStep::onLeave()
++{
++    auto* storage = Calamares::JobQueue::instanceGlobalStorage();
++    if ( !storage || !m_ready )
++    {
++        return;
++    }
++
++    QVariantMap selection;
++    selection.insert( QStringLiteral( "catalogVersion" ), 3 );
++    selection.insert( QStringLiteral( "catalogRelease" ), m_release );
++    selection.insert( QStringLiteral( "catalogSha256" ), m_catalogSha256 );
++    selection.insert( QStringLiteral( "selectedLeafIds" ), selectedLeafIds() );
++    selection.insert( QStringLiteral( "selectedBundleIds" ), selectedBundleIds() );
++    storage->insert( m_storageKey, selection );
++}
++
++Calamares::JobList LinxiraSoftwareViewStep::jobs() const
++{
++    return {};
++}
++
++void LinxiraSoftwareViewStep::setConfigurationMap( const QVariantMap& configurationMap )
++{
++    m_catalogPath = configurationMap.value(
++        QStringLiteral( "catalogPath" ),
++        QStringLiteral( "/usr/share/linxira/catalog/catalog-v3.json" ) ).toString();
++    m_storageKey = configurationMap.value(
++        QStringLiteral( "globalStorageKey" ),
++        QStringLiteral( "linxiraSoftwareSelection" ) ).toString();
++}
++
++QTreeWidget* LinxiraSoftwareViewStep::makeTree()
++{
++    auto* tree = new QTreeWidget;
++    tree->setColumnCount( 3 );
++    tree->setHeaderLabels( { tr( "Feature" ), tr( "Role" ), tr( "Install timing" ) } );
++    tree->header()->setSectionResizeMode( 0, QHeaderView::Stretch );
++    tree->header()->setSectionResizeMode( 1, QHeaderView::ResizeToContents );
++    tree->header()->setSectionResizeMode( 2, QHeaderView::ResizeToContents );
++    tree->setUniformRowHeights( true );
++    connect( tree, &QTreeWidget::itemChanged, this, &LinxiraSoftwareViewStep::itemChanged );
++    return tree;
++}
++
++bool LinxiraSoftwareViewStep::loadCatalog( QString* error )
++{
++    QFile file( m_catalogPath );
++    if ( !file.open( QIODevice::ReadOnly ) )
++    {
++        *error = file.errorString();
++        return false;
++    }
++    const QByteArray raw = file.readAll();
++    QJsonParseError parseError;
++    const auto document = QJsonDocument::fromJson( raw, &parseError );
++    if ( parseError.error != QJsonParseError::NoError || !document.isObject() )
++    {
++        *error = parseError.errorString();
++        return false;
++    }
++    const auto root = document.object();
++    if ( root.value( QStringLiteral( "catalogVersion" ) ).toInt() != 3 )
++    {
++        *error = tr( "unsupported catalog version" );
++        return false;
++    }
++
++    m_release = root.value( QStringLiteral( "release" ) ).toString();
++    m_catalogSha256 = QString::fromLatin1(
++        QCryptographicHash::hash( raw, QCryptographicHash::Sha256 ).toHex() );
++
++    for ( const auto& section : { QStringLiteral( "applications" ),
++                                  QStringLiteral( "components" ),
++                                  QStringLiteral( "bundles" ),
++                                  QStringLiteral( "operations" ) } )
++    {
++        for ( const auto& value : root.value( section ).toArray() )
++        {
++            const auto object = value.toObject();
++            const auto id = object.value( QStringLiteral( "id" ) ).toString();
++            if ( id.isEmpty() || m_nodes.contains( id ) )
++            {
++                *error = tr( "duplicate or empty catalog ID" );
++                return false;
++            }
++            m_nodes.insert( id, object );
++        }
++    }
++
++    m_updating = true;
++    for ( const auto& value : root.value( QStringLiteral( "categories" ) ).toArray() )
++    {
++        const auto category = value.toObject();
++        const auto surface = category.value( QStringLiteral( "surface" ) ).toString();
++        QTreeWidget* tree = surface == QStringLiteral( "applications" ) ? m_applications
++                           : surface == QStringLiteral( "components" ) ? m_components
++                                                                      : nullptr;
++        if ( !tree )
++        {
++            continue;
++        }
++        auto* item = new QTreeWidgetItem( tree );
++        item->setText( 0, localized( category.value( QStringLiteral( "name" ) ) ) );
++        item->setData( 0, IdRole, category.value( QStringLiteral( "id" ) ).toString() );
++        item->setData( 0, KindRole, QStringLiteral( "category" ) );
++        item->setFlags( item->flags() | Qt::ItemIsUserCheckable | Qt::ItemIsAutoTristate );
++        item->setCheckState( 0, Qt::Unchecked );
++        const auto categoryId = category.value( QStringLiteral( "id" ) ).toString();
++        QSet< QString > visiting;
++        for ( const auto& child : category.value( QStringLiteral( "children" ) ).toArray() )
++        {
++            if ( !addNode( item, child.toString(), categoryId, QStringLiteral( "optional" ), visiting ) )
++            {
++                *error = tr( "invalid or cyclic catalog reference: %1" ).arg( child.toString() );
++                m_updating = false;
++                return false;
++            }
++        }
++        item->setExpanded( true );
++    }
++    m_updating = false;
++    return true;
++}
++
++bool LinxiraSoftwareViewStep::addNode( QTreeWidgetItem* parent,
++                                       const QString& id,
++                                       const QString& categoryId,
++                                       const QString& role,
++                                       QSet< QString >& visiting )
++{
++    if ( !m_nodes.contains( id ) || visiting.contains( id ) )
++    {
++        return false;
++    }
++    const auto node = m_nodes.value( id );
++    const auto kind = node.value( QStringLiteral( "kind" ) ).toString();
++    auto* item = new QTreeWidgetItem( parent );
++    item->setText( 0, localized( node.value( QStringLiteral( "name" ) ) ) );
++    item->setText( 1, role );
++    item->setData( 0, IdRole, id );
++    item->setData( 0, KindRole, kind );
++    item->setData( 0, CategoryRole, categoryId );
++
++    if ( kind == QStringLiteral( "bundle" ) )
++    {
++        item->setFlags( item->flags() | Qt::ItemIsUserCheckable | Qt::ItemIsAutoTristate );
++        item->setCheckState( 0, Qt::Unchecked );
++        visiting.insert( id );
++        const auto children = node.value( QStringLiteral( "children" ) ).toObject();
++        for ( const auto& childRole : { QStringLiteral( "required" ),
++                                        QStringLiteral( "recommended" ),
++                                        QStringLiteral( "optional" ) } )
++        {
++            for ( const auto& child : children.value( childRole ).toArray() )
++            {
++                if ( !addNode( item, child.toString(), categoryId, childRole, visiting ) )
++                {
++                    return false;
++                }
++            }
++        }
++        visiting.remove( id );
++        return true;
++    }
++
++    const auto availability = node.value( QStringLiteral( "availability" ) ).toObject();
++    const auto review = node.value( QStringLiteral( "review" ) ).toObject();
++    const auto offlinePolicy = availability.value( QStringLiteral( "offlinePolicy" ) ).toString();
++    const bool reviewed = review.value( QStringLiteral( "status" ) ).toString() == QStringLiteral( "reviewed" );
++    const bool available = availability.value( QStringLiteral( "status" ) ).toString() == QStringLiteral( "available" );
++    const bool defaultChannel = availability.value( QStringLiteral( "channel" ) ).toString() == QStringLiteral( "default" );
++    const bool selectable = kind != QStringLiteral( "operation" ) && reviewed && available && defaultChannel;
++    const bool included = offlinePolicy == QStringLiteral( "included" );
++
++    item->setData( 0, OfflinePolicyRole, offlinePolicy );
++    item->setText( 2, included ? tr( "Included" ) : tr( "After first boot" ) );
++    item->setFlags( selectable ? item->flags() | Qt::ItemIsUserCheckable
++                               : item->flags() & ~Qt::ItemIsEnabled );
++    item->setCheckState( 0, Qt::Unchecked );
++    if ( node.value( QStringLiteral( "presentation" ) ).toObject().value(
++             QStringLiteral( "defaultSelected" ) ).toBool() )
++    {
++        item->setCheckState( 0, Qt::Checked );
++        if ( included )
++        {
++            item->setFlags( item->flags() & ~Qt::ItemIsUserCheckable );
++        }
++    }
++    m_leafItems[ id ].append( item );
++    return true;
++}
++
++void LinxiraSoftwareViewStep::itemChanged( QTreeWidgetItem* item, int column )
++{
++    if ( m_updating || column != 0 )
++    {
++        return;
++    }
++    m_updating = true;
++    const auto kind = item->data( 0, KindRole ).toString();
++    if ( kind != QStringLiteral( "category" ) && kind != QStringLiteral( "bundle" ) )
++    {
++        const auto id = item->data( 0, IdRole ).toString();
++        for ( auto* duplicate : m_leafItems.value( id ) )
++        {
++            if ( duplicate != item && duplicate->flags().testFlag( Qt::ItemIsUserCheckable ) )
++            {
++                duplicate->setCheckState( 0, item->checkState( 0 ) );
++            }
++        }
++    }
++    m_updating = false;
++    updateStatus();
++}
++
++QStringList LinxiraSoftwareViewStep::selectedLeafIds() const
++{
++    QStringList selected;
++    for ( auto it = m_leafItems.cbegin(); it != m_leafItems.cend(); ++it )
++    {
++        for ( const auto* item : it.value() )
++        {
++            if ( item->checkState( 0 ) == Qt::Checked )
++            {
++                selected.append( it.key() );
++                break;
++            }
++        }
++    }
++    selected.removeDuplicates();
++    selected.sort();
++    return selected;
++}
++
++QStringList LinxiraSoftwareViewStep::selectedBundleIds() const
++{
++    QStringList selected;
++    for ( auto* tree : { m_applications, m_components } )
++    {
++        if ( !tree )
++        {
++            continue;
++        }
++        QList< QTreeWidgetItem* > pending;
++        for ( int row = 0; row < tree->topLevelItemCount(); ++row )
++        {
++            pending.append( tree->topLevelItem( row ) );
++        }
++        while ( !pending.isEmpty() )
++        {
++            auto* item = pending.takeLast();
++            const auto kind = item->data( 0, KindRole ).toString();
++            if ( ( kind == QStringLiteral( "category" ) || kind == QStringLiteral( "bundle" ) )
++                 && item->checkState( 0 ) != Qt::Unchecked )
++            {
++                selected.append( item->data( 0, IdRole ).toString() );
++            }
++            for ( int child = 0; child < item->childCount(); ++child )
++            {
++                pending.append( item->child( child ) );
++            }
++        }
++    }
++    selected.removeDuplicates();
++    selected.sort();
++    return selected;
++}
++
++void LinxiraSoftwareViewStep::restoreSelection()
++{
++    auto* storage = Calamares::JobQueue::instanceGlobalStorage();
++    if ( !storage || !storage->contains( m_storageKey ) )
++    {
++        return;
++    }
++    const auto selected = storage->value( m_storageKey ).toMap().value(
++        QStringLiteral( "selectedLeafIds" ) ).toStringList();
++    m_updating = true;
++    for ( const auto& id : selected )
++    {
++        for ( auto* item : m_leafItems.value( id ) )
++        {
++            if ( item->flags().testFlag( Qt::ItemIsUserCheckable ) )
++            {
++                item->setCheckState( 0, Qt::Checked );
++            }
++        }
++    }
++    m_updating = false;
++    updateStatus();
++}
++
++void LinxiraSoftwareViewStep::updateStatus()
++{
++    if ( m_status )
++    {
++        m_status->setText( tr( "%1 items selected. Included items are installed now; other choices remain pending." )
++                               .arg( selectedLeafIds().size() ) );
++    }
++    emit nextStatusChanged( m_ready );
++}
+diff --git a/src/modules/linxirasoftware/LinxiraSoftwareViewStep.h b/src/modules/linxirasoftware/LinxiraSoftwareViewStep.h
+new file mode 100644
+index 0000000..9ce16d0
+--- /dev/null
++++ b/src/modules/linxirasoftware/LinxiraSoftwareViewStep.h
+@@ -0,0 +1,72 @@
++/* SPDX-License-Identifier: GPL-3.0-or-later */
++
++#ifndef LINXIRASOFTWAREVIEWSTEP_H
++#define LINXIRASOFTWAREVIEWSTEP_H
++
++#include "DllMacro.h"
++#include "utils/PluginFactory.h"
++#include "viewpages/ViewStep.h"
++
++#include <QHash>
++#include <QJsonObject>
++#include <QList>
++#include <QSet>
++#include <QString>
++#include <QVariantMap>
++
++class QLabel;
++class QTreeWidget;
++class QTreeWidgetItem;
++class QWidget;
++
++class PLUGINDLLEXPORT LinxiraSoftwareViewStep : public Calamares::ViewStep
++{
++    Q_OBJECT
++
++public:
++    explicit LinxiraSoftwareViewStep( QObject* parent = nullptr );
++    ~LinxiraSoftwareViewStep() override;
++
++    QString prettyName() const override;
++    QString prettyStatus() const override;
++    QWidget* widget() override;
++    bool isNextEnabled() const override;
++    bool isBackEnabled() const override;
++    bool isAtBeginning() const override;
++    bool isAtEnd() const override;
++    void onActivate() override;
++    void onLeave() override;
++    Calamares::JobList jobs() const override;
++    void setConfigurationMap( const QVariantMap& configurationMap ) override;
++
++private:
++    QTreeWidget* makeTree();
++    bool loadCatalog( QString* error );
++    bool addNode( QTreeWidgetItem* parent,
++                  const QString& id,
++                  const QString& categoryId,
++                  const QString& role,
++                  QSet< QString >& visiting );
++    void itemChanged( QTreeWidgetItem* item, int column );
++    QStringList selectedLeafIds() const;
++    QStringList selectedBundleIds() const;
++    void restoreSelection();
++    void updateStatus();
++
++    QWidget* m_widget = nullptr;
++    QTreeWidget* m_applications = nullptr;
++    QTreeWidget* m_components = nullptr;
++    QLabel* m_status = nullptr;
++    QString m_catalogPath = QStringLiteral( "/usr/share/linxira/catalog/catalog-v3.json" );
++    QString m_storageKey = QStringLiteral( "linxiraSoftwareSelection" );
++    QString m_release;
++    QString m_catalogSha256;
++    QHash< QString, QJsonObject > m_nodes;
++    QHash< QString, QList< QTreeWidgetItem* > > m_leafItems;
++    bool m_ready = false;
++    bool m_updating = false;
++};
++
++CALAMARES_PLUGIN_FACTORY_DECLARATION( LinxiraSoftwareViewStepFactory )
++
++#endif
+diff --git a/src/modules/linxirasoftware/linxirasoftware.conf b/src/modules/linxirasoftware/linxirasoftware.conf
+new file mode 100644
+index 0000000..6200e66
+--- /dev/null
++++ b/src/modules/linxirasoftware/linxirasoftware.conf
+@@ -0,0 +1,3 @@
++---
++catalogPath: "/usr/share/linxira/catalog/catalog-v3.json"
++globalStorageKey: "linxiraSoftwareSelection"

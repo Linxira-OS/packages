@@ -40,6 +40,9 @@ if [[ -f packages/calamares/PKGBUILD ]]; then
   grep -q "0001-initcpiocfg-drop-obsolete-crc32c-intel.patch" packages/calamares/PKGBUILD
   grep -q "0231ff9d671cc590f96b863c69c341a1fca45f260ba79ed246b8a5b95fe0859d" \
     packages/calamares/PKGBUILD
+  grep -q "0002-add-linxira-software-viewmodule.patch" packages/calamares/PKGBUILD
+  grep -q "37a91daaacd58b1088099d0a8180232f00dea705670cbbcc8d9a6ae30582d6e4" \
+    packages/calamares/PKGBUILD
 fi
 
 if [[ -f packages/linxira-welcome/PKGBUILD ]]; then
