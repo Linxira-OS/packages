@@ -37,6 +37,9 @@ if [[ -f packages/calamares/PKGBUILD ]]; then
   grep -q 'releases/download/v${pkgver}/calamares-${pkgver}.tar.gz' packages/calamares/PKGBUILD
   grep -q "5547f80db067dea923ae693ba6bb88eb2b2eeac1da3ebec42fce453e31c290c0" \
     packages/calamares/PKGBUILD
+  grep -q "0001-initcpiocfg-drop-obsolete-crc32c-intel.patch" packages/calamares/PKGBUILD
+  grep -q "0231ff9d671cc590f96b863c69c341a1fca45f260ba79ed246b8a5b95fe0859d" \
+    packages/calamares/PKGBUILD
 fi
 
 if [[ -f packages/linxira-welcome/PKGBUILD ]]; then
