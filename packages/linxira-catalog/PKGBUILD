@@ -1,8 +1,8 @@
 # Maintainer: Linxira OS <admin@linxira.org>
 
 pkgname=linxira-catalog
-pkgver=2.0.0
-pkgrel=3
+pkgver=3.0.0
+pkgrel=1
 pkgdesc='Reviewed software catalog and schema for Linxira OS'
 arch=('any')
 groups=('linxira')
@@ -10,13 +10,13 @@ url='https://github.com/Linxira-OS/linxira-catalog'
 license=('MIT')
 checkdepends=('python' 'python-jsonschema')
 
-_commit=62b141f2454cd1ed985b1b4a58c5c350dc3104ba
+_commit=b8daa530214956e6723ffa71dfe8f8aac716e90c
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('30cd73926edaeb1f64d42aa9e1f51d78233fb2f0a04d7d7e13a7c2a2682d452d')
+sha256sums=('ee4ffd8268f4f4ba09fbea06e0b013326c3e764eaf56a42e50dd860a8d431d42')
 
 check() {
   cd "$srcdir/$pkgname-$_commit"
-  python -c 'import json, pathlib, jsonschema; root = pathlib.Path("."); schema = json.loads((root / "schema/catalog-v2.schema.json").read_text()); catalog = json.loads((root / "catalog/catalog-v2.json").read_text()); jsonschema.Draft202012Validator.check_schema(schema); jsonschema.validate(catalog, schema)'
+  python -m unittest discover -s tests -v
 }
 
 package() {
@@ -25,5 +25,9 @@ package() {
     "$pkgdir/usr/share/linxira/catalog/catalog-v2.json"
   install -Dm644 schema/catalog-v2.schema.json \
     "$pkgdir/usr/share/linxira/catalog/catalog-v2.schema.json"
+  install -Dm644 catalog/catalog-v3.json \
+    "$pkgdir/usr/share/linxira/catalog/catalog-v3.json"
+  install -Dm644 schema/catalog-v3.schema.json \
+    "$pkgdir/usr/share/linxira/catalog/catalog-v3.schema.json"
   install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 }

@@ -1,7 +1,7 @@
 # Maintainer: Linxira OS <admin@linxira.org>
 
 pkgname=linxira-config-hub
-pkgver=2.1.0
+pkgver=2.2.0
 pkgrel=1
 pkgdesc='Configuration and diagnostics CLI for Linxira OS'
 arch=('any')
@@ -25,10 +25,11 @@ optdepends=(
   'openssh: SSH client and server workflows'
   'ufw: firewall status and configuration'
 )
+checkdepends=('python')
 
-_commit=c41dd4ce621fe1d18744b1df599c8fa528d3cdc6
+_commit=5d78caaafa7e79d6e132f6071fc2aa59cae83bd0
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('03263da3051a78a002b82b90f7552df4c98191e40552089863a4edae09306628')
+sha256sums=('d3fc9dbd4710572e5b7000737b3dbd7405def990db6c98b0ef473d31c7506e1a')
 
 check() {
   cd "$srcdir/$pkgname-$_commit"

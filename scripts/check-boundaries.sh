@@ -47,16 +47,17 @@ if [[ -f packages/linxira-welcome/PKGBUILD ]]; then
     echo "linxira-welcome must remain independent and unprivileged" >&2
     exit 1
   fi
-  grep -q '10b705d40761b01ef569e5abf1362ddac4b2c94d' packages/linxira-welcome/PKGBUILD
+  grep -q 'b5bfa4f22d3a37498d54970a0c51d2503f2547ed' packages/linxira-welcome/PKGBUILD
 fi
 
 if [[ -f packages/linxira-catalog/PKGBUILD ]]; then
-  grep -q '62b141f2454cd1ed985b1b4a58c5c350dc3104ba' packages/linxira-catalog/PKGBUILD
+  grep -q 'b8daa530214956e6723ffa71dfe8f8aac716e90c' packages/linxira-catalog/PKGBUILD
 fi
 
-grep -q '05ef463125fa8e935ad8dda555aebbce20bbb3bd' packages/linxira-components/PKGBUILD
-grep -q 'c41dd4ce621fe1d18744b1df599c8fa528d3cdc6' packages/linxira-config-hub/PKGBUILD
-grep -q 'b3a807ff0116e8a51f995169ba16a69495ba13da' packages/linxira-package-center/PKGBUILD
+grep -q 'a8134b4585e584fb596fc93641b77140481f0994' packages/linxira-components/PKGBUILD
+grep -q '5d78caaafa7e79d6e132f6071fc2aa59cae83bd0' packages/linxira-config-hub/PKGBUILD
+grep -q '50b03853b659920e18dea7366763ca51a326634c' packages/linxira-component-manager/PKGBUILD
+grep -q '5a6a7666e517e7c736e9892722b07204fb4a9871' packages/linxira-package-center/PKGBUILD
 
 for package in packages/*/PKGBUILD; do
   bash -n "$package"

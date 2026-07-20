@@ -2,7 +2,7 @@
 
 pkgname=linxira-welcome
 pkgver=1.0.0
-pkgrel=2
+pkgrel=3
 pkgdesc='Safe Plasma-native workstation control center for Linxira OS'
 arch=('any')
 groups=('linxira')
@@ -15,19 +15,21 @@ optdepends=(
   'kinfocenter: inspect system information'
   'konsole: open a terminal'
   'linxira-config-hub: administrator configuration and diagnostics'
-  'linxira-package-center: install reviewed applications and capabilities'
+  'linxira-component-manager: select capability bundles and system components'
+  'linxira-package-center: install reviewed applications'
   'shelly: manage software after installation'
   'systemsettings: configure Plasma'
   'timeshift: manage recovery snapshots'
 )
 
-_commit=10b705d40761b01ef569e5abf1362ddac4b2c94d
+_commit=b5bfa4f22d3a37498d54970a0c51d2503f2547ed
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('89ed3cb2c7bd25f85a4c1df5244ba5aeb93b96789331d96d80f4c328ed8f9bf4')
+sha256sums=('6e269e7edbb40a0cc7e5a4ac291ff421731cd37c5dc5c6692d410b0e5f688ec6')
 
 check() {
   cd "$srcdir/$pkgname-$_commit"
   python -m py_compile src/linxira-welcome
+  python -m unittest discover -s tests -v
   desktop-file-validate data/org.linxira.Welcome.desktop
   desktop-file-validate data/autostart/org.linxira.Welcome.desktop
 }

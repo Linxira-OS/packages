@@ -72,8 +72,9 @@ jobs:
                 linxira-catalog
                 linxira-components
                 linxira-config-hub
-                linxira-welcome
+                linxira-component-manager
                 linxira-package-center
+                linxira-welcome
               )
               for package in "${packages[@]}"; do
                 chown -R builder:builder "/workspace/packages/$package"
@@ -88,6 +89,7 @@ jobs:
             packages/linxira-catalog/*.pkg.tar.zst
             packages/linxira-components/*.pkg.tar.zst
             packages/linxira-config-hub/*.pkg.tar.zst
+            packages/linxira-component-manager/*.pkg.tar.zst
             packages/linxira-package-center/*.pkg.tar.zst
             packages/linxira-welcome/*.pkg.tar.zst
           if-no-files-found: error

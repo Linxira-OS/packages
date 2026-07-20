@@ -1,7 +1,7 @@
 # Maintainer: Linxira OS <admin@linxira.org>
 
 pkgname=linxira-package-center
-pkgver=0.1.0
+pkgver=0.2.0
 pkgrel=1
 pkgdesc='Catalog-bound application and capability manager for Linxira OS'
 arch=('any')
@@ -9,20 +9,21 @@ groups=('linxira')
 url='https://github.com/Linxira-OS/linxira-package-center'
 license=('MIT')
 depends=(
-  'bash' 'coreutils' 'jq' 'kdialog' 'polkit'
+  'python' 'pyside6' 'polkit'
   'linxira-catalog' 'linxira-components'
 )
-checkdepends=('python')
+checkdepends=('desktop-file-utils')
 
-_commit=b3a807ff0116e8a51f995169ba16a69495ba13da
+_commit=5a6a7666e517e7c736e9892722b07204fb4a9871
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('bfc5726d836c9d4e929c9f5e0bacb8190a687d9931c3d24c8f2bf2b9e1f29f4c')
+sha256sums=('67057767563c19403db3f0d105d8c6118e8f639fcd36a9a02e2d770d20ce380b')
 
 check() {
   cd "$srcdir/$pkgname-$_commit"
   [[ $(<VERSION) == "$pkgver" ]]
-  bash -n src/linxira-package-center
-  python -m unittest discover -s tests -v
+  python -m py_compile src/linxira-package-center
+  QT_QPA_PLATFORM=offscreen python -m unittest discover -s tests -v
+  desktop-file-validate data/org.linxira.PackageCenter.desktop
 }
 
 package() {
