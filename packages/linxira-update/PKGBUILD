@@ -1,0 +1,93 @@
+# Maintainer: Linxira OS <admin@linxira.org>
+
+pkgname=linxira-update
+pkgver=0.1.0
+pkgrel=1
+pkgdesc='System update notifier and maintenance assistant for Linxira OS'
+arch=('any')
+groups=('linxira')
+url='https://github.com/Linxira-OS/linxira-update'
+license=('GPL-3.0-or-later')
+depends=(
+  'archlinux-contrib'
+  'bash'
+  'curl'
+  'diffutils'
+  'fakeroot'
+  'gettext'
+  'glib2'
+  'hicolor-icon-theme'
+  'htmlq'
+  'pacman'
+  'pacman-contrib'
+  'python'
+  'python-pyqt6'
+  'qt6-svg'
+  'systemd'
+  'util-linux'
+  'xdg-utils'
+)
+makedepends=('scdoc')
+checkdepends=('bats' 'desktop-file-utils')
+optdepends=(
+  'flatpak: explicitly enabled Flatpak update support'
+  'libnotify: desktop update notifications'
+  'neovim: use Neovim with pacdiff'
+  'opendoas: privilege elevation'
+  'paru: explicitly enabled AUR update support'
+  'pikaur: explicitly enabled AUR update support'
+  'sudo: privilege elevation'
+  'sudo-rs: privilege elevation'
+  'vim: use Vim with pacdiff'
+  'yay: explicitly enabled AUR update support'
+)
+conflicts=('arch-update' 'cachy-update')
+
+_commit=2d281c909331dc5c7884be1765bd75059ce96836
+source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
+sha256sums=('c7dab0270da60403ab2bd24acd8c9a27568378e7a436b89fe56a0143a282cf23')
+
+prepare() {
+  cd "$srcdir/$pkgname-$_commit"
+  make clean
+}
+
+build() {
+  cd "$srcdir/$pkgname-$_commit"
+  make
+}
+
+check() {
+  cd "$srcdir/$pkgname-$_commit"
+  find src -type f -name '*.sh' -exec bash -n {} +
+  python -m py_compile src/lib/tray.py src/lib/write_status.py
+  desktop-file-validate res/desktop/*.desktop
+  make test
+}
+
+package() {
+  cd "$srcdir/$pkgname-$_commit"
+  make PREFIX=/usr SYSCONFDIR=/etc DESTDIR="$pkgdir" install
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+
+  local required=(
+    usr/bin/linxira-update
+    usr/share/linxira-update/lib/common.sh
+    usr/share/linxira-update/lib/tray.py
+    usr/share/linxira-update/lib/write_status.py
+    usr/share/applications/linxira-update.desktop
+    usr/share/applications/linxira-update-tray.desktop
+    etc/xdg/autostart/linxira-update-tray.desktop
+    usr/lib/systemd/user/linxira-update.service
+    usr/lib/systemd/user/linxira-update.timer
+    usr/lib/systemd/user/linxira-update-tray.service
+    usr/lib/systemd/user-preset/80-linxira-update.preset
+    usr/share/linxira-update/config/linxira-update.conf.example
+    usr/share/licenses/linxira-update/LICENSE
+  )
+  local path
+  for path in "${required[@]}"; do
+    [[ -e "$pkgdir/$path" ]] || return 1
+  done
+  [[ ! -e "$pkgdir/usr/bin/arch-update" ]]
+}

@@ -76,3 +76,11 @@ upstream. It does not consume the CachyOS fork, package, or repository.
 Distribution-specific storage policy, target package manifests, branding, and
 offline repository configuration remain in the Direct-Arch ISO profile. The
 Calamares package contains the framework and upstream modules only.
+
+## Linxira Update
+
+`linxira-update` is the Linxira-owned continuation of the GPL-3.0
+Cachy-Update/Arch-Update code line. It is built from the pinned public Linxira
+source commit and installs only Linxira command, desktop, state, icon, and
+systemd identities. Official pacman repositories are the default update scope;
+AUR and Flatpak updates require explicit user opt-in.

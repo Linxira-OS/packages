@@ -74,6 +74,7 @@ jobs:
                 linxira-config-hub
                 linxira-component-manager
                 linxira-package-center
+                linxira-update
                 linxira-welcome
               )
               for package in "${packages[@]}"; do
@@ -91,6 +92,7 @@ jobs:
             packages/linxira-config-hub/*.pkg.tar.zst
             packages/linxira-component-manager/*.pkg.tar.zst
             packages/linxira-package-center/*.pkg.tar.zst
+            packages/linxira-update/*.pkg.tar.zst
             packages/linxira-welcome/*.pkg.tar.zst
           if-no-files-found: error
 

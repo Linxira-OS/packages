@@ -50,7 +50,18 @@ if [[ -f packages/linxira-welcome/PKGBUILD ]]; then
     echo "linxira-welcome must remain independent and unprivileged" >&2
     exit 1
   fi
-  grep -q 'b5bfa4f22d3a37498d54970a0c51d2503f2547ed' packages/linxira-welcome/PKGBUILD
+  grep -q '7394a21a53eecfc5df7fd04398b6c0500a5fa630' packages/linxira-welcome/PKGBUILD
+fi
+
+if [[ -f packages/linxira-update/PKGBUILD ]]; then
+  grep -q '2d281c909331dc5c7884be1765bd75059ce96836' packages/linxira-update/PKGBUILD
+  grep -q 'c7dab0270da60403ab2bd24acd8c9a27568378e7a436b89fe56a0143a282cf23' \
+    packages/linxira-update/PKGBUILD
+  grep -q "conflicts=('arch-update' 'cachy-update')" packages/linxira-update/PKGBUILD
+  if grep -q '^replaces=' packages/linxira-update/PKGBUILD; then
+    echo "linxira-update must not silently replace an installed updater" >&2
+    exit 1
+  fi
 fi
 
 if [[ -f packages/linxira-catalog/PKGBUILD ]]; then
