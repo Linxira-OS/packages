@@ -2,26 +2,35 @@
 
 pkgname=linxira-welcome
 pkgver=1.0.0
-pkgrel=1
+pkgrel=2
 pkgdesc='Safe Plasma-native workstation control center for Linxira OS'
 arch=('any')
 groups=('linxira')
 url='https://github.com/Linxira-OS/linxira-welcome'
 license=('MIT')
-depends=('python' 'pyside6')
+depends=('python' 'pyside6' 'linxira-catalog')
+checkdepends=('desktop-file-utils')
 optdepends=(
   'calamares: install Linxira OS from the live environment'
   'kinfocenter: inspect system information'
   'konsole: open a terminal'
-  'linxira-catalog: curated software profile metadata'
+  'linxira-config-hub: administrator configuration and diagnostics'
+  'linxira-package-center: install reviewed applications and capabilities'
   'shelly: manage software after installation'
   'systemsettings: configure Plasma'
   'timeshift: manage recovery snapshots'
 )
 
-_commit=fe2aebdb32520da752834a3dc3bdf195b530fc14
+_commit=10b705d40761b01ef569e5abf1362ddac4b2c94d
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('1ebfb16e4269a5ad9454e2b97be0e677d34fc01be392ad1243720c036efbcc5b')
+sha256sums=('89ed3cb2c7bd25f85a4c1df5244ba5aeb93b96789331d96d80f4c328ed8f9bf4')
+
+check() {
+  cd "$srcdir/$pkgname-$_commit"
+  python -m py_compile src/linxira-welcome
+  desktop-file-validate data/org.linxira.Welcome.desktop
+  desktop-file-validate data/autostart/org.linxira.Welcome.desktop
+}
 
 package() {
   cd "$srcdir/$pkgname-$_commit"

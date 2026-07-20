@@ -9,9 +9,12 @@ contains no private keys, passwords, tokens, SSH keys, or signing secrets.
 | Purpose | Repository | Known-good revision |
 |---|---|---|
 | Package definitions and Pages publishing | https://github.com/Linxira-OS/packages | `main` |
-| Direct-Arch ISO profile | https://github.com/Linxira-OS/linxira-iso-direct | `e0f8697` |
-| Linxira Welcome | https://github.com/Linxira-OS/linxira-welcome | `fe2aebdb32520da752834a3dc3bdf195b530fc14` |
-| Reviewed catalog | https://github.com/Linxira-OS/linxira-catalog | `791d56fd8dea84a397488977e953732e61b5e0b9` |
+| Direct-Arch ISO profile | https://github.com/Linxira-OS/linxira-iso-direct | `74532c5` |
+| Linxira Welcome | https://github.com/Linxira-OS/linxira-welcome | `10b705d40761b01ef569e5abf1362ddac4b2c94d` |
+| Reviewed catalog | https://github.com/Linxira-OS/linxira-catalog | `62b141f2454cd1ed985b1b4a58c5c350dc3104ba` |
+| Transaction backend | https://github.com/Linxira-OS/linxira-components | `05ef463125fa8e935ad8dda555aebbce20bbb3bd` |
+| Config CLI | https://github.com/Linxira-OS/linxira-config-hub | `c41dd4ce621fe1d18744b1df599c8fa528d3cdc6` |
+| Package Center | https://github.com/Linxira-OS/linxira-package-center | `b3a807ff0116e8a51f995169ba16a69495ba13da` |
 | Canonical artwork | https://github.com/Linxira-OS/linxira-artwork | `614dfb33e4aec9fa96adff28a8fa077cad8a8901` |
 | Linxira pacman hooks | https://github.com/Linxira-OS/linxira-hooks | `25355105174646260fdb464cbdbe526055c825ae` |
 
@@ -19,9 +22,9 @@ The package CI is known good at:
 
 https://github.com/Linxira-OS/packages/actions/runs/29335712348
 
-It builds Calamares, Shelly, Linxira artwork, catalog, hooks, and Welcome in
-fresh official Arch containers. The publish job remains disabled until signing
-secrets and `linxira-keyring` are ready.
+It builds independent packages and the dependency-ordered Linxira system
+software stack in fresh official Arch containers. The publish job remains
+disabled until signing secrets and `linxira-keyring` are ready.
 
 ## Signing identity
 

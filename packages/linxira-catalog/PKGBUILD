@@ -2,16 +2,22 @@
 
 pkgname=linxira-catalog
 pkgver=2.0.0
-pkgrel=2
+pkgrel=3
 pkgdesc='Reviewed software catalog and schema for Linxira OS'
 arch=('any')
 groups=('linxira')
 url='https://github.com/Linxira-OS/linxira-catalog'
 license=('MIT')
+checkdepends=('python' 'python-jsonschema')
 
-_commit=791d56fd8dea84a397488977e953732e61b5e0b9
+_commit=62b141f2454cd1ed985b1b4a58c5c350dc3104ba
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('da4e0866a39ef64b7ed9ae22d08f93570da87c57b78ea7b140371b40441e53e5')
+sha256sums=('30cd73926edaeb1f64d42aa9e1f51d78233fb2f0a04d7d7e13a7c2a2682d452d')
+
+check() {
+  cd "$srcdir/$pkgname-$_commit"
+  python -c 'import json, pathlib, jsonschema; root = pathlib.Path("."); schema = json.loads((root / "schema/catalog-v2.schema.json").read_text()); catalog = json.loads((root / "catalog/catalog-v2.json").read_text()); jsonschema.Draft202012Validator.check_schema(schema); jsonschema.validate(catalog, schema)'
+}
 
 package() {
   cd "$srcdir/$pkgname-$_commit"

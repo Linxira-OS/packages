@@ -1,0 +1,33 @@
+# Maintainer: Linxira OS <admin@linxira.org>
+
+pkgname=linxira-components
+pkgver=0.2.0
+pkgrel=1
+pkgdesc='Catalog-bound transaction planning and receipt backend for Linxira OS'
+arch=('any')
+groups=('linxira')
+url='https://github.com/Linxira-OS/linxira-components'
+license=('MIT')
+depends=('python' 'pacman' 'linxira-catalog')
+
+_commit=05ef463125fa8e935ad8dda555aebbce20bbb3bd
+source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
+sha256sums=('7b033a09eed032f85421d660682a7dbc0061490fa37e827a213294d7a10ec9a4')
+
+check() {
+  cd "$srcdir/$pkgname-$_commit"
+  python -m unittest discover -s tests -v
+  python -m compileall -q src tests
+}
+
+package() {
+  cd "$srcdir/$pkgname-$_commit"
+  install -Dm755 scripts/linxira-components \
+    "$pkgdir/usr/bin/linxira-components"
+  install -d "$pkgdir/usr/lib/linxira-components"
+  cp -a src/linxira_components "$pkgdir/usr/lib/linxira-components/"
+  find "$pkgdir/usr/lib/linxira-components" -type d -name __pycache__ \
+    -prune -exec rm -rf {} +
+  find "$pkgdir/usr/lib/linxira-components" -type f -name '*.pyc' -delete
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}

@@ -1,0 +1,37 @@
+# Maintainer: Linxira OS <admin@linxira.org>
+
+pkgname=linxira-package-center
+pkgver=0.1.0
+pkgrel=1
+pkgdesc='Catalog-bound application and capability manager for Linxira OS'
+arch=('any')
+groups=('linxira')
+url='https://github.com/Linxira-OS/linxira-package-center'
+license=('MIT')
+depends=(
+  'bash' 'coreutils' 'jq' 'kdialog' 'polkit'
+  'linxira-catalog' 'linxira-components'
+)
+checkdepends=('python')
+
+_commit=b3a807ff0116e8a51f995169ba16a69495ba13da
+source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
+sha256sums=('bfc5726d836c9d4e929c9f5e0bacb8190a687d9931c3d24c8f2bf2b9e1f29f4c')
+
+check() {
+  cd "$srcdir/$pkgname-$_commit"
+  [[ $(<VERSION) == "$pkgver" ]]
+  bash -n src/linxira-package-center
+  python -m unittest discover -s tests -v
+}
+
+package() {
+  cd "$srcdir/$pkgname-$_commit"
+  install -Dm755 src/linxira-package-center \
+    "$pkgdir/usr/bin/linxira-package-center"
+  install -Dm644 data/org.linxira.PackageCenter.desktop \
+    "$pkgdir/usr/share/applications/org.linxira.PackageCenter.desktop"
+  install -Dm644 VERSION \
+    "$pkgdir/usr/share/linxira/package-center/VERSION"
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}

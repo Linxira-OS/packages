@@ -47,12 +47,16 @@ if [[ -f packages/linxira-welcome/PKGBUILD ]]; then
     echo "linxira-welcome must remain independent and unprivileged" >&2
     exit 1
   fi
-  grep -q 'fe2aebdb32520da752834a3dc3bdf195b530fc14' packages/linxira-welcome/PKGBUILD
+  grep -q '10b705d40761b01ef569e5abf1362ddac4b2c94d' packages/linxira-welcome/PKGBUILD
 fi
 
 if [[ -f packages/linxira-catalog/PKGBUILD ]]; then
-  grep -q '791d56fd8dea84a397488977e953732e61b5e0b9' packages/linxira-catalog/PKGBUILD
+  grep -q '62b141f2454cd1ed985b1b4a58c5c350dc3104ba' packages/linxira-catalog/PKGBUILD
 fi
+
+grep -q '05ef463125fa8e935ad8dda555aebbce20bbb3bd' packages/linxira-components/PKGBUILD
+grep -q 'c41dd4ce621fe1d18744b1df599c8fa528d3cdc6' packages/linxira-config-hub/PKGBUILD
+grep -q 'b3a807ff0116e8a51f995169ba16a69495ba13da' packages/linxira-package-center/PKGBUILD
 
 for package in packages/*/PKGBUILD; do
   bash -n "$package"

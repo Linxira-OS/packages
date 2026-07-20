@@ -31,9 +31,7 @@ jobs:
         package:
           - calamares
           - linxira-artwork
-          - linxira-catalog
           - linxira-hooks
-          - linxira-welcome
           - shelly
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
@@ -57,9 +55,46 @@ jobs:
           path: packages/${{ matrix.package }}/*.pkg.tar.zst
           if-no-files-found: error
 
+  system-stack:
+    needs: boundaries
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+      - name: Build dependency-ordered system packages
+        run: |
+          docker run --rm \
+            -v "$PWD:/workspace" \
+            archlinux:base-devel bash -euxo pipefail -c '
+              pacman -Syu --noconfirm git sudo
+              useradd --create-home builder
+              printf "builder ALL=(ALL) NOPASSWD: ALL\n" >/etc/sudoers.d/builder
+              packages=(
+                linxira-catalog
+                linxira-components
+                linxira-config-hub
+                linxira-welcome
+                linxira-package-center
+              )
+              for package in "${packages[@]}"; do
+                chown -R builder:builder "/workspace/packages/$package"
+                su builder -c "cd /workspace/packages/$package && makepkg --syncdeps --noconfirm --clean --cleanbuild"
+                pacman -U --noconfirm /workspace/packages/$package/*.pkg.tar.zst
+              done
+            '
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0 # v7
+        with:
+          name: linxira-system-stack
+          path: |
+            packages/linxira-catalog/*.pkg.tar.zst
+            packages/linxira-components/*.pkg.tar.zst
+            packages/linxira-config-hub/*.pkg.tar.zst
+            packages/linxira-package-center/*.pkg.tar.zst
+            packages/linxira-welcome/*.pkg.tar.zst
+          if-no-files-found: error
+
   publish:
     if: github.event_name == 'workflow_dispatch' && inputs.publish
-    needs: build
+    needs: [build, system-stack]
     runs-on: ubuntu-latest
     permissions:
       contents: read
