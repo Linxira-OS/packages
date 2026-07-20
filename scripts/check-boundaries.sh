@@ -56,7 +56,7 @@ fi
 
 grep -q 'a8134b4585e584fb596fc93641b77140481f0994' packages/linxira-components/PKGBUILD
 grep -q '5d78caaafa7e79d6e132f6071fc2aa59cae83bd0' packages/linxira-config-hub/PKGBUILD
-grep -q '50b03853b659920e18dea7366763ca51a326634c' packages/linxira-component-manager/PKGBUILD
+grep -q '374957b6a4bbe4b4a39dbab18789982fca1f097e' packages/linxira-component-manager/PKGBUILD
 grep -q '5a6a7666e517e7c736e9892722b07204fb4a9871' packages/linxira-package-center/PKGBUILD
 
 for package in packages/*/PKGBUILD; do
