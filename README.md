@@ -84,3 +84,11 @@ Cachy-Update/Arch-Update code line. It is built from the pinned public Linxira
 source commit and installs only Linxira command, desktop, state, icon, and
 systemd identities. Official pacman repositories are the default update scope;
 AUR and Flatpak updates require explicit user opt-in.
+
+## Gaming Manager
+
+`linxira-gaming-manager` is a user-scoped library and compatibility workspace.
+It discovers Steam and imported games, launches through fixed argument arrays,
+detects external compatibility tools, and delegates encrypted backups to
+restic. It contains no package manager, system service, Polkit policy, or root
+helper.

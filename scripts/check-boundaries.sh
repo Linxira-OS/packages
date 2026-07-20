@@ -71,6 +71,14 @@ fi
 grep -q 'a8134b4585e584fb596fc93641b77140481f0994' packages/linxira-components/PKGBUILD
 grep -q '5d78caaafa7e79d6e132f6071fc2aa59cae83bd0' packages/linxira-config-hub/PKGBUILD
 grep -q '374957b6a4bbe4b4a39dbab18789982fca1f097e' packages/linxira-component-manager/PKGBUILD
+grep -q '9569e94634050a7ddc7c439b07595ddf5037a81e' packages/linxira-gaming-manager/PKGBUILD
+grep -q 'afc3e03c7df79af893c4d64fd2320476d6c731551557e74dd24157b2f717632d' \
+  packages/linxira-gaming-manager/PKGBUILD
+if grep -E -n "depends=.*polkit|install.*systemd/system|install.*polkit" \
+  packages/linxira-gaming-manager/PKGBUILD; then
+  echo "linxira-gaming-manager must remain user-scoped" >&2
+  exit 1
+fi
 grep -q '5a6a7666e517e7c736e9892722b07204fb4a9871' packages/linxira-package-center/PKGBUILD
 
 for package in packages/*/PKGBUILD; do

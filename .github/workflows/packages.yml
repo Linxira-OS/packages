@@ -73,6 +73,7 @@ jobs:
                 linxira-components
                 linxira-config-hub
                 linxira-component-manager
+                linxira-gaming-manager
                 linxira-package-center
                 linxira-update
                 linxira-welcome
@@ -91,6 +92,7 @@ jobs:
             packages/linxira-components/*.pkg.tar.zst
             packages/linxira-config-hub/*.pkg.tar.zst
             packages/linxira-component-manager/*.pkg.tar.zst
+            packages/linxira-gaming-manager/*.pkg.tar.zst
             packages/linxira-package-center/*.pkg.tar.zst
             packages/linxira-update/*.pkg.tar.zst
             packages/linxira-welcome/*.pkg.tar.zst
