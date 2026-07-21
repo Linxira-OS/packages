@@ -73,6 +73,18 @@ grep -q '923347715d21f8fd67fb80f156da55e8dbf3d84c' packages/linxira-completion-a
 grep -q '5dfa4d9cd2d24df2df8eb67f4ad3675a0f8bc55e38b6e9eda0ee424eb06c8e37' \
   packages/linxira-completion-agent/PKGBUILD
 grep -q "depends=.*'linxira-catalog'.*'linxira-components'" packages/linxira-completion-agent/PKGBUILD
+grep -q '2ba853f094896e9500232c681c4a3ddb43c38448' packages/linxira-chwd-detector/PKGBUILD
+grep -q '50e6b7324bc4fa065be79f27d7e0da5d4ba5e7b98537329d3f0c7e42dbbd90c2' \
+  packages/linxira-chwd-detector/PKGBUILD
+grep -q '6755adee9dfaeed06f8dedd56707bddfeff44e92' packages/linxira-hardware-driver-manager/PKGBUILD
+grep -q '0fe9934a7565245b07d371b463d9be64a40173e60a3cbc6bf3f545c7ad477b84' \
+  packages/linxira-hardware-driver-manager/PKGBUILD
+grep -q "depends=.*'linxira-chwd-detector'" packages/linxira-hardware-driver-manager/PKGBUILD
+if grep -E -n "depends=.*polkit|install.*systemd/system|install.*polkit" \
+  packages/linxira-hardware-driver-manager/PKGBUILD; then
+  echo "linxira-hardware-driver-manager MVP must remain report-and-plan only" >&2
+  exit 1
+fi
 grep -q '5d78caaafa7e79d6e132f6071fc2aa59cae83bd0' packages/linxira-config-hub/PKGBUILD
 grep -q '374957b6a4bbe4b4a39dbab18789982fca1f097e' packages/linxira-component-manager/PKGBUILD
 grep -q '9569e94634050a7ddc7c439b07595ddf5037a81e' packages/linxira-gaming-manager/PKGBUILD

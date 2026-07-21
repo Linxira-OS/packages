@@ -100,3 +100,14 @@ and presents pending online work after first login. It delegates only reviewed
 Arch leaves to `linxira-components`; third-party and review-channel providers
 remain visible and deferred. The agent accepts no package names, commands, URLs,
 or repository definitions from the UI.
+
+## Hardware And Driver Manager
+
+`linxira-chwd-detector` is a GPL-3.0-only, detector-only derivative of CHWD
+1.23.0. It reads fixed Linux hardware evidence and emits versioned JSON; it has
+no package, hook, command, or mutation surface.
+
+`linxira-hardware-driver-manager` consumes that fixed detector contract and
+creates read-only reports and immutable user-state plans for reviewed policy
+IDs. The initial package has no privileged apply backend, Polkit policy, system
+service, package mutation, or arbitrary command/path input.

@@ -1,0 +1,41 @@
+# Maintainer: Linxira OS <admin@linxira.org>
+
+pkgname=linxira-chwd-detector
+pkgver=0.1.0
+pkgrel=1
+pkgdesc='Read-only CHWD-derived hardware detector for Linxira OS'
+arch=('x86_64')
+groups=('linxira')
+url='https://github.com/Linxira-OS/linxira-chwd-detector'
+license=('GPL-3.0-only')
+depends=('glibc')
+makedepends=('rust')
+checkdepends=('python')
+options=('!debug')
+
+_commit=2ba853f094896e9500232c681c4a3ddb43c38448
+source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
+sha256sums=('50e6b7324bc4fa065be79f27d7e0da5d4ba5e7b98537329d3f0c7e42dbbd90c2')
+
+build() {
+  cd "$srcdir/$pkgname-$_commit"
+  cargo build --release --locked
+}
+
+check() {
+  cd "$srcdir/$pkgname-$_commit"
+  cargo fmt --all -- --check
+  cargo test --all-targets --locked
+  cargo clippy --all-targets --locked -- -D warnings
+  ./target/release/linxira-chwd-detector >/tmp/linxira-chwd-detector-report.json
+  python -c 'import json; d=json.load(open("/tmp/linxira-chwd-detector-report.json")); assert d["schema_version"] == 1'
+  ! ./target/release/linxira-chwd-detector /tmp
+}
+
+package() {
+  cd "$srcdir/$pkgname-$_commit"
+  install -Dm755 target/release/linxira-chwd-detector "$pkgdir/usr/bin/linxira-chwd-detector"
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+  install -Dm644 UPSTREAM.md "$pkgdir/usr/share/doc/$pkgname/UPSTREAM.md"
+  install -Dm644 README.md "$pkgdir/usr/share/doc/$pkgname/README.md"
+}
