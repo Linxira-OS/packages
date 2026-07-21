@@ -74,6 +74,8 @@ jobs:
                 linxira-completion-agent
                 linxira-chwd-detector
                 linxira-hardware-driver-manager
+                linxira-kernel-manager
+                linxira-recovery-diagnostics
                 linxira-config-hub
                 linxira-component-manager
                 linxira-gaming-manager
@@ -96,6 +98,8 @@ jobs:
             packages/linxira-completion-agent/*.pkg.tar.zst
             packages/linxira-chwd-detector/*.pkg.tar.zst
             packages/linxira-hardware-driver-manager/*.pkg.tar.zst
+            packages/linxira-kernel-manager/*.pkg.tar.zst
+            packages/linxira-recovery-diagnostics/*.pkg.tar.zst
             packages/linxira-config-hub/*.pkg.tar.zst
             packages/linxira-component-manager/*.pkg.tar.zst
             packages/linxira-gaming-manager/*.pkg.tar.zst

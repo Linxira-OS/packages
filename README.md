@@ -111,3 +111,14 @@ no package, hook, command, or mutation surface.
 creates read-only reports and immutable user-state plans for reviewed policy
 IDs. The initial package has no privileged apply backend, Polkit policy, system
 service, package mutation, or arbitrary command/path input.
+
+## Kernel And Recovery
+
+`linxira-kernel-manager` reports the fixed `linux` and `linux-lts` support
+matrix, matching headers, boot images, GRUB entries, exact DKMS state, and
+reboot evidence. It saves only fixed-operation review plans.
+
+`linxira-recovery-diagnostics` reports installed/live Btrfs, Timeshift,
+grub-btrfs, pacman lock, keyring, boot, and fixed `/mnt` chroot readiness. Its
+support bundle is structured, recursively redacted, private, and never
+uploaded. Both initial packages keep privileged apply disabled.

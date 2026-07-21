@@ -1,0 +1,39 @@
+# Maintainer: Linxira OS <admin@linxira.org>
+
+pkgname=linxira-kernel-manager
+pkgver=0.1.0
+pkgrel=1
+pkgdesc='Fixed-policy kernel, boot, and initramfs reporting for Linxira OS'
+arch=('any')
+groups=('linxira')
+url='https://github.com/Linxira-OS/linxira-kernel-manager'
+license=('MIT')
+depends=('grub' 'pacman' 'python' 'pyside6')
+makedepends=('python-build' 'python-installer' 'python-setuptools' 'python-wheel')
+checkdepends=('appstream' 'desktop-file-utils')
+optdepends=('dkms: report exact per-kernel DKMS module status')
+
+_commit=40b27d0e733bbfb8edae83151ce3059e204c0967
+source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
+sha256sums=('aa6c60b9608cea69ae162e0eaf7b7cf38b7cf6eee9ec943b7cabaf3e7795f3d8')
+
+build() {
+  cd "$srcdir/$pkgname-$_commit"
+  python -m build --wheel --no-isolation
+}
+
+check() {
+  cd "$srcdir/$pkgname-$_commit"
+  [[ $(<VERSION) == "$pkgver" ]]
+  PYTHONPATH=src:tests QT_QPA_PLATFORM=offscreen python -m unittest discover -s tests -v
+  python -m compileall -q src tests
+  desktop-file-validate data/org.linxira.KernelManager.desktop
+  appstreamcli validate --no-net data/org.linxira.KernelManager.metainfo.xml
+  ! grep -R -E -n 'shell=True|os\.system|sudo|pkexec' src
+}
+
+package() {
+  cd "$srcdir/$pkgname-$_commit"
+  python -m installer --destdir="$pkgdir" dist/*.whl
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}

@@ -85,6 +85,17 @@ if grep -E -n "depends=.*polkit|install.*systemd/system|install.*polkit" \
   echo "linxira-hardware-driver-manager MVP must remain report-and-plan only" >&2
   exit 1
 fi
+grep -q '40b27d0e733bbfb8edae83151ce3059e204c0967' packages/linxira-kernel-manager/PKGBUILD
+grep -q 'aa6c60b9608cea69ae162e0eaf7b7cf38b7cf6eee9ec943b7cabaf3e7795f3d8' \
+  packages/linxira-kernel-manager/PKGBUILD
+grep -q '2c05f516fa25840d89d81c15923d82771b86ddc8' packages/linxira-recovery-diagnostics/PKGBUILD
+grep -q '38a6408340dcd79fad542e1b385a8cdfe05603ddc2b81139b5e1abece16c7b14' \
+  packages/linxira-recovery-diagnostics/PKGBUILD
+if grep -E -n "depends=.*polkit|install.*systemd/system|install.*polkit" \
+  packages/linxira-kernel-manager/PKGBUILD packages/linxira-recovery-diagnostics/PKGBUILD; then
+  echo "kernel and recovery MVP packages must remain report-and-plan only" >&2
+  exit 1
+fi
 grep -q '5d78caaafa7e79d6e132f6071fc2aa59cae83bd0' packages/linxira-config-hub/PKGBUILD
 grep -q 'e36503cc2f058b4ff4078ec9fdd48bd0ac61eea2' packages/linxira-component-manager/PKGBUILD
 grep -q '9569e94634050a7ddc7c439b07595ddf5037a81e' packages/linxira-gaming-manager/PKGBUILD
