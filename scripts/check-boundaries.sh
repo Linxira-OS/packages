@@ -68,9 +68,9 @@ if [[ -f packages/linxira-catalog/PKGBUILD ]]; then
   grep -q 'b8daa530214956e6723ffa71dfe8f8aac716e90c' packages/linxira-catalog/PKGBUILD
 fi
 
-grep -q 'a8134b4585e584fb596fc93641b77140481f0994' packages/linxira-components/PKGBUILD
-grep -q '923347715d21f8fd67fb80f156da55e8dbf3d84c' packages/linxira-completion-agent/PKGBUILD
-grep -q '5dfa4d9cd2d24df2df8eb67f4ad3675a0f8bc55e38b6e9eda0ee424eb06c8e37' \
+grep -q 'd27e011967908e85484f025ad1a4ee196a251d24' packages/linxira-components/PKGBUILD
+grep -q '6c498082db56edb078224b48cbe8d495d1040bfd' packages/linxira-completion-agent/PKGBUILD
+grep -q '30e4d4dc1464384e11abc82e351f8f8660400cc03df5bfbb01558c52cd83eaef' \
   packages/linxira-completion-agent/PKGBUILD
 grep -q "depends=.*'linxira-catalog'.*'linxira-components'" packages/linxira-completion-agent/PKGBUILD
 grep -q '2ba853f094896e9500232c681c4a3ddb43c38448' packages/linxira-chwd-detector/PKGBUILD
@@ -86,7 +86,7 @@ if grep -E -n "depends=.*polkit|install.*systemd/system|install.*polkit" \
   exit 1
 fi
 grep -q '5d78caaafa7e79d6e132f6071fc2aa59cae83bd0' packages/linxira-config-hub/PKGBUILD
-grep -q '374957b6a4bbe4b4a39dbab18789982fca1f097e' packages/linxira-component-manager/PKGBUILD
+grep -q 'e36503cc2f058b4ff4078ec9fdd48bd0ac61eea2' packages/linxira-component-manager/PKGBUILD
 grep -q '9569e94634050a7ddc7c439b07595ddf5037a81e' packages/linxira-gaming-manager/PKGBUILD
 grep -q 'afc3e03c7df79af893c4d64fd2320476d6c731551557e74dd24157b2f717632d' \
   packages/linxira-gaming-manager/PKGBUILD
@@ -95,7 +95,7 @@ if grep -E -n "depends=.*polkit|install.*systemd/system|install.*polkit" \
   echo "linxira-gaming-manager must remain user-scoped" >&2
   exit 1
 fi
-grep -q '5a6a7666e517e7c736e9892722b07204fb4a9871' packages/linxira-package-center/PKGBUILD
+grep -q 'deb19b5d2bc50e76434df0d421bce4fd25602b9d' packages/linxira-package-center/PKGBUILD
 
 for package in packages/*/PKGBUILD; do
   bash -n "$package"
