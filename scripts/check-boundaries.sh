@@ -82,8 +82,8 @@ if [[ -f packages/linxira-catalog/PKGBUILD ]]; then
   grep -q '427eb8df5bf80922028ce6a09d932660c38e5028f6cd50218cdc86daa4f2f11b' packages/linxira-catalog/PKGBUILD
 fi
 
-grep -q 'cca6379c54099fae357455f3209339c744931075' packages/linxira-components/PKGBUILD
-grep -q '203b692e14a4cc0509171c931065310df93c8fd1433335ceef0867d1c1c009bf' packages/linxira-components/PKGBUILD
+grep -q '9dcd29b7f4f68b43cddcbf692536a15581a66c14' packages/linxira-components/PKGBUILD
+grep -q '5d7bd9c0e0bbe9b5f15dfd6ec35a1e6f4eb31f347f590e5cb3180239a788bfbb' packages/linxira-components/PKGBUILD
 grep -q 'scripts/linxira-components-service' packages/linxira-components/PKGBUILD
 grep -q 'scripts/linxira-components-worker' packages/linxira-components/PKGBUILD
 grep -q 'service/linxira-components.service' packages/linxira-components/PKGBUILD
@@ -99,8 +99,8 @@ grep -q "depends=.*'linxira-catalog'.*'linxira-components'" packages/linxira-com
 grep -q '2ba853f094896e9500232c681c4a3ddb43c38448' packages/linxira-chwd-detector/PKGBUILD
 grep -q '50e6b7324bc4fa065be79f27d7e0da5d4ba5e7b98537329d3f0c7e42dbbd90c2' \
   packages/linxira-chwd-detector/PKGBUILD
-grep -q '3b794e4f159a561b2331af2b950ede364b93567b' packages/linxira-hardware-driver-manager/PKGBUILD
-grep -q '1529dac041c9ab90b5e004a5918372d04abc3c774bac22567d6a9c9723537386' \
+grep -q '1cc3eb3040bea48a68b83e0b4f4ddfac32b510ff' packages/linxira-hardware-driver-manager/PKGBUILD
+grep -q 'f5382ff2d1612545f83712876d34f9aa18ebde6c3603191c8963538f4d1f31f5' \
   packages/linxira-hardware-driver-manager/PKGBUILD
 grep -q "depends=.*'linxira-chwd-detector'" packages/linxira-hardware-driver-manager/PKGBUILD
 if grep -E -n "depends=.*polkit|install.*systemd/system|install.*polkit" \
