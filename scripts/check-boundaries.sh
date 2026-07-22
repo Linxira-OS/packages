@@ -82,7 +82,7 @@ fi
 
 grep -q 'a7663b69dfb6fc9d137e6c0f0d85954255506b14' packages/linxira-components/PKGBUILD
 grep -q '782de5d2f8876eb8f01c2fc65bd3c45498c6c407' packages/linxira-completion-agent/PKGBUILD
-grep -q '30e4d4dc1464384e11abc82e351f8f8660400cc03df5bfbb01558c52cd83eaef' \
+grep -q '2358d9384098b248e26eeff30397965082810e8b37cad4e8c1178d76eb313de6' \
   packages/linxira-completion-agent/PKGBUILD
 grep -q "depends=.*'linxira-catalog'.*'linxira-components'" packages/linxira-completion-agent/PKGBUILD
 grep -q '2ba853f094896e9500232c681c4a3ddb43c38448' packages/linxira-chwd-detector/PKGBUILD
