@@ -41,8 +41,20 @@ if [[ -f packages/calamares/PKGBUILD ]]; then
   grep -q "0231ff9d671cc590f96b863c69c341a1fca45f260ba79ed246b8a5b95fe0859d" \
     packages/calamares/PKGBUILD
   grep -q "0002-add-linxira-software-viewmodule.patch" packages/calamares/PKGBUILD
-  grep -q "37a91daaacd58b1088099d0a8180232f00dea705670cbbcc8d9a6ae30582d6e4" \
+  grep -q "dc71133cb28f994da33463c02342cd43fdc1afe4a6a87210e8d3bf542f28cde3" \
     packages/calamares/PKGBUILD
+  grep -q 'install(FILES linxirasoftware.conf' \
+    packages/calamares/0002-add-linxira-software-viewmodule.patch
+  grep -q 'load: "libcalamares_viewmodule_linxirasoftware.so"' \
+    packages/calamares/0002-add-linxira-software-viewmodule.patch
+  grep -q 'QStringLiteral( "exclusive" )' \
+    packages/calamares/0002-add-linxira-software-viewmodule.patch
+  grep -q 'org.linxira.installer-selection.v1' \
+    packages/calamares/0002-add-linxira-software-viewmodule.patch
+  grep -q 'QStringLiteral( "desktops" )' \
+    packages/calamares/0002-add-linxira-software-viewmodule.patch
+  grep -q 'QStringLiteral( "bounded" )' \
+    packages/calamares/0002-add-linxira-software-viewmodule.patch
 fi
 
 if [[ -f packages/linxira-welcome/PKGBUILD ]]; then
@@ -65,11 +77,11 @@ if [[ -f packages/linxira-update/PKGBUILD ]]; then
 fi
 
 if [[ -f packages/linxira-catalog/PKGBUILD ]]; then
-  grep -q 'b8daa530214956e6723ffa71dfe8f8aac716e90c' packages/linxira-catalog/PKGBUILD
+  grep -q '7fd8dcaf09d7639c3740c04eb5462ee6d212f3c5' packages/linxira-catalog/PKGBUILD
 fi
 
-grep -q 'd27e011967908e85484f025ad1a4ee196a251d24' packages/linxira-components/PKGBUILD
-grep -q '6c498082db56edb078224b48cbe8d495d1040bfd' packages/linxira-completion-agent/PKGBUILD
+grep -q 'a7663b69dfb6fc9d137e6c0f0d85954255506b14' packages/linxira-components/PKGBUILD
+grep -q '782de5d2f8876eb8f01c2fc65bd3c45498c6c407' packages/linxira-completion-agent/PKGBUILD
 grep -q '30e4d4dc1464384e11abc82e351f8f8660400cc03df5bfbb01558c52cd83eaef' \
   packages/linxira-completion-agent/PKGBUILD
 grep -q "depends=.*'linxira-catalog'.*'linxira-components'" packages/linxira-completion-agent/PKGBUILD
@@ -97,7 +109,7 @@ if grep -E -n "depends=.*polkit|install.*systemd/system|install.*polkit" \
   exit 1
 fi
 grep -q '5d78caaafa7e79d6e132f6071fc2aa59cae83bd0' packages/linxira-config-hub/PKGBUILD
-grep -q 'e36503cc2f058b4ff4078ec9fdd48bd0ac61eea2' packages/linxira-component-manager/PKGBUILD
+grep -q 'a848d9c244e00eb526a83de5a6976a88e942c7bb' packages/linxira-component-manager/PKGBUILD
 grep -q '9569e94634050a7ddc7c439b07595ddf5037a81e' packages/linxira-gaming-manager/PKGBUILD
 grep -q 'afc3e03c7df79af893c4d64fd2320476d6c731551557e74dd24157b2f717632d' \
   packages/linxira-gaming-manager/PKGBUILD

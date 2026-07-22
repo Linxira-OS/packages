@@ -2,7 +2,7 @@
 
 pkgname=linxira-component-manager
 pkgver=0.1.0
-pkgrel=2
+pkgrel=3
 pkgdesc='Nested capability bundle and component manager for Linxira OS'
 arch=('any')
 groups=('linxira')
@@ -12,9 +12,9 @@ depends=('python' 'pyside6' 'polkit' 'linxira-catalog' 'linxira-components')
 makedepends=('python-build' 'python-installer' 'python-setuptools' 'python-wheel')
 checkdepends=('desktop-file-utils')
 
-_commit=e36503cc2f058b4ff4078ec9fdd48bd0ac61eea2
+_commit=a848d9c244e00eb526a83de5a6976a88e942c7bb
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('d6bcf9d9408a54d91dbb1ca4d30b50158a45a45e5e9cb36828f481092bb08c8c')
+sha256sums=('2e2e8ab058505578c059b36db68407dbbf917a58ef5491ea90b0042e3d869f44')
 
 build() {
   cd "$srcdir/$pkgname-$_commit"

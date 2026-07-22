@@ -3,7 +3,7 @@ new file mode 100644
 index 0000000..8df14af
 --- /dev/null
 +++ b/src/modules/linxirasoftware/CMakeLists.txt
-@@ -0,0 +1,15 @@
+@@ -0,0 +1,18 @@
 +# SPDX-License-Identifier: BSD-2-Clause
 +
 +find_package(${qtname} COMPONENTS Core Gui Widgets REQUIRED)
@@ -19,12 +19,15 @@ index 0000000..8df14af
 +        ${qtname}::Widgets
 +    SHARED_LIB
 +)
++
++install(FILES linxirasoftware.conf
++        DESTINATION share/calamares/modules)
 diff --git a/src/modules/linxirasoftware/LinxiraSoftwareViewStep.cpp b/src/modules/linxirasoftware/LinxiraSoftwareViewStep.cpp
 new file mode 100644
 index 0000000..eaf52a1
 --- /dev/null
 +++ b/src/modules/linxirasoftware/LinxiraSoftwareViewStep.cpp
-@@ -0,0 +1,465 @@
+@@ -0,0 +1,576 @@
 +/* SPDX-License-Identifier: GPL-3.0-or-later */
 +
 +#include "LinxiraSoftwareViewStep.h"
@@ -52,6 +55,8 @@ index 0000000..eaf52a1
 +constexpr int KindRole = Qt::UserRole + 1;
 +constexpr int CategoryRole = Qt::UserRole + 2;
 +constexpr int OfflinePolicyRole = Qt::UserRole + 3;
++constexpr int CategorySelectionRole = Qt::UserRole + 4;
++constexpr int CategoryMaximumRole = Qt::UserRole + 5;
 +
 +QString localized( const QJsonValue& value )
 +{
@@ -137,6 +142,8 @@ index 0000000..eaf52a1
 +    auto* tabs = new QTabWidget;
 +    m_applications = makeTree();
 +    m_components = makeTree();
++    m_desktops = makeTree();
++    tabs->addTab( m_desktops, tr( "Desktop" ) );
 +    tabs->addTab( m_applications, tr( "Applications" ) );
 +    tabs->addTab( m_components, tr( "Components" ) );
 +    layout->addWidget( tabs, 1 );
@@ -161,7 +168,7 @@ index 0000000..eaf52a1
 +
 +bool LinxiraSoftwareViewStep::isNextEnabled() const
 +{
-+    return m_ready;
++    return m_ready && selectionValid();
 +}
 +
 +bool LinxiraSoftwareViewStep::isBackEnabled() const
@@ -197,6 +204,8 @@ index 0000000..eaf52a1
 +    }
 +
 +    QVariantMap selection;
++    selection.insert( QStringLiteral( "schemaVersion" ),
++                      QStringLiteral( "org.linxira.installer-selection.v1" ) );
 +    selection.insert( QStringLiteral( "catalogVersion" ), 3 );
 +    selection.insert( QStringLiteral( "catalogRelease" ), m_release );
 +    selection.insert( QStringLiteral( "catalogSha256" ), m_catalogSha256 );
@@ -260,7 +269,8 @@ index 0000000..eaf52a1
 +    m_catalogSha256 = QString::fromLatin1(
 +        QCryptographicHash::hash( raw, QCryptographicHash::Sha256 ).toHex() );
 +
-+    for ( const auto& section : { QStringLiteral( "applications" ),
++    for ( const auto& section : { QStringLiteral( "desktops" ),
++                                  QStringLiteral( "applications" ),
 +                                  QStringLiteral( "components" ),
 +                                  QStringLiteral( "bundles" ),
 +                                  QStringLiteral( "operations" ) } )
@@ -283,7 +293,8 @@ index 0000000..eaf52a1
 +    {
 +        const auto category = value.toObject();
 +        const auto surface = category.value( QStringLiteral( "surface" ) ).toString();
-+        QTreeWidget* tree = surface == QStringLiteral( "applications" ) ? m_applications
++        QTreeWidget* tree = surface == QStringLiteral( "desktops" ) ? m_desktops
++                           : surface == QStringLiteral( "applications" ) ? m_applications
 +                           : surface == QStringLiteral( "components" ) ? m_components
 +                                                                      : nullptr;
 +        if ( !tree )
@@ -294,6 +305,11 @@ index 0000000..eaf52a1
 +        item->setText( 0, localized( category.value( QStringLiteral( "name" ) ) ) );
 +        item->setData( 0, IdRole, category.value( QStringLiteral( "id" ) ).toString() );
 +        item->setData( 0, KindRole, QStringLiteral( "category" ) );
++        const auto categorySelection = category.value( QStringLiteral( "selection" ) ).toObject();
++        item->setData( 0, CategorySelectionRole,
++                       categorySelection.value( QStringLiteral( "mode" ) ).toString() );
++        item->setData( 0, CategoryMaximumRole,
++                       categorySelection.value( QStringLiteral( "maxSelected" ) ).toInt() );
 +        item->setFlags( item->flags() | Qt::ItemIsUserCheckable | Qt::ItemIsAutoTristate );
 +        item->setCheckState( 0, Qt::Unchecked );
 +        const auto categoryId = category.value( QStringLiteral( "id" ) ).toString();
@@ -309,6 +325,7 @@ index 0000000..eaf52a1
 +        }
 +        item->setExpanded( true );
 +    }
++    normalizeExclusiveCategories();
 +    m_updating = false;
 +    return true;
 +}
@@ -372,10 +389,6 @@ index 0000000..eaf52a1
 +             QStringLiteral( "defaultSelected" ) ).toBool() )
 +    {
 +        item->setCheckState( 0, Qt::Checked );
-+        if ( included )
-+        {
-+            item->setFlags( item->flags() & ~Qt::ItemIsUserCheckable );
-+        }
 +    }
 +    m_leafItems[ id ].append( item );
 +    return true;
@@ -389,6 +402,35 @@ index 0000000..eaf52a1
 +    }
 +    m_updating = true;
 +    const auto kind = item->data( 0, KindRole ).toString();
++    QTreeWidgetItem* category = kind == QStringLiteral( "category" ) ? item : nullptr;
++    QTreeWidgetItem* choice = item;
++    while ( !category && choice->parent() )
++    {
++        if ( choice->parent()->data( 0, KindRole ).toString() == QStringLiteral( "category" ) )
++        {
++            category = choice->parent();
++            break;
++        }
++        choice = choice->parent();
++    }
++    if ( category
++         && category->data( 0, CategorySelectionRole ).toString() == QStringLiteral( "exclusive" )
++         && item->checkState( 0 ) != Qt::Unchecked )
++    {
++        QTreeWidgetItem* selectedChoice = category == item ? nullptr : choice;
++        for ( int child = 0; child < category->childCount(); ++child )
++        {
++            auto* sibling = category->child( child );
++            if ( !selectedChoice && sibling->checkState( 0 ) != Qt::Unchecked )
++            {
++                selectedChoice = sibling;
++            }
++            else if ( sibling != selectedChoice )
++            {
++                sibling->setCheckState( 0, Qt::Unchecked );
++            }
++        }
++    }
 +    if ( kind != QStringLiteral( "category" ) && kind != QStringLiteral( "bundle" ) )
 +    {
 +        const auto id = item->data( 0, IdRole ).toString();
@@ -426,7 +468,7 @@ index 0000000..eaf52a1
 +QStringList LinxiraSoftwareViewStep::selectedBundleIds() const
 +{
 +    QStringList selected;
-+    for ( auto* tree : { m_applications, m_components } )
++    for ( auto* tree : { m_desktops, m_applications, m_components } )
 +    {
 +        if ( !tree )
 +        {
@@ -477,25 +519,97 @@ index 0000000..eaf52a1
 +            }
 +        }
 +    }
++    normalizeExclusiveCategories();
 +    m_updating = false;
 +    updateStatus();
++}
++
++void LinxiraSoftwareViewStep::normalizeExclusiveCategories()
++{
++    for ( auto* tree : { m_desktops, m_applications, m_components } )
++    {
++        for ( int row = 0; tree && row < tree->topLevelItemCount(); ++row )
++        {
++            auto* category = tree->topLevelItem( row );
++            if ( category->data( 0, CategorySelectionRole ).toString() != QStringLiteral( "exclusive" ) )
++            {
++                continue;
++            }
++            QTreeWidgetItem* selectedChoice = nullptr;
++            for ( int child = 0; child < category->childCount(); ++child )
++            {
++                auto* choice = category->child( child );
++                if ( !selectedChoice && choice->checkState( 0 ) != Qt::Unchecked )
++                {
++                    selectedChoice = choice;
++                }
++                else if ( choice->checkState( 0 ) != Qt::Unchecked )
++                {
++                    choice->setCheckState( 0, Qt::Unchecked );
++                }
++            }
++        }
++    }
++}
++
++bool LinxiraSoftwareViewStep::selectionValid() const
++{
++    int selectedDesktops = 0;
++    for ( const auto& id : selectedLeafIds() )
++    {
++        if ( m_nodes.value( id ).value( QStringLiteral( "kind" ) ).toString()
++             == QStringLiteral( "desktop" ) )
++        {
++            ++selectedDesktops;
++        }
++    }
++    if ( selectedDesktops != 1 )
++    {
++        return false;
++    }
++    for ( auto* tree : { m_desktops, m_applications, m_components } )
++    {
++        for ( int row = 0; tree && row < tree->topLevelItemCount(); ++row )
++        {
++            auto* category = tree->topLevelItem( row );
++            int selectedChoices = 0;
++            for ( int child = 0; child < category->childCount(); ++child )
++            {
++                selectedChoices += category->child( child )->checkState( 0 ) != Qt::Unchecked;
++            }
++            const auto mode = category->data( 0, CategorySelectionRole ).toString();
++            if ( mode == QStringLiteral( "exclusive" ) && selectedChoices > 1 )
++            {
++                return false;
++            }
++            if ( mode == QStringLiteral( "bounded" )
++                 && selectedChoices > category->data( 0, CategoryMaximumRole ).toInt() )
++            {
++                return false;
++            }
++        }
++    }
++    return true;
 +}
 +
 +void LinxiraSoftwareViewStep::updateStatus()
 +{
 +    if ( m_status )
 +    {
-+        m_status->setText( tr( "%1 items selected. Included items are installed now; other choices remain pending." )
-+                               .arg( selectedLeafIds().size() ) );
++        m_status->setText(
++            selectionValid()
++                ? tr( "%1 items selected. Included items are installed now; other choices remain pending." )
++                      .arg( selectedLeafIds().size() )
++                : tr( "Choose exactly one desktop and stay within each category limit." ) );
 +    }
-+    emit nextStatusChanged( m_ready );
++    emit nextStatusChanged( m_ready && selectionValid() );
 +}
 diff --git a/src/modules/linxirasoftware/LinxiraSoftwareViewStep.h b/src/modules/linxirasoftware/LinxiraSoftwareViewStep.h
 new file mode 100644
 index 0000000..9ce16d0
 --- /dev/null
 +++ b/src/modules/linxirasoftware/LinxiraSoftwareViewStep.h
-@@ -0,0 +1,72 @@
+@@ -0,0 +1,75 @@
 +/* SPDX-License-Identifier: GPL-3.0-or-later */
 +
 +#ifndef LINXIRASOFTWAREVIEWSTEP_H
@@ -549,11 +663,14 @@ index 0000000..9ce16d0
 +    QStringList selectedLeafIds() const;
 +    QStringList selectedBundleIds() const;
 +    void restoreSelection();
++    void normalizeExclusiveCategories();
++    bool selectionValid() const;
 +    void updateStatus();
 +
 +    QWidget* m_widget = nullptr;
 +    QTreeWidget* m_applications = nullptr;
 +    QTreeWidget* m_components = nullptr;
++    QTreeWidget* m_desktops = nullptr;
 +    QLabel* m_status = nullptr;
 +    QString m_catalogPath = QStringLiteral( "/usr/share/linxira/catalog/catalog-v3.json" );
 +    QString m_storageKey = QStringLiteral( "linxiraSoftwareSelection" );
@@ -577,3 +694,16 @@ index 0000000..6200e66
 +---
 +catalogPath: "/usr/share/linxira/catalog/catalog-v3.json"
 +globalStorageKey: "linxiraSoftwareSelection"
+diff --git a/src/modules/linxirasoftware/module.desc b/src/modules/linxirasoftware/module.desc
+new file mode 100644
+index 0000000..879382e
+--- /dev/null
++++ b/src/modules/linxirasoftware/module.desc
+@@ -0,0 +1,7 @@
++# SPDX-License-Identifier: CC0-1.0
++# Syntax is YAML 1.2
++---
++type: "viewmodule"
++name: "linxirasoftware"
++interface: "qtplugin"
++load: "libcalamares_viewmodule_linxirasoftware.so"
