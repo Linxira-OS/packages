@@ -1,7 +1,7 @@
 # Maintainer: Linxira OS <admin@linxira.org>
 
 pkgname=linxira-components
-pkgver=0.4.0
+pkgver=0.5.0
 pkgrel=1
 pkgdesc='Catalog-bound transaction planning and receipt backend for Linxira OS'
 arch=('any')
@@ -9,18 +9,18 @@ groups=('linxira')
 url='https://github.com/Linxira-OS/linxira-components'
 license=('MIT')
 depends=(
-  'dbus' 'linxira-catalog' 'pacman' 'polkit' 'python' 'python-dbus'
+  'dbus' 'linxira-catalog' 'linxira-chwd-detector' 'pacman' 'polkit' 'python' 'python-dbus'
   'python-gobject' 'systemd'
 )
 checkdepends=('python-pytest')
 
-_commit=11b8921d16c1e5ea0c5f229f533667f8087c34f4
+_commit=4e74d5e9edde5c9daf5e637896a0b483cf15e9b6
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('b40516076b6b04db610ce5a9e96451e19dfa13b40fc4f3452abcd5b16920d4e7')
+sha256sums=('3954f88fbc0cfad397e538cf0ed874ae17574bbcf5c6aeb8da019c40fd2a2565')
 
 check() {
   cd "$srcdir/$pkgname-$_commit"
-  grep -q 'version = "0.4.0"' pyproject.toml
+  grep -q 'version = "0.5.0"' pyproject.toml
   python -m unittest discover -s tests -v
   PYTHONPATH=src dbus-run-session python -m pytest -q tests/test_dbus_service.py
   python -m compileall -q src tests

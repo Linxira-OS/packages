@@ -62,8 +62,8 @@ if [[ -f packages/linxira-welcome/PKGBUILD ]]; then
     echo "linxira-welcome must remain independent and unprivileged" >&2
     exit 1
   fi
-  grep -q 'f8338c74b3dacce6f3f2a7d7b088301eb199eb0b' packages/linxira-welcome/PKGBUILD
-  grep -q '869a53fcc9cd5402af7ca881f9460594176c2124c9aa69b0341438c89cee3c63' packages/linxira-welcome/PKGBUILD
+  grep -q '35961740a8c568f17990471f9a1e3de28bd91ac2' packages/linxira-welcome/PKGBUILD
+  grep -q '99213e0a367cd4c073c37abcb87f31d7c837248446b8453bf00a699f4815cc0b' packages/linxira-welcome/PKGBUILD
 fi
 
 if [[ -f packages/linxira-update/PKGBUILD ]]; then
@@ -82,8 +82,8 @@ if [[ -f packages/linxira-catalog/PKGBUILD ]]; then
   grep -q '427eb8df5bf80922028ce6a09d932660c38e5028f6cd50218cdc86daa4f2f11b' packages/linxira-catalog/PKGBUILD
 fi
 
-grep -q '11b8921d16c1e5ea0c5f229f533667f8087c34f4' packages/linxira-components/PKGBUILD
-grep -q 'b40516076b6b04db610ce5a9e96451e19dfa13b40fc4f3452abcd5b16920d4e7' packages/linxira-components/PKGBUILD
+grep -q '4e74d5e9edde5c9daf5e637896a0b483cf15e9b6' packages/linxira-components/PKGBUILD
+grep -q '3954f88fbc0cfad397e538cf0ed874ae17574bbcf5c6aeb8da019c40fd2a2565' packages/linxira-components/PKGBUILD
 grep -q 'scripts/linxira-components-service' packages/linxira-components/PKGBUILD
 grep -q 'service/linxira-components.service' packages/linxira-components/PKGBUILD
 grep -q 'org.linxira.components.policy' packages/linxira-components/PKGBUILD
@@ -95,8 +95,8 @@ grep -q "depends=.*'linxira-catalog'.*'linxira-components'" packages/linxira-com
 grep -q '2ba853f094896e9500232c681c4a3ddb43c38448' packages/linxira-chwd-detector/PKGBUILD
 grep -q '50e6b7324bc4fa065be79f27d7e0da5d4ba5e7b98537329d3f0c7e42dbbd90c2' \
   packages/linxira-chwd-detector/PKGBUILD
-grep -q '6755adee9dfaeed06f8dedd56707bddfeff44e92' packages/linxira-hardware-driver-manager/PKGBUILD
-grep -q '0fe9934a7565245b07d371b463d9be64a40173e60a3cbc6bf3f545c7ad477b84' \
+grep -q '54a4edd7b1c37ec5f6e268c0456be5cc91915bc7' packages/linxira-hardware-driver-manager/PKGBUILD
+grep -q 'fcb5d94e38fc60a17b63cab4cc3374eb8d8ae21f9109e3696c664ca3a1b7a498' \
   packages/linxira-hardware-driver-manager/PKGBUILD
 grep -q "depends=.*'linxira-chwd-detector'" packages/linxira-hardware-driver-manager/PKGBUILD
 if grep -E -n "depends=.*polkit|install.*systemd/system|install.*polkit" \
