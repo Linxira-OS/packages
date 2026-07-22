@@ -23,6 +23,27 @@ check() {
   grep -q 'version = "0.6.0"' pyproject.toml
   python -m unittest discover -s tests -v
   PYTHONPATH=src dbus-run-session python -m pytest -q tests/test_dbus_service.py
+  PYTHONPATH=src python - <<'PY'
+from pathlib import Path
+import tempfile
+import pyalpm
+from linxira_components.driver_worker import _sync_metadata
+
+hyperv = _sync_metadata(Path("/"))["hyperv"]
+assert len(hyperv["sha256"]) == 64
+assert len(hyperv["signatureSha256"]) == 64
+
+with tempfile.TemporaryDirectory() as directory:
+    root = Path(directory) / "root"
+    database = Path(directory) / "db"
+    root.mkdir()
+    (database / "local").mkdir(parents=True)
+    handle = pyalpm.Handle(str(root), str(database))
+    transaction = handle.init_transaction()
+    assert (database / "db.lck").exists()
+    transaction.release()
+    assert not (database / "db.lck").exists()
+PY
   python -m compileall -q src tests
   python - <<'PY'
 import xml.etree.ElementTree as ET
