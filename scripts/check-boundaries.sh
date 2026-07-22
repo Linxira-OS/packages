@@ -83,7 +83,7 @@ if [[ -f packages/linxira-catalog/PKGBUILD ]]; then
 fi
 
 grep -q 'f67363b0626bc47c6f3a7cf1795507dba4cc5df7' packages/linxira-components/PKGBUILD
-grep -q '8fcf08640cc03607c347afd56fee27a8d5dd3082d0ae575a17dbe396a657887d' packages/linxira-components/PKGBUILD
+grep -q 'b458d5535132b10ef89867bee4fd427cbdc23685cef2e79ad5eca9bb95921ffd' packages/linxira-components/PKGBUILD
 grep -q 'scripts/linxira-components-service' packages/linxira-components/PKGBUILD
 grep -q 'service/linxira-components.service' packages/linxira-components/PKGBUILD
 grep -q 'org.linxira.components.policy' packages/linxira-components/PKGBUILD
