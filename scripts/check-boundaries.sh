@@ -82,15 +82,15 @@ if [[ -f packages/linxira-catalog/PKGBUILD ]]; then
   grep -q '427eb8df5bf80922028ce6a09d932660c38e5028f6cd50218cdc86daa4f2f11b' packages/linxira-catalog/PKGBUILD
 fi
 
-grep -q '9dcd29b7f4f68b43cddcbf692536a15581a66c14' packages/linxira-components/PKGBUILD
-grep -q '5d7bd9c0e0bbe9b5f15dfd6ec35a1e6f4eb31f347f590e5cb3180239a788bfbb' packages/linxira-components/PKGBUILD
+grep -q '96bf7baa8708c40c8238278d1be874cb838d6089' packages/linxira-components/PKGBUILD
+grep -q '3539b201cfe238a0a19b22f517288d5a964fce179dae016405db163f5142ad66' packages/linxira-components/PKGBUILD
 grep -q 'scripts/linxira-components-service' packages/linxira-components/PKGBUILD
 grep -q 'scripts/linxira-components-worker' packages/linxira-components/PKGBUILD
 grep -q 'service/linxira-components.service' packages/linxira-components/PKGBUILD
 grep -q 'service/linxira-components-worker@.service' packages/linxira-components/PKGBUILD
 grep -q 'org.linxira.components.policy' packages/linxira-components/PKGBUILD
 grep -q "'python-dbus'" packages/linxira-components/PKGBUILD
-grep -q 'pkgver=0.6.0' packages/linxira-components/PKGBUILD
+grep -q 'pkgver=0.7.0' packages/linxira-components/PKGBUILD
 grep -q "'pyalpm'" packages/linxira-components/PKGBUILD
 grep -q 'b986a0972d8ddecb11489c92aa1efac47650a47b' packages/linxira-completion-agent/PKGBUILD
 grep -q '2288eaa81c6d86ce161b975eda15858540cf1bfc0b6d0fb958559d6fd3aa6bc3' \
@@ -99,8 +99,8 @@ grep -q "depends=.*'linxira-catalog'.*'linxira-components'" packages/linxira-com
 grep -q '2ba853f094896e9500232c681c4a3ddb43c38448' packages/linxira-chwd-detector/PKGBUILD
 grep -q '50e6b7324bc4fa065be79f27d7e0da5d4ba5e7b98537329d3f0c7e42dbbd90c2' \
   packages/linxira-chwd-detector/PKGBUILD
-grep -q '1cc3eb3040bea48a68b83e0b4f4ddfac32b510ff' packages/linxira-hardware-driver-manager/PKGBUILD
-grep -q 'f5382ff2d1612545f83712876d34f9aa18ebde6c3603191c8963538f4d1f31f5' \
+grep -q '0f6b770ad62cde4dc336f2efdd5889cf0c749075' packages/linxira-hardware-driver-manager/PKGBUILD
+grep -q '3737a3773f4fdd199a20b4786e70eca2342c14baf13427f8bc3c3a857a7aeab0' \
   packages/linxira-hardware-driver-manager/PKGBUILD
 grep -q "depends=.*'linxira-chwd-detector'" packages/linxira-hardware-driver-manager/PKGBUILD
 if grep -E -n "depends=.*polkit|install.*systemd/system|install.*polkit" \

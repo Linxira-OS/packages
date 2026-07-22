@@ -1,7 +1,7 @@
 # Maintainer: Linxira OS <admin@linxira.org>
 
 pkgname=linxira-components
-pkgver=0.6.0
+pkgver=0.7.0
 pkgrel=1
 pkgdesc='Catalog-bound transaction planning and receipt backend for Linxira OS'
 arch=('any')
@@ -14,24 +14,32 @@ depends=(
 )
 checkdepends=('python-pytest')
 
-_commit=9dcd29b7f4f68b43cddcbf692536a15581a66c14
+_commit=96bf7baa8708c40c8238278d1be874cb838d6089
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('5d7bd9c0e0bbe9b5f15dfd6ec35a1e6f4eb31f347f590e5cb3180239a788bfbb')
+sha256sums=('3539b201cfe238a0a19b22f517288d5a964fce179dae016405db163f5142ad66')
 
 check() {
   cd "$srcdir/$pkgname-$_commit"
-  grep -q 'version = "0.6.0"' pyproject.toml
+  grep -q 'version = "0.7.0"' pyproject.toml
   python -m unittest discover -s tests -v
   PYTHONPATH=src dbus-run-session python -m pytest -q tests/test_dbus_service.py
   PYTHONPATH=src python - <<'PY'
 from pathlib import Path
 import tempfile
 import pyalpm
-from linxira_components.driver_worker import _sync_metadata
+from linxira_components.driver_worker import _package_artifacts, _sync_metadata
+from linxira_components.system_transactions import SystemTransactionStore
 
 hyperv = _sync_metadata(Path("/"))["hyperv"]
 assert len(hyperv["sha256"]) == 64
 assert len(hyperv["signatureSha256"]) == 64
+
+with tempfile.TemporaryDirectory() as state_directory:
+    store = SystemTransactionStore(Path(state_directory), Path("/"), recover=False)
+    for targets in (("qemu-guest-agent", "spice-vdagent"), ("open-vm-tools",)):
+        artifacts = _package_artifacts(Path("/"), store._run_fixed, targets)
+        assert set(targets).issubset({item["name"] for item in artifacts})
+        assert all(len(item["sha256"]) == 64 and len(item["signatureSha256"]) == 64 for item in artifacts)
 
 with tempfile.TemporaryDirectory() as directory:
     root = Path(directory) / "root"

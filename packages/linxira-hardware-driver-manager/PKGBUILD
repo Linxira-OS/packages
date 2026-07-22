@@ -1,21 +1,21 @@
 # Maintainer: Linxira OS <admin@linxira.org>
 
 pkgname=linxira-hardware-driver-manager
-pkgver=0.3.0
+pkgver=0.4.0
 pkgrel=1
 pkgdesc='Hardware driver reporting, fixed planning, and root-owned diagnostics for Linxira OS'
 arch=('any')
 groups=('linxira')
 url='https://github.com/Linxira-OS/linxira-hardware-driver-manager'
 license=('MIT')
-depends=('linxira-chwd-detector' 'linxira-components>=0.6.0' 'pacman' 'python' 'python-dbus' 'pyside6')
+depends=('linxira-chwd-detector' 'linxira-components>=0.7.0' 'pacman' 'python' 'python-dbus' 'pyside6')
 makedepends=('python-build' 'python-installer' 'python-setuptools' 'python-wheel')
 checkdepends=('appstream' 'desktop-file-utils')
 optdepends=('dkms: report DKMS module build status')
 
-_commit=1cc3eb3040bea48a68b83e0b4f4ddfac32b510ff
+_commit=0f6b770ad62cde4dc336f2efdd5889cf0c749075
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('f5382ff2d1612545f83712876d34f9aa18ebde6c3603191c8963538f4d1f31f5')
+sha256sums=('3737a3773f4fdd199a20b4786e70eca2342c14baf13427f8bc3c3a857a7aeab0')
 
 build() {
   cd "$srcdir/$pkgname-$_commit"
