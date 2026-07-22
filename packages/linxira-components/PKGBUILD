@@ -1,7 +1,7 @@
 # Maintainer: Linxira OS <admin@linxira.org>
 
 pkgname=linxira-components
-pkgver=0.5.0
+pkgver=0.6.0
 pkgrel=1
 pkgdesc='Catalog-bound transaction planning and receipt backend for Linxira OS'
 arch=('any')
@@ -9,18 +9,18 @@ groups=('linxira')
 url='https://github.com/Linxira-OS/linxira-components'
 license=('MIT')
 depends=(
-  'dbus' 'linxira-catalog' 'linxira-chwd-detector' 'pacman' 'polkit' 'python' 'python-dbus'
-  'python-gobject' 'systemd'
+  'btrfs-progs' 'dbus' 'linxira-catalog' 'linxira-chwd-detector' 'pacman' 'polkit'
+  'python' 'python-dbus' 'python-gobject' 'pyalpm' 'systemd' 'timeshift' 'util-linux'
 )
 checkdepends=('python-pytest')
 
-_commit=f67363b0626bc47c6f3a7cf1795507dba4cc5df7
+_commit=cca6379c54099fae357455f3209339c744931075
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('b458d5535132b10ef89867bee4fd427cbdc23685cef2e79ad5eca9bb95921ffd')
+sha256sums=('203b692e14a4cc0509171c931065310df93c8fd1433335ceef0867d1c1c009bf')
 
 check() {
   cd "$srcdir/$pkgname-$_commit"
-  grep -q 'version = "0.5.0"' pyproject.toml
+  grep -q 'version = "0.6.0"' pyproject.toml
   python -m unittest discover -s tests -v
   PYTHONPATH=src dbus-run-session python -m pytest -q tests/test_dbus_service.py
   python -m compileall -q src tests
@@ -41,6 +41,8 @@ package() {
     "$pkgdir/usr/bin/linxira-components"
   install -Dm755 scripts/linxira-components-service \
     "$pkgdir/usr/bin/linxira-components-service"
+  install -Dm755 scripts/linxira-components-worker \
+    "$pkgdir/usr/bin/linxira-components-worker"
   install -d "$pkgdir/usr/lib/linxira-components"
   cp -a src/linxira_components "$pkgdir/usr/lib/linxira-components/"
   find "$pkgdir/usr/lib/linxira-components" -type d -name __pycache__ \
@@ -54,6 +56,8 @@ package() {
     "$pkgdir/usr/share/dbus-1/system-services/org.linxira.Components1.service"
   install -Dm644 service/linxira-components.service \
     "$pkgdir/usr/lib/systemd/system/linxira-components.service"
+  install -Dm644 service/linxira-components-worker@.service \
+    "$pkgdir/usr/lib/systemd/system/linxira-components-worker@.service"
   install -Dm644 policy/org.linxira.components.policy.in \
     "$pkgdir/usr/share/polkit-1/actions/org.linxira.components.policy"
   install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
