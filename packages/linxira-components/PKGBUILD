@@ -12,7 +12,7 @@ depends=('python' 'pacman' 'linxira-catalog')
 
 _commit=fab1262fcdfcfd141e9644d4d42db0c4b2ecb1e0
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('628af08197ee5bf95d1fcf90f98d2000b0c131c730f1ee0bd733100ef47a8cc0')
+sha256sums=('9b8d028f3f2668e290b3f5ed1ac43b12005ffadfdfc757e1d6a8833de2499933')
 
 check() {
   cd "$srcdir/$pkgname-$_commit"
