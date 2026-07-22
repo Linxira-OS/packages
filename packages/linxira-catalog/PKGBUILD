@@ -2,7 +2,7 @@
 
 pkgname=linxira-catalog
 pkgver=3.0.0
-pkgrel=3
+pkgrel=4
 pkgdesc='Reviewed software catalog and schema for Linxira OS'
 arch=('any')
 groups=('linxira')
@@ -10,9 +10,9 @@ url='https://github.com/Linxira-OS/linxira-catalog'
 license=('MIT')
 checkdepends=('python' 'python-jsonschema')
 
-_commit=ce30201c8913ef92022ecd4ecd44c7bad31fd9c8
+_commit=66aeb725b9bbbee9ac3c810c2e64c7c929863bf4
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('041f1e346cdfd020323387f88c02917de488f09055d623a7e3baff5cd02594e0')
+sha256sums=('427eb8df5bf80922028ce6a09d932660c38e5028f6cd50218cdc86daa4f2f11b')
 
 check() {
   cd "$srcdir/$pkgname-$_commit"

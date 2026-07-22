@@ -121,4 +121,6 @@ reboot evidence. It saves only fixed-operation review plans.
 `linxira-recovery-diagnostics` reports installed/live Btrfs, Timeshift,
 grub-btrfs, pacman lock, keyring, boot, and fixed `/mnt` chroot readiness. Its
 support bundle is structured, recursively redacted, private, and never
-uploaded. Both initial packages keep privileged apply disabled.
+uploaded. Pacman-lock diagnosis and live-chroot readiness use the shared
+root-owned transaction service; kernel changes and all mutating recovery
+operations remain disabled.

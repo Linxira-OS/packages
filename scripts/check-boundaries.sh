@@ -62,7 +62,8 @@ if [[ -f packages/linxira-welcome/PKGBUILD ]]; then
     echo "linxira-welcome must remain independent and unprivileged" >&2
     exit 1
   fi
-  grep -q '7c0d1128ae7d6d5947bdc2cb246ceab0f6052b4e' packages/linxira-welcome/PKGBUILD
+  grep -q 'f8338c74b3dacce6f3f2a7d7b088301eb199eb0b' packages/linxira-welcome/PKGBUILD
+  grep -q '869a53fcc9cd5402af7ca881f9460594176c2124c9aa69b0341438c89cee3c63' packages/linxira-welcome/PKGBUILD
 fi
 
 if [[ -f packages/linxira-update/PKGBUILD ]]; then
@@ -77,10 +78,16 @@ if [[ -f packages/linxira-update/PKGBUILD ]]; then
 fi
 
 if [[ -f packages/linxira-catalog/PKGBUILD ]]; then
-  grep -q 'ce30201c8913ef92022ecd4ecd44c7bad31fd9c8' packages/linxira-catalog/PKGBUILD
+  grep -q '66aeb725b9bbbee9ac3c810c2e64c7c929863bf4' packages/linxira-catalog/PKGBUILD
+  grep -q '427eb8df5bf80922028ce6a09d932660c38e5028f6cd50218cdc86daa4f2f11b' packages/linxira-catalog/PKGBUILD
 fi
 
-grep -q 'fab1262fcdfcfd141e9644d4d42db0c4b2ecb1e0' packages/linxira-components/PKGBUILD
+grep -q '11b8921d16c1e5ea0c5f229f533667f8087c34f4' packages/linxira-components/PKGBUILD
+grep -q 'b40516076b6b04db610ce5a9e96451e19dfa13b40fc4f3452abcd5b16920d4e7' packages/linxira-components/PKGBUILD
+grep -q 'scripts/linxira-components-service' packages/linxira-components/PKGBUILD
+grep -q 'service/linxira-components.service' packages/linxira-components/PKGBUILD
+grep -q 'org.linxira.components.policy' packages/linxira-components/PKGBUILD
+grep -q "'python-dbus'" packages/linxira-components/PKGBUILD
 grep -q 'b986a0972d8ddecb11489c92aa1efac47650a47b' packages/linxira-completion-agent/PKGBUILD
 grep -q '2288eaa81c6d86ce161b975eda15858540cf1bfc0b6d0fb958559d6fd3aa6bc3' \
   packages/linxira-completion-agent/PKGBUILD
@@ -100,18 +107,20 @@ fi
 grep -q '40b27d0e733bbfb8edae83151ce3059e204c0967' packages/linxira-kernel-manager/PKGBUILD
 grep -q 'aa6c60b9608cea69ae162e0eaf7b7cf38b7cf6eee9ec943b7cabaf3e7795f3d8' \
   packages/linxira-kernel-manager/PKGBUILD
-grep -q '2c05f516fa25840d89d81c15923d82771b86ddc8' packages/linxira-recovery-diagnostics/PKGBUILD
-grep -q '38a6408340dcd79fad542e1b385a8cdfe05603ddc2b81139b5e1abece16c7b14' \
+grep -q 'badc0f75e4b31453fa11376caf985c2314eb1792' packages/linxira-recovery-diagnostics/PKGBUILD
+grep -q '31db718145af2c9b67019ec70f999c8c0ac0fc31154b36573afb604943dd6326' \
   packages/linxira-recovery-diagnostics/PKGBUILD
+grep -q "'linxira-components>=0.4.0'" packages/linxira-recovery-diagnostics/PKGBUILD
 if grep -E -n "depends=.*polkit|install.*systemd/system|install.*polkit" \
   packages/linxira-kernel-manager/PKGBUILD packages/linxira-recovery-diagnostics/PKGBUILD; then
-  echo "kernel and recovery MVP packages must remain report-and-plan only" >&2
+  echo "kernel and recovery clients must not package their own privileged service" >&2
   exit 1
 fi
-grep -q '5d78caaafa7e79d6e132f6071fc2aa59cae83bd0' packages/linxira-config-hub/PKGBUILD
+grep -q '7e679a522b8ce280469e7fcd05cce5a6adb283c8' packages/linxira-config-hub/PKGBUILD
+grep -q '18e68d450d3c2305b1615a20a49e6ab476bad402a3404ae62f9e34474b55eaed' packages/linxira-config-hub/PKGBUILD
 grep -q 'a848d9c244e00eb526a83de5a6976a88e942c7bb' packages/linxira-component-manager/PKGBUILD
-grep -q '38232a13ca8683bd12caee20abe990e661f08dd7' packages/linxira-gaming-manager/PKGBUILD
-grep -q 'c6eeb01f53f599fe1621e559e070e549323ec9e0c3c4fa63e8ac7b3a17dc3f2a' \
+grep -q 'b9d7edc7372312f5f2c5b15cf552474af6a5debe' packages/linxira-gaming-manager/PKGBUILD
+grep -q '9048f6a7511c830ea8709c24dcace29fbc3b57e1ce2f7bd6034be8550a38008c' \
   packages/linxira-gaming-manager/PKGBUILD
 if grep -E -n "install.*systemd/system|install.*polkit" \
   packages/linxira-gaming-manager/PKGBUILD; then

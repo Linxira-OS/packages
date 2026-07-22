@@ -1,14 +1,17 @@
 # Maintainer: Linxira OS <admin@linxira.org>
 
 pkgname=linxira-recovery-diagnostics
-pkgver=0.1.0
+pkgver=0.2.0
 pkgrel=1
 pkgdesc='Read-only recovery readiness, repair planning, and support bundles for Linxira OS'
 arch=('any')
 groups=('linxira')
 url='https://github.com/Linxira-OS/linxira-recovery-diagnostics'
 license=('MIT')
-depends=('pacman' 'python' 'pyside6' 'systemd' 'util-linux')
+depends=(
+  'linxira-components>=0.4.0' 'pacman' 'python' 'python-dbus' 'pyside6'
+  'systemd' 'util-linux'
+)
 makedepends=('python-build' 'python-hatchling' 'python-installer')
 checkdepends=('appstream' 'desktop-file-utils' 'python-pytest')
 optdepends=(
@@ -17,9 +20,9 @@ optdepends=(
   'timeshift: inspect snapshot configuration and inventory'
 )
 
-_commit=2c05f516fa25840d89d81c15923d82771b86ddc8
+_commit=badc0f75e4b31453fa11376caf985c2314eb1792
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('38a6408340dcd79fad542e1b385a8cdfe05603ddc2b81139b5e1abece16c7b14')
+sha256sums=('31db718145af2c9b67019ec70f999c8c0ac0fc31154b36573afb604943dd6326')
 
 build() {
   cd "$srcdir/$pkgname-$_commit"

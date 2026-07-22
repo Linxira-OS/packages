@@ -1,7 +1,7 @@
 # Maintainer: Linxira OS <admin@linxira.org>
 
 pkgname=linxira-config-hub
-pkgver=2.2.0
+pkgver=2.2.1
 pkgrel=1
 pkgdesc='Configuration and diagnostics CLI for Linxira OS'
 arch=('any')
@@ -27,12 +27,13 @@ optdepends=(
 )
 checkdepends=('python')
 
-_commit=5d78caaafa7e79d6e132f6071fc2aa59cae83bd0
+_commit=7e679a522b8ce280469e7fcd05cce5a6adb283c8
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('d3fc9dbd4710572e5b7000737b3dbd7405def990db6c98b0ef473d31c7506e1a')
+sha256sums=('18e68d450d3c2305b1615a20a49e6ab476bad402a3404ae62f9e34474b55eaed')
 
 check() {
   cd "$srcdir/$pkgname-$_commit"
+  grep -q 'VERSION="2.2.1"' cli/linxira-config
   bash -n cli/linxira-config
   python -m unittest discover -s tests -v
 }

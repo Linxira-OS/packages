@@ -1,14 +1,14 @@
 # Maintainer: Linxira OS <admin@linxira.org>
 
 pkgname=linxira-gaming-manager
-pkgver=0.2.0
+pkgver=0.3.0
 pkgrel=1
 pkgdesc='User-level game library and compatibility manager for Linxira OS'
 arch=('any')
 groups=('linxira')
 url='https://github.com/Linxira-OS/linxira-gaming-manager'
 license=('MIT')
-depends=('linxira-catalog' 'linxira-components' 'polkit' 'python' 'python-vdf' 'pyside6')
+depends=('linxira-catalog' 'linxira-components>=0.3.0' 'polkit' 'python' 'python-vdf' 'pyside6')
 makedepends=('python-build' 'python-installer' 'python-setuptools' 'python-wheel')
 checkdepends=('appstream' 'desktop-file-utils')
 optdepends=(
@@ -22,9 +22,9 @@ optdepends=(
   'winetricks: reviewed Wine prefix operations'
 )
 
-_commit=38232a13ca8683bd12caee20abe990e661f08dd7
+_commit=b9d7edc7372312f5f2c5b15cf552474af6a5debe
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('c6eeb01f53f599fe1621e559e070e549323ec9e0c3c4fa63e8ac7b3a17dc3f2a')
+sha256sums=('9048f6a7511c830ea8709c24dcace29fbc3b57e1ce2f7bd6034be8550a38008c')
 
 build() {
   cd "$srcdir/$pkgname-$_commit"
