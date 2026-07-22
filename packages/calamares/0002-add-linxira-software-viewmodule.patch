@@ -27,7 +27,7 @@ new file mode 100644
 index 0000000..eaf52a1
 --- /dev/null
 +++ b/src/modules/linxirasoftware/LinxiraSoftwareViewStep.cpp
-@@ -0,0 +1,576 @@
+@@ -0,0 +1,577 @@
 +/* SPDX-License-Identifier: GPL-3.0-or-later */
 +
 +#include "LinxiraSoftwareViewStep.h"
@@ -377,7 +377,8 @@ index 0000000..eaf52a1
 +    const bool reviewed = review.value( QStringLiteral( "status" ) ).toString() == QStringLiteral( "reviewed" );
 +    const bool available = availability.value( QStringLiteral( "status" ) ).toString() == QStringLiteral( "available" );
 +    const bool defaultChannel = availability.value( QStringLiteral( "channel" ) ).toString() == QStringLiteral( "default" );
-+    const bool selectable = kind != QStringLiteral( "operation" ) && reviewed && available && defaultChannel;
++    const bool requiresAcceptance = node.value( QStringLiteral( "license" ) ).toObject().value( QStringLiteral( "requiresAcceptance" ) ).toBool();
++    const bool selectable = kind != QStringLiteral( "operation" ) && reviewed && available && defaultChannel && !requiresAcceptance;
 +    const bool included = offlinePolicy == QStringLiteral( "included" );
 +
 +    item->setData( 0, OfflinePolicyRole, offlinePolicy );

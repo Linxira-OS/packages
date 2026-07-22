@@ -1,8 +1,8 @@
 # Maintainer: Linxira OS <admin@linxira.org>
 
 pkgname=linxira-package-center
-pkgver=0.2.0
-pkgrel=2
+pkgver=0.2.1
+pkgrel=1
 pkgdesc='Catalog-bound application and capability manager for Linxira OS'
 arch=('any')
 groups=('linxira')
@@ -14,9 +14,9 @@ depends=(
 )
 checkdepends=('desktop-file-utils')
 
-_commit=deb19b5d2bc50e76434df0d421bce4fd25602b9d
+_commit=f49c7790416ae2c7b1677b58f81205bd01c87944
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('ae02ba90ba39d9515eb6ae60d0378b52487a031da0f4457203b84eff686ca41e')
+sha256sums=('5c5dc6624a8baea7396bdefede39c4fe8b623399bd8ba70b1c3ab3127905d0af')
 
 check() {
   cd "$srcdir/$pkgname-$_commit"

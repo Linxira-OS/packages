@@ -1,8 +1,8 @@
 # Maintainer: Linxira OS <admin@linxira.org>
 
 pkgname=linxira-completion-agent
-pkgver=0.1.0
-pkgrel=3
+pkgver=0.1.1
+pkgrel=1
 pkgdesc='First-online completion workflow for Linxira OS'
 arch=('any')
 groups=('linxira')
@@ -12,9 +12,9 @@ depends=('linxira-catalog' 'linxira-components' 'networkmanager' 'python' 'pysid
 makedepends=('python-build' 'python-installer' 'python-setuptools' 'python-wheel')
 checkdepends=('appstream' 'desktop-file-utils')
 
-_commit=782de5d2f8876eb8f01c2fc65bd3c45498c6c407
+_commit=b986a0972d8ddecb11489c92aa1efac47650a47b
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('2358d9384098b248e26eeff30397965082810e8b37cad4e8c1178d76eb313de6')
+sha256sums=('bd8447ed5ec6445744c5a7fdfd5ac9ff1c7a568fcad56ad9c468d66e75301953')
 
 build() {
   cd "$srcdir/$pkgname-$_commit"

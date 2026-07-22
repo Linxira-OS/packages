@@ -1,14 +1,14 @@
 # Maintainer: Linxira OS <admin@linxira.org>
 
 pkgname=linxira-gaming-manager
-pkgver=0.1.0
+pkgver=0.2.0
 pkgrel=1
 pkgdesc='User-level game library and compatibility manager for Linxira OS'
 arch=('any')
 groups=('linxira')
 url='https://github.com/Linxira-OS/linxira-gaming-manager'
 license=('MIT')
-depends=('python' 'python-vdf' 'pyside6')
+depends=('linxira-catalog' 'linxira-components' 'polkit' 'python' 'python-vdf' 'pyside6')
 makedepends=('python-build' 'python-installer' 'python-setuptools' 'python-wheel')
 checkdepends=('appstream' 'desktop-file-utils')
 optdepends=(
@@ -22,9 +22,9 @@ optdepends=(
   'winetricks: reviewed Wine prefix operations'
 )
 
-_commit=9569e94634050a7ddc7c439b07595ddf5037a81e
+_commit=38232a13ca8683bd12caee20abe990e661f08dd7
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('afc3e03c7df79af893c4d64fd2320476d6c731551557e74dd24157b2f717632d')
+sha256sums=('d443161d91e28d21dec0efe8f1b9d331d10ce7e8f2bb1df90d2712b18b355b13')
 
 build() {
   cd "$srcdir/$pkgname-$_commit"
@@ -38,7 +38,9 @@ check() {
   python -m compileall -q src
   desktop-file-validate data/org.linxira.GamingManager.desktop
   appstreamcli validate --no-net data/org.linxira.GamingManager.metainfo.xml
-  ! grep -R -E -n 'pkexec|sudo|pacman|flatpak|shell=True' src
+  ! grep -R -E -n 'sudo|pacman|flatpak|shell=True' src
+  grep -q 'PKEXEC = Path("/usr/bin/pkexec")' src/linxira_gaming_manager/setup.py
+  grep -q 'COMPONENTS_CLI = Path("/usr/bin/linxira-components")' src/linxira_gaming_manager/setup.py
 }
 
 package() {

@@ -2,7 +2,7 @@
 
 pkgname=linxira-welcome
 pkgver=1.0.0
-pkgrel=4
+pkgrel=5
 pkgdesc='Safe Plasma-native workstation control center for Linxira OS'
 arch=('any')
 groups=('linxira')
@@ -16,6 +16,7 @@ optdepends=(
   'konsole: open a terminal'
   'linxira-config-hub: administrator configuration and diagnostics'
   'linxira-component-manager: select capability bundles and system components'
+  'linxira-gaming-manager: deploy and manage the gaming environment'
   'linxira-package-center: install reviewed applications'
   'linxira-update: check and apply system updates'
   'shelly: manage software after installation'
@@ -23,9 +24,9 @@ optdepends=(
   'timeshift: manage recovery snapshots'
 )
 
-_commit=7394a21a53eecfc5df7fd04398b6c0500a5fa630
+_commit=7c0d1128ae7d6d5947bdc2cb246ceab0f6052b4e
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('b04e7d40ed456b3d5656cb76c04ac86467025f81ad490fb33c85896184487e29')
+sha256sums=('94c8e6b66beb64a36efc5604bfcbdf7c9a0ab55673586b39c2c5fe95e8a7096b')
 
 check() {
   cd "$srcdir/$pkgname-$_commit"
