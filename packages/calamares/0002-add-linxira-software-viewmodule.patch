@@ -27,7 +27,7 @@ new file mode 100644
 index 0000000..eaf52a1
 --- /dev/null
 +++ b/src/modules/linxirasoftware/LinxiraSoftwareViewStep.cpp
-@@ -0,0 +1,577 @@
+@@ -0,0 +1,617 @@
 +/* SPDX-License-Identifier: GPL-3.0-or-later */
 +
 +#include "LinxiraSoftwareViewStep.h"
@@ -57,6 +57,7 @@ index 0000000..eaf52a1
 +constexpr int OfflinePolicyRole = Qt::UserRole + 3;
 +constexpr int CategorySelectionRole = Qt::UserRole + 4;
 +constexpr int CategoryMaximumRole = Qt::UserRole + 5;
++constexpr int SelectableRole = Qt::UserRole + 6;
 +
 +QString localized( const QJsonValue& value )
 +{
@@ -373,20 +374,40 @@ index 0000000..eaf52a1
 +
 +    const auto availability = node.value( QStringLiteral( "availability" ) ).toObject();
 +    const auto review = node.value( QStringLiteral( "review" ) ).toObject();
++    const auto artifact = node.value( QStringLiteral( "artifact" ) ).toObject();
 +    const auto offlinePolicy = availability.value( QStringLiteral( "offlinePolicy" ) ).toString();
 +    const bool reviewed = review.value( QStringLiteral( "status" ) ).toString() == QStringLiteral( "reviewed" );
 +    const bool available = availability.value( QStringLiteral( "status" ) ).toString() == QStringLiteral( "available" );
 +    const bool defaultChannel = availability.value( QStringLiteral( "channel" ) ).toString() == QStringLiteral( "default" );
 +    const bool requiresAcceptance = node.value( QStringLiteral( "license" ) ).toObject().value( QStringLiteral( "requiresAcceptance" ) ).toBool();
-+    const bool selectable = kind != QStringLiteral( "operation" ) && reviewed && available && defaultChannel && !requiresAcceptance;
++    const bool pacmanArch = node.value( QStringLiteral( "provider" ) ).toString() == QStringLiteral( "pacman" )
++        && node.value( QStringLiteral( "source" ) ).toString() == QStringLiteral( "arch" );
++    const bool supportedArtifact = artifact.value( QStringLiteral( "type" ) ).toString() == QStringLiteral( "package" )
++        || artifact.value( QStringLiteral( "type" ) ).toString() == QStringLiteral( "package-group" );
++    const bool architecture = stringList( availability.value( QStringLiteral( "architectures" ) ).toArray() )
++                                  .contains( QStringLiteral( "x86_64" ) );
++    const bool selectable = kind != QStringLiteral( "operation" ) && pacmanArch && reviewed && available
++        && defaultChannel && architecture && supportedArtifact && !requiresAcceptance;
 +    const bool included = offlinePolicy == QStringLiteral( "included" );
++    const auto provider = node.value( QStringLiteral( "provider" ) ).toString();
 +
 +    item->setData( 0, OfflinePolicyRole, offlinePolicy );
-+    item->setText( 2, included ? tr( "Included" ) : tr( "After first boot" ) );
-+    item->setFlags( selectable ? item->flags() | Qt::ItemIsUserCheckable
-+                               : item->flags() & ~Qt::ItemIsEnabled );
++    item->setData( 0, SelectableRole, selectable );
++    item->setText( 2, included ? tr( "Included" )
++                               : selectable ? tr( "After first boot (%1)" ).arg( provider )
++                                            : tr( "Review pending (%1)" ).arg( provider.isEmpty() ? kind : provider ) );
++    Qt::ItemFlags flags = item->flags();
++    if ( selectable )
++    {
++        flags |= Qt::ItemIsUserCheckable;
++    }
++    else
++    {
++        flags &= ~( Qt::ItemIsEnabled | Qt::ItemIsUserCheckable );
++    }
++    item->setFlags( flags );
 +    item->setCheckState( 0, Qt::Unchecked );
-+    if ( node.value( QStringLiteral( "presentation" ) ).toObject().value(
++    if ( selectable && node.value( QStringLiteral( "presentation" ) ).toObject().value(
 +             QStringLiteral( "defaultSelected" ) ).toBool() )
 +    {
 +        item->setCheckState( 0, Qt::Checked );
@@ -437,7 +458,7 @@ index 0000000..eaf52a1
 +        const auto id = item->data( 0, IdRole ).toString();
 +        for ( auto* duplicate : m_leafItems.value( id ) )
 +        {
-+            if ( duplicate != item && duplicate->flags().testFlag( Qt::ItemIsUserCheckable ) )
++            if ( duplicate != item && duplicate->data( 0, SelectableRole ).toBool() )
 +            {
 +                duplicate->setCheckState( 0, item->checkState( 0 ) );
 +            }
@@ -454,7 +475,8 @@ index 0000000..eaf52a1
 +    {
 +        for ( const auto* item : it.value() )
 +        {
-+            if ( item->checkState( 0 ) == Qt::Checked )
++            if ( item->data( 0, SelectableRole ).toBool()
++                 && item->checkState( 0 ) == Qt::Checked )
 +            {
 +                selected.append( it.key() );
 +                break;
@@ -464,6 +486,24 @@ index 0000000..eaf52a1
 +    selected.removeDuplicates();
 +    selected.sort();
 +    return selected;
++}
++
++bool LinxiraSoftwareViewStep::hasSelectedLeafDescendant( const QTreeWidgetItem* item ) const
++{
++    const auto kind = item->data( 0, KindRole ).toString();
++    if ( kind != QStringLiteral( "category" ) && kind != QStringLiteral( "bundle" ) )
++    {
++        return item->data( 0, SelectableRole ).toBool()
++            && item->checkState( 0 ) == Qt::Checked;
++    }
++    for ( int child = 0; child < item->childCount(); ++child )
++    {
++        if ( hasSelectedLeafDescendant( item->child( child ) ) )
++        {
++            return true;
++        }
++    }
++    return false;
 +}
 +
 +QStringList LinxiraSoftwareViewStep::selectedBundleIds() const
@@ -485,7 +525,7 @@ index 0000000..eaf52a1
 +            auto* item = pending.takeLast();
 +            const auto kind = item->data( 0, KindRole ).toString();
 +            if ( ( kind == QStringLiteral( "category" ) || kind == QStringLiteral( "bundle" ) )
-+                 && item->checkState( 0 ) != Qt::Unchecked )
++                 && hasSelectedLeafDescendant( item ) )
 +            {
 +                selected.append( item->data( 0, IdRole ).toString() );
 +            }
@@ -514,7 +554,7 @@ index 0000000..eaf52a1
 +    {
 +        for ( auto* item : m_leafItems.value( id ) )
 +        {
-+            if ( item->flags().testFlag( Qt::ItemIsUserCheckable ) )
++            if ( item->data( 0, SelectableRole ).toBool() )
 +            {
 +                item->setCheckState( 0, Qt::Checked );
 +            }
@@ -576,7 +616,7 @@ index 0000000..eaf52a1
 +            int selectedChoices = 0;
 +            for ( int child = 0; child < category->childCount(); ++child )
 +            {
-+                selectedChoices += category->child( child )->checkState( 0 ) != Qt::Unchecked;
++                selectedChoices += hasSelectedLeafDescendant( category->child( child ) );
 +            }
 +            const auto mode = category->data( 0, CategorySelectionRole ).toString();
 +            if ( mode == QStringLiteral( "exclusive" ) && selectedChoices > 1 )
@@ -610,7 +650,7 @@ new file mode 100644
 index 0000000..9ce16d0
 --- /dev/null
 +++ b/src/modules/linxirasoftware/LinxiraSoftwareViewStep.h
-@@ -0,0 +1,75 @@
+@@ -0,0 +1,76 @@
 +/* SPDX-License-Identifier: GPL-3.0-or-later */
 +
 +#ifndef LINXIRASOFTWAREVIEWSTEP_H
@@ -662,6 +702,7 @@ index 0000000..9ce16d0
 +                  QSet< QString >& visiting );
 +    void itemChanged( QTreeWidgetItem* item, int column );
 +    QStringList selectedLeafIds() const;
++    bool hasSelectedLeafDescendant( const QTreeWidgetItem* item ) const;
 +    QStringList selectedBundleIds() const;
 +    void restoreSelection();
 +    void normalizeExclusiveCategories();
