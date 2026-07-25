@@ -2,7 +2,7 @@
 
 pkgname=linxira-welcome
 pkgver=1.0.0
-pkgrel=7
+pkgrel=8
 pkgdesc='Safe Plasma-native workstation control center for Linxira OS'
 arch=('any')
 groups=('linxira')
@@ -15,10 +15,10 @@ optdepends=(
   'kinfocenter: inspect system information'
   'konsole: open a terminal'
   'linxira-config-hub: administrator configuration and diagnostics'
-  'linxira-component-manager: select capability bundles and system components'
+  'linxira-component-manager: quick setup for runtimes and system capabilities'
   'linxira-gaming-manager: deploy and manage the gaming environment'
   'linxira-hardware-driver-manager: inspect hardware and reviewed driver policies'
-  'linxira-package-center: install reviewed applications'
+  'linxira-package-center: quick setup for reviewed applications'
   'linxira-recovery-diagnostics: inspect fixed recovery readiness and diagnostics'
   'linxira-update: check and apply system updates'
   'shelly: manage software after installation'

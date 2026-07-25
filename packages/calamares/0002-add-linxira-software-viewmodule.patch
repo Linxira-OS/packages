@@ -323,7 +323,7 @@ index 0000000..eaf52a1
 +                return false;
 +            }
 +        }
-+        item->setExpanded( true );
++        item->setExpanded( tree == m_desktops );
 +    }
 +    normalizeExclusiveCategories();
 +    m_updating = false;
@@ -601,7 +601,7 @@ index 0000000..eaf52a1
 +            selectionValid()
 +                ? tr( "%1 items selected. Included items are installed now; other choices remain pending." )
 +                      .arg( selectedLeafIds().size() )
-+                : tr( "Choose exactly one desktop and stay within each category limit." ) );
++                : tr( "Choose exactly one desktop; application and runtime choices are optional." ) );
 +    }
 +    emit nextStatusChanged( m_ready && selectionValid() );
 +}

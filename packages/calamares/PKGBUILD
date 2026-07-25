@@ -2,7 +2,7 @@
 
 pkgname=calamares
 pkgver=3.3.14
-pkgrel=5
+pkgrel=6
 pkgdesc='Distribution-independent graphical system installer framework'
 arch=('x86_64')
 url='https://calamares.io/'
@@ -42,7 +42,7 @@ source=(
 )
 sha256sums=('5547f80db067dea923ae693ba6bb88eb2b2eeac1da3ebec42fce453e31c290c0'
             '0231ff9d671cc590f96b863c69c341a1fca45f260ba79ed246b8a5b95fe0859d'
-            '299742d4f9519dc4128f4e7aef65bbe4a1cd964ddf18992716fc87e116367027')
+            '118de03dc057d0041d64ea5032536cb60d946895a6a75af7fc6b17a98bed5917')
 
 prepare() {
   cd "calamares-${pkgver}"
