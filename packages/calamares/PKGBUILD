@@ -2,7 +2,7 @@
 
 pkgname=calamares
 pkgver=3.3.14
-pkgrel=7
+pkgrel=9
 pkgdesc='Distribution-independent graphical system installer framework'
 arch=('x86_64')
 url='https://calamares.io/'
@@ -39,10 +39,12 @@ source=(
   "https://github.com/calamares/calamares/releases/download/v${pkgver}/calamares-${pkgver}.tar.gz"
   '0001-initcpiocfg-drop-obsolete-crc32c-intel.patch'
   '0002-add-linxira-software-viewmodule.patch'
+  '0003-add-linxira-about-links.patch'
 )
 sha256sums=('5547f80db067dea923ae693ba6bb88eb2b2eeac1da3ebec42fce453e31c290c0'
             '0231ff9d671cc590f96b863c69c341a1fca45f260ba79ed246b8a5b95fe0859d'
-            '31ca7f9886e7b8c352f58620a8389ccd1a8df5966375a3a1d38f6dffa4fda0c5')
+            '66aaf7e5c6daa176ae2a976606d01e505553fc2ae7610af838bf80a71dd5561b'
+            '09c4431c16d26d122e19656f5207e52aa2d8328f063398facad7eb41d5056aea')
 
 prepare() {
   cd "calamares-${pkgver}"
@@ -50,6 +52,8 @@ prepare() {
     -i "${srcdir}/0001-initcpiocfg-drop-obsolete-crc32c-intel.patch"
   patch --no-backup-if-mismatch -Np1 \
     -i "${srcdir}/0002-add-linxira-software-viewmodule.patch"
+  patch --no-backup-if-mismatch -Np1 \
+    -i "${srcdir}/0003-add-linxira-about-links.patch"
   ! grep -R -q -E 'crc32c[-_]intel' src/modules/initcpiocfg
 }
 
@@ -93,10 +97,13 @@ check() {
     "calamares-${pkgver}/src/modules/linxirasoftware/LinxiraSoftwareViewStep.cpp"
   grep -Fq 'QStringLiteral( "bounded" )' \
     "calamares-${pkgver}/src/modules/linxirasoftware/LinxiraSoftwareViewStep.cpp"
+  grep -Fq 'https://github.com/Linxira-OS/linxira-iso-direct/issues' \
+    "calamares-${pkgver}/src/libcalamares/CalamaresAbout.cpp"
 }
 
 package() {
   DESTDIR="$pkgdir" cmake --install build
+  rm -f "$pkgdir/usr/share/applications/calamares.desktop"
   install -Dm644 "calamares-${pkgver}/LICENSES/BSD-2-Clause.txt" \
     "$pkgdir/usr/share/licenses/$pkgname/BSD-2-Clause.txt"
 
@@ -107,4 +114,5 @@ package() {
   grep -Fxq 'load: "libcalamares_viewmodule_linxirasoftware.so"' "$module_dir/module.desc"
   grep -Fxq 'catalogPath: "/usr/share/linxira/catalog/catalog-v3.json"' \
     "$pkgdir/usr/share/calamares/modules/linxirasoftware.conf"
+  test ! -e "$pkgdir/usr/share/applications/calamares.desktop"
 }

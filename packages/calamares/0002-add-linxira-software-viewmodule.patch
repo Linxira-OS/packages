@@ -394,8 +394,10 @@ index 0000000..eaf52a1
 +    item->setData( 0, OfflinePolicyRole, offlinePolicy );
 +    item->setData( 0, SelectableRole, selectable );
 +    item->setText( 2, included ? tr( "Included" )
-+                               : selectable ? tr( "After first boot (%1)" ).arg( provider )
-+                                            : tr( "Review pending (%1)" ).arg( provider.isEmpty() ? kind : provider ) );
++                               : selectable && offlinePolicy == QStringLiteral( "online-only" )
++                                   ? tr( "Downloaded during installation (%1)" ).arg( provider )
++                                   : selectable ? tr( "Downloaded during installation with consent (%1)" ).arg( provider )
++                                                : tr( "Review pending (%1)" ).arg( provider.isEmpty() ? kind : provider ) );
 +    Qt::ItemFlags flags = item->flags();
 +    if ( selectable )
 +    {

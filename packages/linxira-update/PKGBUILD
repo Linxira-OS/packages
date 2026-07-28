@@ -2,7 +2,7 @@
 
 pkgname=linxira-update
 pkgver=0.1.0
-pkgrel=2
+pkgrel=3
 pkgdesc='System update notifier and maintenance assistant for Linxira OS'
 arch=('any')
 groups=('linxira')
@@ -28,7 +28,7 @@ depends=(
   'xdg-utils'
 )
 makedepends=('scdoc')
-checkdepends=('bats' 'desktop-file-utils')
+checkdepends=('appstream' 'bats' 'desktop-file-utils')
 optdepends=(
   'flatpak: explicitly enabled Flatpak update support'
   'libnotify: desktop update notifications'
@@ -43,9 +43,9 @@ optdepends=(
 )
 conflicts=('arch-update' 'cachy-update')
 
-_commit=a4579d4e2239dc86ceaddc6540e7eb8c9e5f79a2
+_commit=a4a1f949a707a9430ac7b8a719aa2ac3f0549e31
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('0ff3a37db4a08aaaa99e55a3fab70f1464ae144c7da97b0a1991c27519c23c7d')
+sha256sums=('9d93e84894d9a76add158ccba723734be0efc558f34e8c35666d552cf3936dee')
 
 prepare() {
   cd "$srcdir/$pkgname-$_commit"
@@ -60,8 +60,9 @@ build() {
 check() {
   cd "$srcdir/$pkgname-$_commit"
   find src -type f -name '*.sh' -exec bash -n {} +
-  python -m py_compile src/lib/tray.py src/lib/write_status.py
+  python -m py_compile src/lib/tray.py src/lib/tray_utils.py src/lib/write_status.py
   desktop-file-validate res/desktop/*.desktop
+  appstreamcli validate --no-net res/org.linxira.Update.metainfo.xml
   make test
 }
 
@@ -74,9 +75,11 @@ package() {
     usr/bin/linxira-update
     usr/share/linxira-update/lib/common.sh
     usr/share/linxira-update/lib/tray.py
+    usr/share/linxira-update/lib/tray_utils.py
     usr/share/linxira-update/lib/write_status.py
     usr/share/applications/linxira-update.desktop
     usr/share/applications/linxira-update-tray.desktop
+    usr/share/metainfo/org.linxira.Update.metainfo.xml
     etc/xdg/autostart/linxira-update-tray.desktop
     usr/lib/systemd/user/linxira-update.service
     usr/lib/systemd/user/linxira-update.timer

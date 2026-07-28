@@ -2,14 +2,14 @@
 
 pkgname=linxira-welcome
 pkgver=1.0.0
-pkgrel=8
+pkgrel=9
 pkgdesc='Safe Plasma-native workstation control center for Linxira OS'
 arch=('any')
 groups=('linxira')
 url='https://github.com/Linxira-OS/linxira-welcome'
 license=('MIT')
 depends=('python' 'pyside6' 'linxira-catalog')
-checkdepends=('desktop-file-utils')
+checkdepends=('appstream' 'desktop-file-utils')
 optdepends=(
   'calamares: install Linxira OS from the live environment'
   'kinfocenter: inspect system information'
@@ -26,9 +26,9 @@ optdepends=(
   'timeshift: manage recovery snapshots'
 )
 
-_commit=35961740a8c568f17990471f9a1e3de28bd91ac2
+_commit=1bdf1afb9e7fd327b84bd0a118ff599d07864961
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('99213e0a367cd4c073c37abcb87f31d7c837248446b8453bf00a699f4815cc0b')
+sha256sums=('f0692e795a64a01ac9fd2536597828cefef492c5f36136109daab41d67baf9b4')
 
 check() {
   cd "$srcdir/$pkgname-$_commit"
@@ -36,6 +36,7 @@ check() {
   python -m unittest discover -s tests -v
   desktop-file-validate data/org.linxira.Welcome.desktop
   desktop-file-validate data/autostart/org.linxira.Welcome.desktop
+  appstreamcli validate --no-net data/org.linxira.Welcome.metainfo.xml
 }
 
 package() {
@@ -45,6 +46,8 @@ package() {
     "$pkgdir/usr/share/applications/org.linxira.Welcome.desktop"
   install -Dm644 data/autostart/org.linxira.Welcome.desktop \
     "$pkgdir/etc/xdg/autostart/org.linxira.Welcome.desktop"
+  install -Dm644 data/org.linxira.Welcome.metainfo.xml \
+    "$pkgdir/usr/share/metainfo/org.linxira.Welcome.metainfo.xml"
   install -Dm644 data/i18n/*.json -t "$pkgdir/usr/share/linxira/welcome/i18n"
   install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 }

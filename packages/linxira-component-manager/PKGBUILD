@@ -2,7 +2,7 @@
 
 pkgname=linxira-component-manager
 pkgver=0.1.0
-pkgrel=3
+pkgrel=4
 pkgdesc='Nested capability bundle and component manager for Linxira OS'
 arch=('any')
 groups=('linxira')
@@ -10,11 +10,11 @@ url='https://github.com/Linxira-OS/linxira-component-manager'
 license=('MIT')
 depends=('python' 'pyside6' 'polkit' 'linxira-catalog' 'linxira-components')
 makedepends=('python-build' 'python-installer' 'python-setuptools' 'python-wheel')
-checkdepends=('desktop-file-utils')
+checkdepends=('appstream' 'desktop-file-utils')
 
-_commit=a848d9c244e00eb526a83de5a6976a88e942c7bb
+_commit=23efa317059e686fc301714465695b0a9278e652
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('2e2e8ab058505578c059b36db68407dbbf917a58ef5491ea90b0042e3d869f44')
+sha256sums=('6441a1f0f647441c08a9bb66e3de705a896230fa8968a80cf7a4982d2e2fe5fa')
 
 build() {
   cd "$srcdir/$pkgname-$_commit"
@@ -27,6 +27,7 @@ check() {
     PYTHONPATH=src QT_QPA_PLATFORM=offscreen \
     python -m unittest discover -s tests -v
   desktop-file-validate data/org.linxira.ComponentManager.desktop
+  appstreamcli validate --no-net data/org.linxira.ComponentManager.metainfo.xml
 }
 
 package() {
@@ -34,6 +35,8 @@ package() {
   python -m installer --destdir="$pkgdir" dist/*.whl
   install -Dm644 data/org.linxira.ComponentManager.desktop \
     "$pkgdir/usr/share/applications/org.linxira.ComponentManager.desktop"
+  install -Dm644 data/org.linxira.ComponentManager.metainfo.xml \
+    "$pkgdir/usr/share/metainfo/org.linxira.ComponentManager.metainfo.xml"
   install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
   find "$pkgdir" -type d -name __pycache__ -prune -exec rm -rf {} +
   find "$pkgdir" -type f -name '*.pyc' -delete

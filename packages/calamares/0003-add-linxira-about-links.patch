@@ -1,0 +1,35 @@
+diff --git a/src/libcalamares/CalamaresAbout.cpp b/src/libcalamares/CalamaresAbout.cpp
+index 771f91df..9f4bd961 100644
+--- a/src/libcalamares/CalamaresAbout.cpp
++++ b/src/libcalamares/CalamaresAbout.cpp
+@@ -16,6 +16,15 @@
+ static const char s_header[]
+     = QT_TRANSLATE_NOOP( "AboutData", "<h1>%1</h1><br/><strong>%2<br/> for %3</strong><br/><br/>" );
+ 
++static const char s_linxira[]
++    = QT_TRANSLATE_NOOP(
++        "AboutData",
++        "<strong>Linxira OS installer integration</strong><br/>"
++        "Configured and maintained by Linxira OS contributors.<br/>"
++        "<a href=\"https://github.com/Linxira-OS/linxira-iso-direct\">Source repository</a> | "
++        "<a href=\"https://github.com/Linxira-OS/linxira-iso-direct/issues\">Report a problem</a> | "
++        "<a href=\"https://linxira-os.github.io/linxira-wiki/\">Documentation</a><br/><br/>" );
++
+ static const char s_footer[]
+     = QT_TRANSLATE_NOOP( "AboutData",
+                          "Thanks to <a href=\"https://calamares.io/team/\">the Calamares team</a> "
+@@ -66,11 +75,13 @@ const QString
+ Calamares::aboutString()
+ {
+     return substituteVersions( QCoreApplication::translate( "AboutData", s_header ) ) + aboutMaintainers()
++        + QCoreApplication::translate( "AboutData", s_linxira )
+         + QCoreApplication::translate( "AboutData", s_footer );
+ }
+ 
+ const QString
+ Calamares::aboutStringUntranslated()
+ {
+-    return substituteVersions( QString( s_header ) ) + aboutMaintainers() + QString( s_footer );
++    return substituteVersions( QString( s_header ) ) + aboutMaintainers() + QString( s_linxira )
++        + QString( s_footer );
+ }

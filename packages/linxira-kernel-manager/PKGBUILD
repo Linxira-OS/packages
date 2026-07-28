@@ -2,7 +2,7 @@
 
 pkgname=linxira-kernel-manager
 pkgver=0.1.0
-pkgrel=1
+pkgrel=2
 pkgdesc='Fixed-policy kernel, boot, and initramfs reporting for Linxira OS'
 arch=('any')
 groups=('linxira')
@@ -13,9 +13,9 @@ makedepends=('python-build' 'python-installer' 'python-setuptools' 'python-wheel
 checkdepends=('appstream' 'desktop-file-utils')
 optdepends=('dkms: report exact per-kernel DKMS module status')
 
-_commit=40b27d0e733bbfb8edae83151ce3059e204c0967
+_commit=bdb65855c2043f7ae4983b2c898b86d542fb77ce
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('aa6c60b9608cea69ae162e0eaf7b7cf38b7cf6eee9ec943b7cabaf3e7795f3d8')
+sha256sums=('ffc39d90b17bc0f6cceae71d882b9399609375702722e2fc63b6983b1b4e46e4')
 
 build() {
   cd "$srcdir/$pkgname-$_commit"

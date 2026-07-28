@@ -2,7 +2,7 @@
 
 pkgname=linxira-package-center
 pkgver=0.2.1
-pkgrel=1
+pkgrel=2
 pkgdesc='Catalog-bound application and capability manager for Linxira OS'
 arch=('any')
 groups=('linxira')
@@ -12,11 +12,11 @@ depends=(
   'python' 'pyside6' 'polkit'
   'linxira-catalog' 'linxira-components'
 )
-checkdepends=('desktop-file-utils')
+checkdepends=('appstream' 'desktop-file-utils')
 
-_commit=f49c7790416ae2c7b1677b58f81205bd01c87944
+_commit=9364644a9009fc7f09a67c955143c9dd3bb79cfc
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('5610d6bd239b931c711730f26f12737cf5c2c69fa5cd99bf5abec75fdbfa683e')
+sha256sums=('1ff1b5f641e3112721b5198709a37dbddba26d4fbcf520f4fe9e8b8b3c4f60f7')
 
 check() {
   cd "$srcdir/$pkgname-$_commit"
@@ -24,6 +24,7 @@ check() {
   python -m py_compile src/linxira-package-center
   QT_QPA_PLATFORM=offscreen python -m unittest discover -s tests -v
   desktop-file-validate data/org.linxira.PackageCenter.desktop
+  appstreamcli validate --no-net data/org.linxira.PackageCenter.metainfo.xml
 }
 
 package() {
@@ -32,6 +33,8 @@ package() {
     "$pkgdir/usr/bin/linxira-package-center"
   install -Dm644 data/org.linxira.PackageCenter.desktop \
     "$pkgdir/usr/share/applications/org.linxira.PackageCenter.desktop"
+  install -Dm644 data/org.linxira.PackageCenter.metainfo.xml \
+    "$pkgdir/usr/share/metainfo/org.linxira.PackageCenter.metainfo.xml"
   install -Dm644 VERSION \
     "$pkgdir/usr/share/linxira/package-center/VERSION"
   install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"

@@ -2,7 +2,7 @@
 
 pkgname=linxira-hardware-driver-manager
 pkgver=0.4.0
-pkgrel=1
+pkgrel=2
 pkgdesc='Hardware driver reporting, fixed planning, and root-owned diagnostics for Linxira OS'
 arch=('any')
 groups=('linxira')
@@ -13,9 +13,9 @@ makedepends=('python-build' 'python-installer' 'python-setuptools' 'python-wheel
 checkdepends=('appstream' 'desktop-file-utils')
 optdepends=('dkms: report DKMS module build status')
 
-_commit=0f6b770ad62cde4dc336f2efdd5889cf0c749075
+_commit=27698ad385849930ac70e67cb1d03ce715a142fb
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('3737a3773f4fdd199a20b4786e70eca2342c14baf13427f8bc3c3a857a7aeab0')
+sha256sums=('338f36b8c2d17e8e7321d9de45b5f354b3a0090f89fb562da8a9a518fb120f5d')
 
 build() {
   cd "$srcdir/$pkgname-$_commit"
