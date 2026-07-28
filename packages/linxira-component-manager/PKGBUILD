@@ -12,9 +12,9 @@ depends=('python' 'pyside6' 'polkit' 'linxira-catalog' 'linxira-components')
 makedepends=('python-build' 'python-installer' 'python-setuptools' 'python-wheel')
 checkdepends=('appstream' 'desktop-file-utils')
 
-_commit=23efa317059e686fc301714465695b0a9278e652
+_commit=3c54e9d817f36310ac34c000cb19e0afcbafe2ce
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('6441a1f0f647441c08a9bb66e3de705a896230fa8968a80cf7a4982d2e2fe5fa')
+sha256sums=('a4936c3f295a7e328376afaf118c172a28ec508dbb434ab46dcac238596ff9dd')
 
 build() {
   cd "$srcdir/$pkgname-$_commit"
