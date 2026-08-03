@@ -2,7 +2,7 @@
 
 pkgname=linxira-artwork
 pkgver=1.0.3
-pkgrel=4
+pkgrel=5
 pkgdesc='Canonical artwork and visual identity for Linxira OS'
 arch=('any')
 groups=('linxira')
@@ -11,9 +11,9 @@ license=('GPL-3.0-or-later')
 
 _commit=6e56f3faac9d1cefed3d61ca46c75b99ad39cdbb
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit"
-        'logo-ascii.txt')
+        'linxira-logo-braille60.ansi')
 sha256sums=('d62183825f06274c64dce82f5b7ee62cfc6902932028d89942383835349fbbc3'
-            '3cd1171e26c9773d0625499e1cedae4d2f36b505f37f198d8ba798af3129e307')
+            'f2f4c61c2a2f1e131e388a8a2ad9cb12e3b8746278deee3499416f9141e6c7ba')
 
 package() {
   cd "$srcdir/$pkgname-$_commit"
@@ -22,8 +22,8 @@ package() {
     "$pkgdir/usr/share/linxira/linxira-logo.svg"
   install -Dm644 assets/logo/linxira-l.svg \
     "$pkgdir/usr/share/linxira/linxira-icon.svg"
-  install -Dm644 "$srcdir/logo-ascii.txt" \
-    "$pkgdir/usr/share/linxira/logo-ascii.txt"
+  install -Dm644 "$srcdir/linxira-logo-braille60.ansi" \
+    "$pkgdir/usr/share/linxira/linxira-logo-braille60.ansi"
   install -Dm644 assets/logo/linxira-l.svg \
     "$pkgdir/usr/share/icons/hicolor/scalable/apps/linxira.svg"
   install -Dm644 TRADEMARKS.md \
