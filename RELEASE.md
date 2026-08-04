@@ -22,12 +22,12 @@
 
 ## [linxira] 仓库
 
-- URL:`https://linxira-os.github.io/packages/x86_64`
+- URL:`https://linxira-os.github.io/linxira-packages/x86_64`
 - 启用方式:先装 `linxira-keyring`(信任发布密钥),再在 `/etc/pacman.conf` 添加:
 
 ```
 [linxira]
-Server = https://linxira-os.github.io/packages/$arch
+Server = https://linxira-os.github.io/linxira-packages/$arch
 SigLevel = Required DatabaseOptional
 ```
 
