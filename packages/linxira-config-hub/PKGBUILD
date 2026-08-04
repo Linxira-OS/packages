@@ -28,8 +28,8 @@ optdepends=(
 checkdepends=('python')
 
 _commit=7450ed5937fa556c1ba853f5ffa094e0dd9877ee
-source=("$pkgname-$_commit.tar.gz")
-sha256sums=('1fe121728e7289d8e460ba9d0b0fb86c449d364829f9b67db4dd5ea5c7d71d7a')
+source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
+sha256sums=('986f54e4e37d1fa5f76a26a7a53e7a12f19f100ac604830c16d6ae30d4238b1e')
 
 check() {
   cd "$srcdir/$pkgname-$_commit"

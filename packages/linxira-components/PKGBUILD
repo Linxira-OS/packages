@@ -15,8 +15,8 @@ depends=(
 checkdepends=('python-pytest')
 
 _commit=cfff5359b0fc0e66ec22ea9a91f2b69d17c7fdf9
-source=("$pkgname-$_commit.tar.gz")
-sha256sums=('0054f60b069b3a15e7ea9c9ef11181db941216bcd76b3a0abe2d252dee88683e')
+source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
+sha256sums=('f8e0bfe95be79b0866a2572f3cbbdb57e563af2318afa3cf2c2dec6cca82b9e2')
 
 check() {
   cd "$srcdir/$pkgname-$_commit"

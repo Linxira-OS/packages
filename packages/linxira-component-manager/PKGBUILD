@@ -13,8 +13,8 @@ makedepends=('python-build' 'python-installer' 'python-setuptools' 'python-wheel
 checkdepends=('appstream' 'desktop-file-utils')
 
 _commit=4accd7877093c94ef29b34a0a91ddb4849f262c8
-source=("$pkgname-$_commit.tar.gz")
-sha256sums=('8951f68214eb5d1f73c52f7485a0968bff9f61faf97e957409c5a4f3423ff22e')
+source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
+sha256sums=('0a62624c5bd95f3518655cc564c51213d574a91991fe529f2a5cb27f0d632f07')
 
 build() {
   cd "$srcdir/$pkgname-$_commit"
