@@ -32,13 +32,15 @@ if (( ${#packages[@]} == 0 )); then
   exit 1
 fi
 
+: "${LINXIRA_GPG_PASSPHRASE:?LINXIRA_GPG_PASSPHRASE is required for signing}"
+
 for package in "${packages[@]}"; do
-  gpg --batch --yes --local-user "$expected_fingerprint" --detach-sign "$package"
+  gpg --batch --pinentry-mode loopback --passphrase "$LINXIRA_GPG_PASSPHRASE"     --yes --local-user "$expected_fingerprint" --detach-sign "$package"
 done
 
 (
   cd "$repo_dir/x86_64"
-  repo-add --sign --key "$expected_fingerprint" linxira.db.tar.gz ./*.pkg.tar.zst
+  repo-add --sign --key "$expected_fingerprint" linxira.db.tar.gz ./*.pkg.tar.zst 2>/dev/null ||   repo-add --sign --key "$expected_fingerprint" linxira.db.tar.zst ./*.pkg.tar.zst
 )
 
 gpg --batch --armor --export "$expected_fingerprint" >"$repo_dir/linxira.gpg"

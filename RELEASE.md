@@ -93,3 +93,19 @@ curl -L -O https://github.com/Linxira-OS/<repo>/releases/download/<tag>/linxira-
 gpg --keyserver keyserver.ubuntu.com --recv-keys 7CE0D31F4A71657AD66B7854BFF6AA69F55A30B8
 gpg --verify linxira-*.iso.sig linxira-*.iso
 ```
+
+## 密钥管理(口令与备份)
+
+发布密钥分层:
+
+| 密钥 | 用途 | 口令 | 存放 |
+|---|---|---|---|
+| 主密钥 `7CE0D31F...` | 证书/撤销/签发子密钥 | **有口令**(2026-08-04 起) | 构建机 `~/.gnupg-linxira` + 本地加密备份 `.keys/linxira-master-secret.asc` |
+| 签名子密钥 `31156EC1...` | 包/db 签名 | 与主密钥同链(签名需传口令) | 构建机 keyring + 本地 `.keys/linxira-signing-subkey.asc` |
+| 公钥 `linxira.gpg` | 分发信任 | — | `linxira-keyring` 包 + 本仓库 |
+
+- **自动化签名**(CI `publish-repo.sh`):需提供 `LINXIRA_GPG_PRIVATE_KEY` + `LINXIRA_GPG_FINGERPRINT` + `LINXIRA_GPG_PASSPHRASE` 三个 secret。
+- **主密钥口令**存放于本地 `.keys/master-passphrase.txt`(24 位随机)。**必须立即转移到密码管理器/离线介质**,本地副本仅作过渡。
+- 主密钥离线加密备份在 `.keys/linxira-master-secret.asc`(导入需口令)。
+- 轮换/撤销:使用主密钥 + 撤销证书(`openpgp-revocs.d/`)。签名子密钥泄露时,用主密钥签发新子密钥并吊销旧的。
+- 安全约定:签名密钥永不进入 ISO 源码树/公开镜像;CI secret 仅给签名子密钥 + 口令。
