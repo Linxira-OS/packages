@@ -16,7 +16,7 @@
 
 1. **拉取源码**:`git clone` 目标仓库(linxira-components 等),commit 由 PKGBUILD `_commit` 固定。
 2. **构建包**:在 Arch 环境对 `packages/packages/<pkg>` 目录执行 `makepkg`(PKGBUILD source 指向 codeload,自动下载固定 commit 的源码归档,sha256 校验)。
-3. **签名**:发布者用签名子密钥 `31156EC1A740B2884F8110235EF193D3392B8D7B` 对包生成分离签名(`.sig`)。
+3. **签名**:发布者用签名子密钥 `D477286C296F1E1C35735E52B22DF3E636274191` 对包生成分离签名(`.sig`)。
 4. **入仓库**:`repo-add --sign -R linxira.db.tar.zst <pkg>.pkg.tar.zst` 更新 `[linxira]` 数据库。
 5. **发布**:更新后的包 + db + sig 提交到 `Linxira-OS.github.io/public/packages/x86_64/`,push 后 GitHub Pages Actions 自动部署。
 
@@ -31,7 +31,7 @@ Server = https://linxira-os.github.io/linxira-packages/$arch
 SigLevel = Required DatabaseOptional
 ```
 
-- 密钥指纹(发布文档固定):`7CE0D31F4A71657AD66B7854BFF6AA69F55A30B8`(主密钥)/ 签名子密钥 `31156EC1A740B2884F8110235EF193D3392B8D7B`
+- 密钥指纹(发布文档固定):`E1A4155F457D1481CA85EE6BF9D157739534BC29`(主密钥)/ 签名子密钥 `D477286C296F1E1C35735E52B22DF3E636274191`
 
 ## ISO 构建集成(规范化方向)
 
@@ -72,7 +72,7 @@ makepkg -f            # 产出 linxira-components-0.7.0-4-any.pkg.tar.zst
 cd ../../
 ./scripts/check-boundaries.sh   # 边界校验(CI 同款)
 LINXIRA_GPG_PRIVATE_KEY="$(cat signing-subkey.asc)" \
-LINXIRA_GPG_FINGERPRINT=31156EC1A740B2884F8110235EF193D3392B8D7B \
+LINXIRA_GPG_FINGERPRINT=D477286C296F1E1C35735E52B22DF3E636274191 \
 ./scripts/publish-repo.sh ~/linxira-repo
 ```
 
@@ -90,7 +90,7 @@ LINXIRA_GPG_FINGERPRINT=31156EC1A740B2884F8110235EF193D3392B8D7B \
 ```bash
 curl -L -O https://github.com/Linxira-OS/<repo>/releases/download/<tag>/linxira-*.iso
 curl -L -O https://github.com/Linxira-OS/<repo>/releases/download/<tag>/linxira-*.iso.sig
-gpg --keyserver keyserver.ubuntu.com --recv-keys 7CE0D31F4A71657AD66B7854BFF6AA69F55A30B8
+gpg --keyserver keyserver.ubuntu.com --recv-keys E1A4155F457D1481CA85EE6BF9D157739534BC29
 gpg --verify linxira-*.iso.sig linxira-*.iso
 ```
 

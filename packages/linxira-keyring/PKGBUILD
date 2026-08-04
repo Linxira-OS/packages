@@ -2,7 +2,7 @@
 
 pkgname=linxira-keyring
 pkgver=20260804
-pkgrel=1
+pkgrel=2
 pkgdesc='Linxira OS package signing keyring (trusted release key)'
 arch=('any')
 groups=('linxira')
@@ -10,9 +10,9 @@ url='https://github.com/Linxira-OS/linxira-keyring'
 license=('GPL-3.0-or-later')
 install=keyring.install
 
-_commit=7CE0D31F4A71657AD66B7854BFF6AA69F55A30B8
+_commit=E1A4155F457D1481CA85EE6BF9D157739534BC29
 source=(linxira.gpg)
-sha256sums=('2634318bc30ad8aa16301818a0c0a9d42f2957ca0ada6d0825c8acbd1fcf4347')
+sha256sums=('99196cbbc98883d9c080e6b44f456df6453803786f6950f7f3bae12248b17ab5')
 
 package() {
   install -Dm644 linxira.gpg "$pkgdir/usr/share/keyrings/linxira.gpg"

@@ -5,7 +5,7 @@
 post_install() {
   if [ -x /usr/bin/pacman-key ]; then
     pacman-key --add /usr/share/keyrings/linxira.gpg >/dev/null 2>&1 || true
-    pacman-key --lsign-key 7CE0D31F4A71657AD66B7854BFF6AA69F55A30B8 >/dev/null 2>&1 || true
+    pacman-key --lsign-key E1A4155F457D1481CA85EE6BF9D157739534BC29 >/dev/null 2>&1 || true
   fi
 }
 
