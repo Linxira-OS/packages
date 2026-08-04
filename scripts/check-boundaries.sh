@@ -120,8 +120,8 @@ if grep -E -n "depends=.*polkit|install.*systemd/system|install.*polkit" \
   echo "kernel and recovery clients must not package their own privileged service" >&2
   exit 1
 fi
-grep -q '7450ed5937fa556c1ba853f5ffa094e0dd9877ee' packages/linxira-config-hub/PKGBUILD
-grep -q '986f54e4e37d1fa5f76a26a7a53e7a12f19f100ac604830c16d6ae30d4238b1e' packages/linxira-config-hub/PKGBUILD
+grep -q 'd5bb6bb094fd43999fa51488dc44bb47bb63fea1' packages/linxira-config-hub/PKGBUILD
+grep -q '129b4e486082dae83bdafd4b12c7b49c240ae864cec025910a3818fedbe80f8d' packages/linxira-config-hub/PKGBUILD
 grep -q '4accd7877093c94ef29b34a0a91ddb4849f262c8' packages/linxira-component-manager/PKGBUILD
 grep -q '208d2aefb6e82bfbab24665069f1efc0bffbc72d' packages/linxira-gaming-manager/PKGBUILD
 grep -q '9bbacc33079d67779547ede0ae1af7c35c1be277df78cb661233a53f12ddb69e' \
