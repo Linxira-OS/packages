@@ -78,8 +78,8 @@ if [[ -f packages/linxira-update/PKGBUILD ]]; then
 fi
 
 if [[ -f packages/linxira-catalog/PKGBUILD ]]; then
-  grep -q 'b25572d4dcd157a880f713d6d5865a02d3b37b37' packages/linxira-catalog/PKGBUILD
-  grep -q '9ec8c4ed1bad03d1a1f0a0de4d5e85eb4cb73fec93f82cd83c11b31c089c78be' packages/linxira-catalog/PKGBUILD
+  grep -q '89b25593d53131e11aa5549c5ae2130eb37dd306' packages/linxira-catalog/PKGBUILD
+  grep -q 'bdf3657dc714d520b95e3178d3deab560ea91662a93af8a7ed074ca97048a8eb' packages/linxira-catalog/PKGBUILD
 fi
 
 grep -q 'cfff5359b0fc0e66ec22ea9a91f2b69d17c7fdf9' packages/linxira-components/PKGBUILD
