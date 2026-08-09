@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Zeta
+Comment=Zeta coding agent desktop shell: embedded Web UI, no terminal, no browser
+Exec=/opt/zeta/zeta-desktop
+Terminal=false
+Type=Application
+Categories=Development;
+Keywords=coding agent;AI;assistant;zeta;
+Icon=zeta-desktop
