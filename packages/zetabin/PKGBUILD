@@ -1,0 +1,52 @@
+# Maintainer: Linxira OS <admin@linxira.org>
+# Prebuilt Zeta desktop shell: the Electron app is assembled by
+# Linxira-OS/linxira-zeta CI (electron-builder), so this package fetches the
+# signed release tarball instead of building the ~200k-line web/runtime stack.
+
+pkgname=zetabin
+pkgver=17.2.12
+pkgrel=1
+pkgdesc='Zeta coding agent desktop shell: embedded Web UI + local service (no terminal, no system browser)'
+arch=('x86_64')
+url='https://github.com/Linxira-OS/linxira-zeta'
+license=('MIT')
+depends=(
+  'at-spi2-core'
+  'gtk3'
+  'libnotify'
+  'libsecret'
+  'libxss'
+  'libxtst'
+  'nss'
+  'util-linux'
+  'xdg-utils'
+)
+provides=('zeta-desktop')
+conflicts=('zeta-desktop')
+
+# The tarball holds the linux-unpacked content at its root: the
+# `zeta-desktop` executable plus `resources/` (app.asar, bundled zeta CLI,
+# Node runtime, standalone Web UI).
+source=("zeta-desktop-${pkgver}-linux-x64.tar.gz::https://github.com/Linxira-OS/linxira-zeta/releases/download/v${pkgver}/zeta-desktop-${pkgver}-linux-x64.tar.gz")
+# Upstream CI publishes SHA256SUMS.txt beside this asset. Pin the checksum
+# here after the first linxira-zeta release produces the artifact (same flow
+# as every other package: pinned source + sha256).
+sha256sums=('SKIP')
+
+check() {
+  [[ -x "$srcdir/zeta-desktop" ]]
+  file "$srcdir/zeta-desktop" | grep -q ELF
+}
+
+package() {
+  install -d "$pkgdir/opt/zeta"
+  cp -a resources "$pkgdir/opt/zeta/"
+  install -Dm755 zeta-desktop "$pkgdir/opt/zeta/zeta-desktop"
+  install -dm755 "$pkgdir/usr/bin"
+  ln -s /opt/zeta/zeta-desktop "$pkgdir/usr/bin/zeta-desktop"
+  install -Dm644 zeta-desktop.desktop \
+    "$pkgdir/usr/share/applications/zeta-desktop.desktop"
+  install -Dm644 zeta-desktop.png \
+    "$pkgdir/usr/share/icons/hicolor/256x256/apps/zeta-desktop.png"
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}
