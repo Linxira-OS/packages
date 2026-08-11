@@ -1,7 +1,7 @@
 # Maintainer: Linxira OS <admin@linxira.org>
 
 pkgname=linxira-chwd-detector
-pkgver=0.1.0
+pkgver=1.23.0
 pkgrel=1
 pkgdesc='Read-only CHWD-derived hardware detector for Linxira OS'
 arch=('x86_64')
@@ -9,13 +9,13 @@ groups=('linxira')
 url='https://github.com/Linxira-OS/linxira-chwd-detector'
 license=('GPL-3.0-only')
 depends=('glibc')
-makedepends=('rust')
+makedepends=('rust' 'libpciaccess' 'libusb')
 checkdepends=('python')
 options=('!debug')
 
-_commit=2ba853f094896e9500232c681c4a3ddb43c38448
+_commit=51750c75b5ac5adb4d4db6e3ee3069c3ed6df3db
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('50e6b7324bc4fa065be79f27d7e0da5d4ba5e7b98537329d3f0c7e42dbbd90c2')
+sha256sums=('45bec4d04f4c8180c4e3825faea571e1e5185b03c6915f5d8468917f4bc9f5d0')
 
 build() {
   cd "$srcdir/$pkgname-$_commit"

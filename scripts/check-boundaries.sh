@@ -62,13 +62,13 @@ if [[ -f packages/linxira-welcome/PKGBUILD ]]; then
     echo "linxira-welcome must remain independent and unprivileged" >&2
     exit 1
   fi
-  grep -q '1bdf1afb9e7fd327b84bd0a118ff599d07864961' packages/linxira-welcome/PKGBUILD
-  grep -q 'f0692e795a64a01ac9fd2536597828cefef492c5f36136109daab41d67baf9b4' packages/linxira-welcome/PKGBUILD
+  grep -q '79dbdc15a3a1e73ba9eff6c6314773808ea090b9' packages/linxira-welcome/PKGBUILD
+  grep -q '1d05e84520dc76604bc1458ad1e1a7f1101b3db7f29da9c9b485365f4b20495e' packages/linxira-welcome/PKGBUILD
 fi
 
 if [[ -f packages/linxira-update/PKGBUILD ]]; then
-  grep -q 'a4a1f949a707a9430ac7b8a719aa2ac3f0549e31' packages/linxira-update/PKGBUILD
-  grep -q '9d93e84894d9a76add158ccba723734be0efc558f34e8c35666d552cf3936dee' \
+  grep -q '99274af30a40a7cc844eb5c07afd91e62e5ba241' packages/linxira-update/PKGBUILD
+  grep -q 'b80dc4744682347a5a5ae8851c41e3835ca50ef0fe93a09bd958b8e41d72f4b3' \
     packages/linxira-update/PKGBUILD
   grep -q "conflicts=('arch-update' 'cachy-update')" packages/linxira-update/PKGBUILD
   if grep -q '^replaces=' packages/linxira-update/PKGBUILD; then
@@ -78,8 +78,8 @@ if [[ -f packages/linxira-update/PKGBUILD ]]; then
 fi
 
 if [[ -f packages/linxira-catalog/PKGBUILD ]]; then
-  grep -q '89b25593d53131e11aa5549c5ae2130eb37dd306' packages/linxira-catalog/PKGBUILD
-  grep -q 'bdf3657dc714d520b95e3178d3deab560ea91662a93af8a7ed074ca97048a8eb' packages/linxira-catalog/PKGBUILD
+  grep -q '9dd16cdac62eb9e764926f8fc4b25fbb078d5d38' packages/linxira-catalog/PKGBUILD
+  grep -q 'df924ff67f711f913d88805eb41270dce966aeb9cc8d8fee5e58e08f50b1cb7e' packages/linxira-catalog/PKGBUILD
 fi
 
 grep -q 'cfff5359b0fc0e66ec22ea9a91f2b69d17c7fdf9' packages/linxira-components/PKGBUILD
@@ -96,8 +96,8 @@ grep -q '394d2a90abbebc1fec618dd0ca8844167ad74e94' packages/linxira-completion-a
 grep -q '0aa0e5669db982337d08202cb0aa583700522a56afbb48bee915580fe332ea68' \
   packages/linxira-completion-agent/PKGBUILD
 grep -q "depends=.*'linxira-catalog'.*'linxira-components'" packages/linxira-completion-agent/PKGBUILD
-grep -q '2ba853f094896e9500232c681c4a3ddb43c38448' packages/linxira-chwd-detector/PKGBUILD
-grep -q '50e6b7324bc4fa065be79f27d7e0da5d4ba5e7b98537329d3f0c7e42dbbd90c2' \
+grep -q '51750c75b5ac5adb4d4db6e3ee3069c3ed6df3db' packages/linxira-chwd-detector/PKGBUILD
+grep -q '45bec4d04f4c8180c4e3825faea571e1e5185b03c6915f5d8468917f4bc9f5d0' \
   packages/linxira-chwd-detector/PKGBUILD
 grep -q '27698ad385849930ac70e67cb1d03ce715a142fb' packages/linxira-hardware-driver-manager/PKGBUILD
 grep -q '338f36b8c2d17e8e7321d9de45b5f354b3a0090f89fb562da8a9a518fb120f5d' \
@@ -120,18 +120,18 @@ if grep -E -n "depends=.*polkit|install.*systemd/system|install.*polkit" \
   echo "kernel and recovery clients must not package their own privileged service" >&2
   exit 1
 fi
-grep -q 'd5bb6bb094fd43999fa51488dc44bb47bb63fea1' packages/linxira-config-hub/PKGBUILD
-grep -q '129b4e486082dae83bdafd4b12c7b49c240ae864cec025910a3818fedbe80f8d' packages/linxira-config-hub/PKGBUILD
-grep -q '4accd7877093c94ef29b34a0a91ddb4849f262c8' packages/linxira-component-manager/PKGBUILD
-grep -q '208d2aefb6e82bfbab24665069f1efc0bffbc72d' packages/linxira-gaming-manager/PKGBUILD
-grep -q '9bbacc33079d67779547ede0ae1af7c35c1be277df78cb661233a53f12ddb69e' \
+grep -q 'c785a407493d40ec34d073a05c52ab4e2325f053' packages/linxira-config-hub/PKGBUILD
+grep -q '20f16c805f8f386e85ea1808b5cf9e667105a799793cffcab0f8856ebddeddca' packages/linxira-config-hub/PKGBUILD
+grep -q '1deed77b28af46bf2351d0de757ea216c6ce52ff' packages/linxira-component-manager/PKGBUILD
+grep -q '72244435fccf888c0c9914731f0efff63b2baa36' packages/linxira-gaming-manager/PKGBUILD
+grep -q 'c36e232c5da3f4d680041f8bd1c009e4efbcb8037ec65702b2a5e18dbd72ae8c' \
   packages/linxira-gaming-manager/PKGBUILD
 if grep -E -n "install.*systemd/system|install.*polkit" \
   packages/linxira-gaming-manager/PKGBUILD; then
   echo "linxira-gaming-manager must remain user-scoped" >&2
   exit 1
 fi
-grep -q '9364644a9009fc7f09a67c955143c9dd3bb79cfc' packages/linxira-package-center/PKGBUILD
+grep -q '2c1e53d47aef388fcfff295027f438ad119a552b' packages/linxira-package-center/PKGBUILD
 
 for package in packages/*/PKGBUILD; do
   bash -n "$package"

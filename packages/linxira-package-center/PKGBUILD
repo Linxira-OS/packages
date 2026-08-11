@@ -14,9 +14,9 @@ depends=(
 )
 checkdepends=('appstream' 'desktop-file-utils')
 
-_commit=9364644a9009fc7f09a67c955143c9dd3bb79cfc
+_commit=2c1e53d47aef388fcfff295027f438ad119a552b
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('1ff1b5f641e3112721b5198709a37dbddba26d4fbcf520f4fe9e8b8b3c4f60f7')
+sha256sums=('95437796b54c4a8dea06ca1c7bde3494a0a133397b1702614e28c849c5f008c5')
 
 check() {
   cd "$srcdir/$pkgname-$_commit"

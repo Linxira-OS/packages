@@ -10,9 +10,9 @@ url='https://github.com/Linxira-OS/linxira-catalog'
 license=('MIT')
 checkdepends=('python' 'python-jsonschema')
 
-_commit=89b25593d53131e11aa5549c5ae2130eb37dd306
+_commit=9dd16cdac62eb9e764926f8fc4b25fbb078d5d38
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('bdf3657dc714d520b95e3178d3deab560ea91662a93af8a7ed074ca97048a8eb')
+sha256sums=('df924ff67f711f913d88805eb41270dce966aeb9cc8d8fee5e58e08f50b1cb7e')
 
 check() {
   cd "$srcdir/$pkgname-$_commit"
@@ -21,10 +21,6 @@ check() {
 
 package() {
   cd "$srcdir/$pkgname-$_commit"
-  install -Dm644 catalog/catalog-v2.json \
-    "$pkgdir/usr/share/linxira/catalog/catalog-v2.json"
-  install -Dm644 schema/catalog-v2.schema.json \
-    "$pkgdir/usr/share/linxira/catalog/catalog-v2.schema.json"
   install -Dm644 catalog/catalog-v3.json \
     "$pkgdir/usr/share/linxira/catalog/catalog-v3.json"
   install -Dm644 schema/catalog-v3.schema.json \

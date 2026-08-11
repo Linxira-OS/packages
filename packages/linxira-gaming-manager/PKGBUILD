@@ -22,9 +22,9 @@ optdepends=(
   'winetricks: reviewed Wine prefix operations'
 )
 
-_commit=208d2aefb6e82bfbab24665069f1efc0bffbc72d
+_commit=72244435fccf888c0c9914731f0efff63b2baa36
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('9bbacc33079d67779547ede0ae1af7c35c1be277df78cb661233a53f12ddb69e')
+sha256sums=('c36e232c5da3f4d680041f8bd1c009e4efbcb8037ec65702b2a5e18dbd72ae8c')
 
 build() {
   cd "$srcdir/$pkgname-$_commit"

@@ -43,9 +43,9 @@ optdepends=(
 )
 conflicts=('arch-update' 'cachy-update')
 
-_commit=a4a1f949a707a9430ac7b8a719aa2ac3f0549e31
+_commit=99274af30a40a7cc844eb5c07afd91e62e5ba241
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('9d93e84894d9a76add158ccba723734be0efc558f34e8c35666d552cf3936dee')
+sha256sums=('b80dc4744682347a5a5ae8851c41e3835ca50ef0fe93a09bd958b8e41d72f4b3')
 
 prepare() {
   cd "$srcdir/$pkgname-$_commit"
