@@ -9,7 +9,7 @@ groups=('linxira')
 url='https://github.com/Linxira-OS/linxira-chwd-detector'
 license=('GPL-3.0-only')
 depends=('glibc')
-makedepends=('rust' 'libpciaccess' 'libusb')
+makedepends=('rust' 'clang' 'pciutils' 'libusb')
 checkdepends=('python')
 options=('!debug')
 

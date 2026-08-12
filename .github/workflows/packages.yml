@@ -33,7 +33,6 @@ jobs:
           - linxira-artwork
           - linxira-hooks
           - shelly
-          - zetabin
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
       - name: Build in clean Arch container
