@@ -63,12 +63,12 @@ if [[ -f packages/linxira-welcome/PKGBUILD ]]; then
     exit 1
   fi
   grep -q '79dbdc15a3a1e73ba9eff6c6314773808ea090b9' packages/linxira-welcome/PKGBUILD
-  grep -q '1d05e84520dc76604bc1458ad1e1a7f1101b3db7f29da9c9b485365f4b20495e' packages/linxira-welcome/PKGBUILD
+  grep -q 'cdb8330d861f197797ccd22311065478bd37df15ca2478bf4eeac03c2fd74cfc' packages/linxira-welcome/PKGBUILD
 fi
 
 if [[ -f packages/linxira-update/PKGBUILD ]]; then
   grep -q '99274af30a40a7cc844eb5c07afd91e62e5ba241' packages/linxira-update/PKGBUILD
-  grep -q 'b80dc4744682347a5a5ae8851c41e3835ca50ef0fe93a09bd958b8e41d72f4b3' \
+  grep -q '1673c964ea77cc39863986d00fab2b7dab5281755a7a70e50658e2a3aaec22ac' \
     packages/linxira-update/PKGBUILD
   grep -q "conflicts=('arch-update' 'cachy-update')" packages/linxira-update/PKGBUILD
   if grep -q '^replaces=' packages/linxira-update/PKGBUILD; then
@@ -79,7 +79,7 @@ fi
 
 if [[ -f packages/linxira-catalog/PKGBUILD ]]; then
   grep -q '9dd16cdac62eb9e764926f8fc4b25fbb078d5d38' packages/linxira-catalog/PKGBUILD
-  grep -q 'df924ff67f711f913d88805eb41270dce966aeb9cc8d8fee5e58e08f50b1cb7e' packages/linxira-catalog/PKGBUILD
+  grep -q '576664069d61882fae2c8746264f228d2fcc7c33941d57898579cf1a4d84fd6c' packages/linxira-catalog/PKGBUILD
 fi
 
 grep -q 'cfff5359b0fc0e66ec22ea9a91f2b69d17c7fdf9' packages/linxira-components/PKGBUILD
@@ -97,7 +97,7 @@ grep -q '0aa0e5669db982337d08202cb0aa583700522a56afbb48bee915580fe332ea68' \
   packages/linxira-completion-agent/PKGBUILD
 grep -q "depends=.*'linxira-catalog'.*'linxira-components'" packages/linxira-completion-agent/PKGBUILD
 grep -q '51750c75b5ac5adb4d4db6e3ee3069c3ed6df3db' packages/linxira-chwd-detector/PKGBUILD
-grep -q '45bec4d04f4c8180c4e3825faea571e1e5185b03c6915f5d8468917f4bc9f5d0' \
+grep -q 'e379d8a00b611c3d4b0d394320a4f581b640e1c392bff16391c26716e142010b' \
   packages/linxira-chwd-detector/PKGBUILD
 grep -q '27698ad385849930ac70e67cb1d03ce715a142fb' packages/linxira-hardware-driver-manager/PKGBUILD
 grep -q '338f36b8c2d17e8e7321d9de45b5f354b3a0090f89fb562da8a9a518fb120f5d' \
@@ -121,10 +121,10 @@ if grep -E -n "depends=.*polkit|install.*systemd/system|install.*polkit" \
   exit 1
 fi
 grep -q 'c785a407493d40ec34d073a05c52ab4e2325f053' packages/linxira-config-hub/PKGBUILD
-grep -q '20f16c805f8f386e85ea1808b5cf9e667105a799793cffcab0f8856ebddeddca' packages/linxira-config-hub/PKGBUILD
+grep -q '72ec1c5f98337d8db72ab50852826489f4d74f23bd38d5c816aa2e33b32b2577' packages/linxira-config-hub/PKGBUILD
 grep -q '1deed77b28af46bf2351d0de757ea216c6ce52ff' packages/linxira-component-manager/PKGBUILD
 grep -q '72244435fccf888c0c9914731f0efff63b2baa36' packages/linxira-gaming-manager/PKGBUILD
-grep -q 'c36e232c5da3f4d680041f8bd1c009e4efbcb8037ec65702b2a5e18dbd72ae8c' \
+grep -q 'a80a41fec6611af7f03b9aa9b5cd9a44fe0fbb40479e1be25d92d511ff4d192a' \
   packages/linxira-gaming-manager/PKGBUILD
 if grep -E -n "install.*systemd/system|install.*polkit" \
   packages/linxira-gaming-manager/PKGBUILD; then

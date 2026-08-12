@@ -12,7 +12,7 @@ license=('GPL-3.0-or-later')
 _commit=8b92b66655770a991cfe35d2ca327407630e364c
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit"
         'linxira-logo-braille60.ansi')
-sha256sums=('c04fe85aa173ab1862e0e48a786ee504a1e2fa86d08d49fcdc173cee5d17c4d7'
+sha256sums=('fced177af3a59795c22f6927cf137b4b510aa124d3e0afd5bceed0ca4f2e8ca6'
             'f2f4c61c2a2f1e131e388a8a2ad9cb12e3b8746278deee3499416f9141e6c7ba')
 
 package() {
