@@ -21,9 +21,9 @@ makedepends=('rust' 'clang' 'pciutils' 'libusb')
 checkdepends=('python')
 options=('!debug')
 
-_commit=3b00997b2d0ec8354db3c7770fa6090d7aaafd6e
+_commit=1d5b5a611811d498e6e457e680e66b0d15f4fb84
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('f02f10ee99df01ddbb681523cfc4dd074a93bf415032a071db1ff7e2cfc6831c')
+sha256sums=('ba1b7ad8878ca39c25dc3cd674cfa34aae9102126346133300b3408dad187ba3')
 
 build() {
   cd "$srcdir/$pkgname-$_commit"
@@ -49,6 +49,12 @@ package() {
   for dir in pci/ai_sdk pci/graphic_drivers pci/handhelds pci/network_drivers pci/power_management pci/t2-macbook usb/fprint; do
     if [ -f "profiles/$dir/profiles.toml" ]; then
       install -Dm644 "profiles/$dir/profiles.toml" "$pkgdir/var/lib/chwd/db/$dir/profiles.toml"
+    fi
+  done
+  # 硬件 ID 文件(profiles.toml 以 >path 引用, 缺失会导致 profile invalid)
+  for idfile in ids/*.ids; do
+    if [ -f "$idfile" ]; then
+      install -Dm644 "$idfile" "$pkgdir/var/lib/chwd/ids/$(basename "$idfile")"
     fi
   done
   # 运行时目录
