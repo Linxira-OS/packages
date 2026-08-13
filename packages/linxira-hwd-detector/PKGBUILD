@@ -23,7 +23,7 @@ options=('!debug')
 
 _commit=3b00997b2d0ec8354db3c7770fa6090d7aaafd6e
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('9fd3bc26a75b07b2ae256de2950268643160a98aa2eca6ffc878f1a9551aa977')
+sha256sums=('f02f10ee99df01ddbb681523cfc4dd074a93bf415032a071db1ff7e2cfc6831c')
 
 build() {
   cd "$srcdir/$pkgname-$_commit"
