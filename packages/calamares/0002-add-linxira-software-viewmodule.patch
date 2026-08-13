@@ -135,10 +135,16 @@ index 0000000..eaf52a1
 +    title->setFont( titleFont );
 +    layout->addWidget( title );
 +
-+    auto* description = new QLabel(
-+        tr( "Included items are installed from the ISO. Other reviewed choices are recorded for completion after first boot." ) );
-+    description->setWordWrap( true );
-+    layout->addWidget( description );
+    auto* description = new QLabel(
+        tr( "Included items are installed from the ISO. Other reviewed choices are recorded for completion after first boot." ) );
+    description->setWordWrap( true );
+    layout->addWidget( description );
+
+    // 2026-08-13: 恢复 gpuNote(驱动说明, 原 611 行 patch 特性)
+    auto* gpuNote = new QLabel(
+        tr( "安装过程使用核显/开源驱动输出；独立显卡驱动（NVIDIA/AMD）将在装完系统后由 Linxira 驱动管理器自动安装。" ) );
+    gpuNote->setWordWrap( true );
+    layout->addWidget( gpuNote );
 +
 +    auto* tabs = new QTabWidget;
 +    m_applications = makeTree();
@@ -391,13 +397,14 @@ index 0000000..eaf52a1
 +    const bool included = offlinePolicy == QStringLiteral( "included" );
 +    const auto provider = node.value( QStringLiteral( "provider" ) ).toString();
 +
-+    item->setData( 0, OfflinePolicyRole, offlinePolicy );
-+    item->setData( 0, SelectableRole, selectable );
-+    item->setText( 2, included ? tr( "Included" )
-+                               : selectable && offlinePolicy == QStringLiteral( "online-only" )
-+                                   ? tr( "Downloaded during installation (%1)" ).arg( provider )
-+                                   : selectable ? tr( "Downloaded during installation with consent (%1)" ).arg( provider )
-+                                                : tr( "Review pending (%1)" ).arg( provider.isEmpty() ? kind : provider ) );
+    item->setData( 0, OfflinePolicyRole, offlinePolicy );
+    item->setData( 0, SelectableRole, selectable );
+    // 2026-08-13: 恢复 emoji 视觉标记(💿=ISO 预装 / 🌐=联网安装), 前缀于 Install timing 文本
+    item->setText( 2, included ? QStringLiteral( "💿 " ) + tr( "Included" )
+                               : selectable && offlinePolicy == QStringLiteral( "online-only" )
+                                   ? QStringLiteral( "🌐 " ) + tr( "Downloaded during installation (%1)" ).arg( provider )
+                                   : selectable ? QStringLiteral( "🌐 " ) + tr( "Downloaded during installation with consent (%1)" ).arg( provider )
+                                                : tr( "Review pending (%1)" ).arg( provider.isEmpty() ? kind : provider ) );
 +    Qt::ItemFlags flags = item->flags();
 +    if ( selectable )
 +    {
