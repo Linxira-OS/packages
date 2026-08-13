@@ -8,7 +8,7 @@ arch=('any')
 groups=('linxira')
 url='https://github.com/Linxira-OS/linxira-hardware-driver-manager'
 license=('MIT')
-depends=('linxira-chwd-detector' 'linxira-components>=0.7.0' 'pacman' 'python' 'python-dbus' 'pyside6')
+depends=('linxira-hwd-detector' 'linxira-components>=0.7.0' 'pacman' 'python' 'python-dbus' 'pyside6')
 makedepends=('python-build' 'python-installer' 'python-setuptools' 'python-wheel')
 checkdepends=('appstream' 'desktop-file-utils')
 optdepends=('dkms: report DKMS module build status')

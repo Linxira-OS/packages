@@ -103,7 +103,7 @@ or repository definitions from the UI.
 
 ## Hardware And Driver Manager
 
-`linxira-chwd-detector` is a GPL-3.0-only, detector-only derivative of CHWD
+`linxira-hwd-detector` is a GPL-3.0-only, detector-only derivative of CHWD
 1.23.0. It reads fixed Linux hardware evidence and emits versioned JSON; it has
 no package, hook, command, or mutation surface.
 

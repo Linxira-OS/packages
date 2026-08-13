@@ -9,7 +9,7 @@ groups=('linxira')
 url='https://github.com/Linxira-OS/linxira-components'
 license=('MIT')
 depends=(
-  'btrfs-progs' 'dbus' 'linxira-catalog' 'linxira-chwd-detector' 'pacman' 'polkit'
+  'btrfs-progs' 'dbus' 'linxira-catalog' 'linxira-hwd-detector' 'pacman' 'polkit'
   'python' 'python-dbus' 'python-gobject' 'pyalpm' 'systemd' 'timeshift' 'util-linux'
 )
 checkdepends=('python-pytest')

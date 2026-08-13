@@ -1,0 +1,56 @@
+# Maintainer: Linxira OS <admin@linxira.org>
+
+# GPL-3.0-only: fork of CachyOS chwd 1.23.0 (upstream https://github.com/CachyOS/chwd).
+# License and provenance: see UPSTREAM.md in the source repository.
+# Linxira changes (2026-08-13): renamed to lhwd / linxira-hwd-detector (the "C" in
+# chwd stands for CachyOS); dual binary (lhwd full CLI + linxira-hwd-detector
+# no-argument JSON report); upstream driver profiles shipped under /var/lib/chwd/db.
+# No custom kernel build workflow (upstream CachyOS builds optimized kernels;
+# Linxira ships the generic linux/linux-lts kernels).
+
+pkgname=linxira-hwd-detector
+pkgver=1.23.0
+pkgrel=1
+pkgdesc='Linxira hardware detection and driver configuration tool (full CHWD port)'
+arch=('x86_64')
+groups=('linxira')
+url='https://github.com/Linxira-OS/linxira-hwd-detector'
+license=('GPL-3.0-only')
+depends=('pacman' 'pciutils' 'usbutils')
+makedepends=('rust' 'clang' 'pciutils' 'libusb')
+checkdepends=('python')
+options=('!debug')
+
+_commit=3b00997b2d0ec8354db3c7770fa6090d7aaafd6e
+source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
+sha256sums=('9fd3bc26a75b07b2ae256de2950268643160a98aa2eca6ffc878f1a9551aa977')
+
+build() {
+  cd "$srcdir/$pkgname-$_commit"
+  cargo build --release --locked
+}
+
+check() {
+  cd "$srcdir/$pkgname-$_commit"
+  cargo fmt --all -- --check
+  cargo test --all-targets --locked
+  cargo clippy --all-targets --locked -- -D warnings
+  ./target/release/linxira-hwd-detector >/tmp/linxira-hwd-detector-report.json
+  python -c 'import json; d=json.load(open("/tmp/linxira-hwd-detector-report.json")); assert d["schema_version"] == 1'
+}
+
+package() {
+  cd "$srcdir/$pkgname-$_commit"
+  install -Dm755 target/release/lhwd "$pkgdir/usr/bin/lhwd"
+  install -Dm755 target/release/linxira-hwd-detector "$pkgdir/usr/bin/linxira-hwd-detector"
+  install -Dm644 UPSTREAM.md "$pkgdir/usr/share/doc/$pkgname/UPSTREAM.md"
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+  # 驱动 profile 数据(按子目录, chwd 要求 conf_dir/<subdir>/profiles.toml)
+  for dir in pci/ai_sdk pci/graphic_drivers pci/handhelds pci/network_drivers pci/power_management pci/t2-macbook usb/fprint; do
+    if [ -f "profiles/$dir/profiles.toml" ]; then
+      install -Dm644 "profiles/$dir/profiles.toml" "$pkgdir/var/lib/chwd/db/$dir/profiles.toml"
+    fi
+  done
+  # 运行时目录
+  install -dm755 "$pkgdir/var/lib/chwd/local/pci" "$pkgdir/var/lib/chwd/local/usb" "$pkgdir/var/lib/chwd/scripts"
+}

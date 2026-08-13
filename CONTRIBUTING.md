@@ -10,7 +10,7 @@ packages/
 ├── packages/                  # 每个子目录 = 一个包
 │   ├── calamares/             # 采用的上游安装器(release tarball + patch)
 │   ├── linxira-catalog/       # 自研包(codeload commit 模式)
-│   ├── linxira-chwd-detector/ # 自研包
+│   ├── linxira-hwd-detector/ # 自研包
 │   ├── shelly/                # 采用的上游包(codeload commit 模式)
 │   └── ...                    # 共 18 个包
 ├── scripts/
