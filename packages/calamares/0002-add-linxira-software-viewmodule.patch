@@ -47,6 +47,7 @@ index 0000000..eaf52a1
 +#include <QSet>
 +#include <QTabWidget>
 +#include <QTreeWidget>
++#include <QTcpSocket>
 +#include <QVBoxLayout>
 +
 +namespace
@@ -154,6 +155,18 @@ index 0000000..eaf52a1
 +    tabs->addTab( m_applications, tr( "Applications" ) );
 +    tabs->addTab( m_components, tr( "Components" ) );
 +    layout->addWidget( tabs, 1 );
++
++    // 2026-08-13: 网络探测用 Arch 官方镜像(不受加速器 hosts 劫持 github.io 影响);
++    // 离线时在线项灰化并提示。
++    {
++        QTcpSocket probe;
++        probe.connectToHost( QStringLiteral( "mirror.archlinux.org" ), 443 );
++        m_online = probe.waitForConnected( 3000 );
++    }
++    if ( !m_online )
++    {
++        description->setText( tr( "💿 Offline mode — only pre-installed software is available" ) );
++    }
 +
 +    m_status = new QLabel;
 +    m_status->setWordWrap( true );
@@ -382,20 +395,20 @@ index 0000000..eaf52a1
 +    const auto review = node.value( QStringLiteral( "review" ) ).toObject();
 +    const auto artifact = node.value( QStringLiteral( "artifact" ) ).toObject();
 +    const auto offlinePolicy = availability.value( QStringLiteral( "offlinePolicy" ) ).toString();
-+    const bool reviewed = review.value( QStringLiteral( "status" ) ).toString() == QStringLiteral( "reviewed" );
-+    const bool available = availability.value( QStringLiteral( "status" ) ).toString() == QStringLiteral( "available" );
-+    const bool defaultChannel = availability.value( QStringLiteral( "channel" ) ).toString() == QStringLiteral( "default" );
-+    const bool requiresAcceptance = node.value( QStringLiteral( "license" ) ).toObject().value( QStringLiteral( "requiresAcceptance" ) ).toBool();
-+    const bool pacmanArch = node.value( QStringLiteral( "provider" ) ).toString() == QStringLiteral( "pacman" )
-+        && node.value( QStringLiteral( "source" ) ).toString() == QStringLiteral( "arch" );
-+    const bool supportedArtifact = artifact.value( QStringLiteral( "type" ) ).toString() == QStringLiteral( "package" )
-+        || artifact.value( QStringLiteral( "type" ) ).toString() == QStringLiteral( "package-group" );
-+    const bool architecture = stringList( availability.value( QStringLiteral( "architectures" ) ).toArray() )
-+                                  .contains( QStringLiteral( "x86_64" ) );
-+    const bool selectable = kind != QStringLiteral( "operation" ) && pacmanArch && reviewed && available
-+        && defaultChannel && architecture && supportedArtifact && !requiresAcceptance;
-+    const bool included = offlinePolicy == QStringLiteral( "included" );
-+    const auto provider = node.value( QStringLiteral( "provider" ) ).toString();
+    const bool reviewed = review.value( QStringLiteral( "status" ) ).toString() == QStringLiteral( "reviewed" );
+    const bool available = availability.value( QStringLiteral( "status" ) ).toString() == QStringLiteral( "available" );
+    const bool defaultChannel = availability.value( QStringLiteral( "channel" ) ).toString() == QStringLiteral( "default" );
+    const bool architecture = stringList( availability.value( QStringLiteral( "architectures" ) ).toArray() )
+                                  .contains( QStringLiteral( "x86_64" ) );
+    const bool supportedArtifact = artifact.value( QStringLiteral( "type" ) ).toString() == QStringLiteral( "package" )
+        || artifact.value( QStringLiteral( "type" ) ).toString() == QStringLiteral( "package-group" );
+    // 2026-08-13 修复: 去除 pacmanArch/requiresAcceptance 误锁(AUR/Flatpak/steam 恢复可选,
+    // 由 reviewed+available 把关); 加回离线灰化(included || m_online)。
+    const bool included = offlinePolicy == QStringLiteral( "included" );
+    const bool selectable = kind != QStringLiteral( "operation" ) && reviewed && available
+        && defaultChannel && architecture && supportedArtifact
+        && ( included || m_online );
+    const auto provider = node.value( QStringLiteral( "provider" ) ).toString();
 +
     item->setData( 0, OfflinePolicyRole, offlinePolicy );
     item->setData( 0, SelectableRole, selectable );
@@ -731,6 +744,7 @@ index 0000000..9ce16d0
 +    QHash< QString, QList< QTreeWidgetItem* > > m_leafItems;
 +    bool m_ready = false;
 +    bool m_updating = false;
++    bool m_online = false;
 +};
 +
 +CALAMARES_PLUGIN_FACTORY_DECLARATION( LinxiraSoftwareViewStepFactory )
