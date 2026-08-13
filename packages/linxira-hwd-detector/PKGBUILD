@@ -10,7 +10,7 @@
 
 pkgname=linxira-hwd-detector
 pkgver=1.23.0
-pkgrel=1
+pkgrel=2
 pkgdesc='Linxira hardware detection and driver configuration tool (full CHWD port)'
 arch=('x86_64')
 groups=('linxira')
