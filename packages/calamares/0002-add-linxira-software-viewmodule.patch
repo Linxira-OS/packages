@@ -27,7 +27,7 @@ new file mode 100644
 index 0000000..eaf52a1
 --- /dev/null
 +++ b/src/modules/linxirasoftware/LinxiraSoftwareViewStep.cpp
-@@ -0,0 +1,619 @@
+@@ -0,0 +1,639 @@
 +/* SPDX-License-Identifier: GPL-3.0-or-later */
 +
 +#include "LinxiraSoftwareViewStep.h"
@@ -136,16 +136,16 @@ index 0000000..eaf52a1
 +    title->setFont( titleFont );
 +    layout->addWidget( title );
 +
-    auto* description = new QLabel(
-        tr( "Included items are installed from the ISO. Other reviewed choices are recorded for completion after first boot." ) );
-    description->setWordWrap( true );
-    layout->addWidget( description );
-
-    // 2026-08-13: 恢复 gpuNote(驱动说明, 原 611 行 patch 特性)
-    auto* gpuNote = new QLabel(
-        tr( "安装过程使用核显/开源驱动输出；独立显卡驱动（NVIDIA/AMD）将在装完系统后由 Linxira 驱动管理器自动安装。" ) );
-    gpuNote->setWordWrap( true );
-    layout->addWidget( gpuNote );
++    auto* description = new QLabel(
++        tr( "Included items are installed from the ISO. Other reviewed choices are recorded for completion after first boot." ) );
++    description->setWordWrap( true );
++    layout->addWidget( description );
++
++    // 2026-08-13: 恢复 gpuNote(驱动说明, 原 611 行 patch 特性)
++    auto* gpuNote = new QLabel(
++        tr( "安装过程使用核显/开源驱动输出；独立显卡驱动（NVIDIA/AMD）将在装完系统后由 Linxira 驱动管理器自动安装。" ) );
++    gpuNote->setWordWrap( true );
++    layout->addWidget( gpuNote );
 +
 +    auto* tabs = new QTabWidget;
 +    m_applications = makeTree();
@@ -395,29 +395,29 @@ index 0000000..eaf52a1
 +    const auto review = node.value( QStringLiteral( "review" ) ).toObject();
 +    const auto artifact = node.value( QStringLiteral( "artifact" ) ).toObject();
 +    const auto offlinePolicy = availability.value( QStringLiteral( "offlinePolicy" ) ).toString();
-    const bool reviewed = review.value( QStringLiteral( "status" ) ).toString() == QStringLiteral( "reviewed" );
-    const bool available = availability.value( QStringLiteral( "status" ) ).toString() == QStringLiteral( "available" );
-    const bool defaultChannel = availability.value( QStringLiteral( "channel" ) ).toString() == QStringLiteral( "default" );
-    const bool architecture = stringList( availability.value( QStringLiteral( "architectures" ) ).toArray() )
-                                  .contains( QStringLiteral( "x86_64" ) );
-    const bool supportedArtifact = artifact.value( QStringLiteral( "type" ) ).toString() == QStringLiteral( "package" )
-        || artifact.value( QStringLiteral( "type" ) ).toString() == QStringLiteral( "package-group" );
-    // 2026-08-13 修复: 去除 pacmanArch/requiresAcceptance 误锁(AUR/Flatpak/steam 恢复可选,
-    // 由 reviewed+available 把关); 加回离线灰化(included || m_online)。
-    const bool included = offlinePolicy == QStringLiteral( "included" );
-    const bool selectable = kind != QStringLiteral( "operation" ) && reviewed && available
-        && defaultChannel && architecture && supportedArtifact
-        && ( included || m_online );
-    const auto provider = node.value( QStringLiteral( "provider" ) ).toString();
++    const bool reviewed = review.value( QStringLiteral( "status" ) ).toString() == QStringLiteral( "reviewed" );
++    const bool available = availability.value( QStringLiteral( "status" ) ).toString() == QStringLiteral( "available" );
++    const bool defaultChannel = availability.value( QStringLiteral( "channel" ) ).toString() == QStringLiteral( "default" );
++    const bool architecture = stringList( availability.value( QStringLiteral( "architectures" ) ).toArray() )
++                                  .contains( QStringLiteral( "x86_64" ) );
++    const bool supportedArtifact = artifact.value( QStringLiteral( "type" ) ).toString() == QStringLiteral( "package" )
++        || artifact.value( QStringLiteral( "type" ) ).toString() == QStringLiteral( "package-group" );
++    // 2026-08-13 修复: 去除 pacmanArch/requiresAcceptance 误锁(AUR/Flatpak/steam 恢复可选,
++    // 由 reviewed+available 把关); 加回离线灰化(included || m_online)。
++    const bool included = offlinePolicy == QStringLiteral( "included" );
++    const bool selectable = kind != QStringLiteral( "operation" ) && reviewed && available
++        && defaultChannel && architecture && supportedArtifact
++        && ( included || m_online );
++    const auto provider = node.value( QStringLiteral( "provider" ) ).toString();
 +
-    item->setData( 0, OfflinePolicyRole, offlinePolicy );
-    item->setData( 0, SelectableRole, selectable );
-    // 2026-08-13: 恢复 emoji 视觉标记(💿=ISO 预装 / 🌐=联网安装), 前缀于 Install timing 文本
-    item->setText( 2, included ? QStringLiteral( "💿 " ) + tr( "Included" )
-                               : selectable && offlinePolicy == QStringLiteral( "online-only" )
-                                   ? QStringLiteral( "🌐 " ) + tr( "Downloaded during installation (%1)" ).arg( provider )
-                                   : selectable ? QStringLiteral( "🌐 " ) + tr( "Downloaded during installation with consent (%1)" ).arg( provider )
-                                                : tr( "Review pending (%1)" ).arg( provider.isEmpty() ? kind : provider ) );
++    item->setData( 0, OfflinePolicyRole, offlinePolicy );
++    item->setData( 0, SelectableRole, selectable );
++    // 2026-08-13: 恢复 emoji 视觉标记(💿=ISO 预装 / 🌐=联网安装), 前缀于 Install timing 文本
++    item->setText( 2, included ? QStringLiteral( "💿 " ) + tr( "Included" )
++                               : selectable && offlinePolicy == QStringLiteral( "online-only" )
++                                   ? QStringLiteral( "🌐 " ) + tr( "Downloaded during installation (%1)" ).arg( provider )
++                                   : selectable ? QStringLiteral( "🌐 " ) + tr( "Downloaded during installation with consent (%1)" ).arg( provider )
++                                                : tr( "Review pending (%1)" ).arg( provider.isEmpty() ? kind : provider ) );
 +    Qt::ItemFlags flags = item->flags();
 +    if ( selectable )
 +    {
@@ -672,7 +672,7 @@ new file mode 100644
 index 0000000..9ce16d0
 --- /dev/null
 +++ b/src/modules/linxirasoftware/LinxiraSoftwareViewStep.h
-@@ -0,0 +1,76 @@
+@@ -0,0 +1,77 @@
 +/* SPDX-License-Identifier: GPL-3.0-or-later */
 +
 +#ifndef LINXIRASOFTWAREVIEWSTEP_H
@@ -764,7 +764,7 @@ new file mode 100644
 index 0000000..879382e
 --- /dev/null
 +++ b/src/modules/linxirasoftware/module.desc
-@@ -0,0 +1,7 @@
+@@ -0,0 +1,8 @@
 +# SPDX-License-Identifier: CC0-1.0
 +# Syntax is YAML 1.2
 +---
@@ -772,3 +772,4 @@ index 0000000..879382e
 +name: "linxirasoftware"
 +interface: "qtplugin"
 +load: "libcalamares_viewmodule_linxirasoftware.so"
++
