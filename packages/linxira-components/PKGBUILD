@@ -2,7 +2,7 @@
 
 pkgname=linxira-components
 pkgver=0.7.0
-pkgrel=4
+pkgrel=5
 pkgdesc='Catalog-bound transaction planning and receipt backend for Linxira OS'
 arch=('any')
 groups=('linxira')
