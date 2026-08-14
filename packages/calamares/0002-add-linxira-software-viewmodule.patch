@@ -27,7 +27,7 @@ new file mode 100644
 index 0000000..eaf52a1
 --- /dev/null
 +++ b/src/modules/linxirasoftware/LinxiraSoftwareViewStep.cpp
-@@ -0,0 +1,659 @@
+@@ -0,0 +1,691 @@
 +/* SPDX-License-Identifier: GPL-3.0-or-later */
 +
 +#include "LinxiraSoftwareViewStep.h"
@@ -38,12 +38,14 @@ index 0000000..eaf52a1
 +
 +#include <QCryptographicHash>
 +#include <QFile>
++#include <QHBoxLayout>
 +#include <QHeaderView>
 +#include <QJsonArray>
 +#include <QJsonDocument>
 +#include <QJsonObject>
 +#include <QLabel>
 +#include <QLocale>
++#include <QPushButton>
 +#include <QSet>
 +#include <QTabWidget>
 +#include <QTreeWidget>
@@ -158,7 +160,8 @@ index 0000000..eaf52a1
 +
 +    // 2026-08-14: 多目标网络探测(清华镜像/Arch 官方/阿里云, 任一可达即在线);
 +    // 国内网络 mirror.archlinux.org 常超时导致误判离线, 先探测国内外均可达的 tuna。
-+    {
++    // 探测抽成 lambda: 供初始化与"手动重试"按钮复用。
++    const auto probeNetwork = [this]() {
 +        const QStringList probeHosts = {
 +            QStringLiteral( "mirrors.tuna.tsinghua.edu.cn" ),
 +            QStringLiteral( "mirror.archlinux.org" ),
@@ -170,15 +173,43 @@ index 0000000..eaf52a1
 +            probe.connectToHost( host, 443 );
 +            if ( probe.waitForConnected( 3000 ) )
 +            {
-+                m_online = true;
-+                break;
++                return true;
 +            }
 +        }
-+    }
-+    if ( !m_online )
-+    {
-+        description->setText( tr( "💿 Offline mode — only pre-installed software is available" ) );
-+    }
++        return false;
++    };
++    const QString onlineDescription =
++        tr( "Included items are installed from the ISO. Other reviewed choices are recorded for completion after first boot." );
++    m_online = probeNetwork();
++    description->setText( m_online ? onlineDescription
++                                   : tr( "💿 Offline mode — only pre-installed software is available" ) );
++    // 手动重试按钮: 探测失败后网络恢复可立即刷新, 无需重启安装器
++    auto* retryRow = new QHBoxLayout;
++    auto* retryBtn = new QPushButton( tr( "🔄 Retry network check" ) );
++    retryBtn->setEnabled( !m_online );
++    retryRow->addWidget( retryBtn );
++    retryRow->addStretch();
++    layout->addLayout( retryRow );
++    QObject::connect( retryBtn, &QPushButton::clicked, this,
++        [this, retryBtn, description, tabs, onlineDescription, probeNetwork]() {
++            m_online = probeNetwork();
++            retryBtn->setEnabled( !m_online );
++            description->setText( m_online ? onlineDescription
++                                           : tr( "💿 Offline mode — only pre-installed software is available" ) );
++            // 重建树: 按新网络状态重算 selectable/emoji(离线时在线项不可选, 勾选本就为空)
++            while ( tabs->count() )
++            {
++                auto* w = tabs->widget( 0 );
++                tabs->removeTab( 0 );
++                delete w;
++            }
++            m_desktops = makeTree();
++            m_applications = makeTree();
++            m_components = makeTree();
++            tabs->addTab( m_desktops, tr( "Desktop" ) );
++            tabs->addTab( m_applications, tr( "Applications" ) );
++            tabs->addTab( m_components, tr( "Components" ) );
++        } );
 +
 +    m_status = new QLabel;
 +    m_status->setWordWrap( true );
@@ -425,14 +456,15 @@ index 0000000..eaf52a1
 +    item->setData( 0, OfflinePolicyRole, offlinePolicy );
 +    item->setData( 0, SelectableRole, selectable );
 +    // 2026-08-13: 恢复 emoji 视觉标记(💿=ISO 预装 / 🌐=联网安装), 前缀于 Install timing 文本
-+    // 2026-08-14: 离线灰化的在线项显示"需联网"而非 Review pending(误导)
++    // 2026-08-14: 离线灰化的在线项显示"需联网"; 其余不可选原因统一 Unavailable
++    // (catalog 条目均已审核, Review pending 概念不适用)
 +    item->setText( 2, included ? QStringLiteral( "💿 " ) + tr( "Included" )
 +                               : selectable && offlinePolicy == QStringLiteral( "online-only" )
 +                                   ? QStringLiteral( "🌐 " ) + tr( "Downloaded during installation (%1)" ).arg( provider )
 +                                   : selectable ? QStringLiteral( "🌐 " ) + tr( "Downloaded during installation with consent (%1)" ).arg( provider )
 +                                                : offlinePolicy == QStringLiteral( "online-only" ) && reviewed && available
 +                                                    ? QStringLiteral( "🌐 " ) + tr( "Needs network (offline)" )
-+                                                    : tr( "Review pending (%1)" ).arg( provider.isEmpty() ? kind : provider ) );
++                                                    : tr( "Unavailable (%1)" ).arg( provider.isEmpty() ? kind : provider ) );
 +    Qt::ItemFlags flags = item->flags();
 +    if ( selectable )
 +    {

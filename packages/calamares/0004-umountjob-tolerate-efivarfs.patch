@@ -1,0 +1,24 @@
+diff --git a/src/modules/umount/UmountJob.cpp b/src/modules/umount/UmountJob.cpp
+--- a/src/modules/umount/UmountJob.cpp
++++ b/src/modules/umount/UmountJob.cpp
+@@ -70,10 +70,19 @@
+         if ( Calamares::Partition::unmount( m.mountPoint, { "-lv" } ) )
+         {
++            // 2026-08-14: efivarfs 是伪文件系统(重启即消失), 卸载失败仅警告并
++            // 强制 lazy 重试; 真实磁盘设备仍严格中断防止数据损坏/丢失。
++            if ( m.device == QStringLiteral( "efivarfs" ) )
++            {
++                cWarning() << "efivarfs at" << m.mountPoint
++                           << "could not be unmounted; forcing lazy unmount (harmless, disappears on reboot)";
++                Calamares::Partition::unmount( m.mountPoint, { "-lf" } );
++                continue;
++            }
+             return Calamares::JobResult::error(
+                 QCoreApplication::translate( UmountJob::staticMetaObject.className(),
+                                              "Could not unmount target system." ),
+                 QCoreApplication::translate( UmountJob::staticMetaObject.className(),
+                                              "The device '%1' is mounted in the target system. It is mounted at '%2'. "
+                                              "The device could not be unmounted." )
+                     .arg( m.device, m.mountPoint ) );
+         }
+     }
