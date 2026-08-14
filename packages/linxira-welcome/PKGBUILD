@@ -2,7 +2,7 @@
 
 pkgname=linxira-welcome
 pkgver=1.0.0
-pkgrel=11
+pkgrel=12
 pkgdesc='Safe Plasma-native workstation control center for Linxira OS'
 arch=('any')
 groups=('linxira')
@@ -26,9 +26,9 @@ optdepends=(
   'timeshift: manage recovery snapshots'
 )
 
-_commit=a535b129f2ac5602ea0c27235aac5c80e1de6028
+_commit=6fe04d1d8f012edce95bbad1d644e0dbaf3b3ed9
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('1577577db5ebb84353d98f30f8cc0f7d1ad2e9bd23e43b7034182b64994a5631')
+sha256sums=('e32ba1902973532484e5032001d9f18d6f7d7b57961232fd314629670288aafd')
 
 check() {
   cd "$srcdir/$pkgname-$_commit"
