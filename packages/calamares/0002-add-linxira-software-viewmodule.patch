@@ -27,7 +27,7 @@ new file mode 100644
 index 0000000..eaf52a1
 --- /dev/null
 +++ b/src/modules/linxirasoftware/LinxiraSoftwareViewStep.cpp
-@@ -0,0 +1,639 @@
+@@ -0,0 +1,659 @@
 +/* SPDX-License-Identifier: GPL-3.0-or-later */
 +
 +#include "LinxiraSoftwareViewStep.h"
@@ -156,12 +156,24 @@ index 0000000..eaf52a1
 +    tabs->addTab( m_components, tr( "Components" ) );
 +    layout->addWidget( tabs, 1 );
 +
-+    // 2026-08-13: 网络探测用 Arch 官方镜像(不受加速器 hosts 劫持 github.io 影响);
-+    // 离线时在线项灰化并提示。
++    // 2026-08-14: 多目标网络探测(清华镜像/Arch 官方/阿里云, 任一可达即在线);
++    // 国内网络 mirror.archlinux.org 常超时导致误判离线, 先探测国内外均可达的 tuna。
 +    {
-+        QTcpSocket probe;
-+        probe.connectToHost( QStringLiteral( "mirror.archlinux.org" ), 443 );
-+        m_online = probe.waitForConnected( 3000 );
++        const QStringList probeHosts = {
++            QStringLiteral( "mirrors.tuna.tsinghua.edu.cn" ),
++            QStringLiteral( "mirror.archlinux.org" ),
++            QStringLiteral( "mirrors.aliyun.com" ),
++        };
++        for ( const QString& host : probeHosts )
++        {
++            QTcpSocket probe;
++            probe.connectToHost( host, 443 );
++            if ( probe.waitForConnected( 3000 ) )
++            {
++                m_online = true;
++                break;
++            }
++        }
 +    }
 +    if ( !m_online )
 +    {
@@ -413,11 +425,14 @@ index 0000000..eaf52a1
 +    item->setData( 0, OfflinePolicyRole, offlinePolicy );
 +    item->setData( 0, SelectableRole, selectable );
 +    // 2026-08-13: 恢复 emoji 视觉标记(💿=ISO 预装 / 🌐=联网安装), 前缀于 Install timing 文本
++    // 2026-08-14: 离线灰化的在线项显示"需联网"而非 Review pending(误导)
 +    item->setText( 2, included ? QStringLiteral( "💿 " ) + tr( "Included" )
 +                               : selectable && offlinePolicy == QStringLiteral( "online-only" )
 +                                   ? QStringLiteral( "🌐 " ) + tr( "Downloaded during installation (%1)" ).arg( provider )
 +                                   : selectable ? QStringLiteral( "🌐 " ) + tr( "Downloaded during installation with consent (%1)" ).arg( provider )
-+                                                : tr( "Review pending (%1)" ).arg( provider.isEmpty() ? kind : provider ) );
++                                                : offlinePolicy == QStringLiteral( "online-only" ) && reviewed && available
++                                                    ? QStringLiteral( "🌐 " ) + tr( "Needs network (offline)" )
++                                                    : tr( "Review pending (%1)" ).arg( provider.isEmpty() ? kind : provider ) );
 +    Qt::ItemFlags flags = item->flags();
 +    if ( selectable )
 +    {
