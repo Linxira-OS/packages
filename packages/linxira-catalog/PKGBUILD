@@ -2,7 +2,7 @@
 
 pkgname=linxira-catalog
 pkgver=3.0.0
-pkgrel=20
+pkgrel=22
 pkgdesc='Reviewed software catalog and schema for Linxira OS'
 arch=('any')
 groups=('linxira')
