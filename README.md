@@ -124,3 +124,37 @@ support bundle is structured, recursively redacted, private, and never
 uploaded. Pacman-lock diagnosis and live-chroot readiness use the shared
 root-owned transaction service; kernel changes and all mutating recovery
 operations remain disabled.
+
+## Upstream Sync
+
+A daily scheduled workflow keeps pinned self-owned packages aligned with
+official upstream releases:
+
+- `upstream-sync.toml`: allowlist mapping each package to its source
+  repository. Packages absent from the list are never bumped automatically
+  (`calamares`, `shelly` are external; `linxira-keyring`, `zetabin` have no
+  version pin).
+- `scripts/sync-upstream.py`: reads GitHub `releases/latest` for every tracked
+  repository, skips draft/prerelease releases and non-version tags, rewrites
+  `pkgver` / `_commit` / the matching `sha256sums` entry, resets `pkgrel=1`
+  on version changes. Run it locally in check mode with
+  `python3 scripts/sync-upstream.py`.
+- `.github/workflows/auto-bump.yml`: cron (`0 20 * * *` UTC) plus manual
+  dispatch; opens one grouped bump PR when pins lag behind releases.
+
+Merge bump PRs with **squash merge** so the commit subject keeps the
+`chore(bump)` marker: that marker auto-triggers the signing and publishing
+path in `packages.yml`, which additionally syncs artifacts to
+`Linxira-OS/linxira-packages` and cuts a `sync-*` release there
+(`scripts/deploy-to-linxira-packages.sh`). Regular pushes keep the previous
+behavior: build only, publish stays manual.
+
+Required secrets for the automatic publish leg:
+
+- `LINXIRA_CI_TOKEN`: PAT with `contents:write` on
+  `Linxira-OS/linxira-packages` (cross-repo push, release creation)
+- `LINXIRA_GPG_PRIVATE_KEY`, `LINXIRA_GPG_FINGERPRINT`,
+  `LINXIRA_GPG_PASSPHRASE`: already documented above
+
+Caveat: GitHub disables scheduled workflows after ~60 days without repository
+activity; run `auto-bump.yml` manually once if it gets disabled.

@@ -1,0 +1,46 @@
+name: Upstream sync (daily)
+
+# 每日定时扫描 upstream-sync.toml 白名单里的上游仓：
+#   上游有新的正式 release 且 PKGBUILD 落后 → 自动改写 pkgver/_commit/sha256
+#   并开一个 bump PR。
+#
+# 合并约定：请用 **squash merge**（默认标题即含 chore(bump)，发布链靠它判定）。
+# 合并后 push 触发 packages.yml 全量构建；commit message 含 chore(bump) 时
+# publish job 会自动签名发布并同步到 Linxira-OS/linxira-packages 打 Release。
+#
+# 注意：GitHub 对连续 60 天无活动的仓库会自动停用 schedule workflow；
+# 长期没有 bump 时在 Actions 页手动 Run一次即可保持启用。
+
+on:
+  schedule:
+    - cron: "0 20 * * *" # UTC 20:00 = 北京时间次日 04:00
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: upstream-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Scan upstream releases
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 scripts/sync-upstream.py --write --summary /tmp/sync-report.md
+          cat /tmp/sync-report.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Create bump PR
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: bot/upstream-sync
+          delete-branch: true
+          title: "chore(bump): 上游 release 同步"
+          body-path: /tmp/sync-report.md
+          commit-message: "chore(bump): sync upstream releases"

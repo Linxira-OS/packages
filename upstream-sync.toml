@@ -1,0 +1,70 @@
+# 上游同步白名单 —— scripts/sync-upstream.py 每日扫描的包清单。
+#
+# 规则：
+# - 只认正式 GitHub Release（draft / prerelease 一律忽略），取 releases/latest。
+#   没有 Release 的上游仓会被跳过并记录"无正式 release"，绝不追 main HEAD。
+# - 不在清单里的包永不自动 bump：
+#     calamares / shelly  外部上游，跨版本可能需要改 patch，保持人工；
+#     linxira-keyring     无版本 pin（_commit 是密钥指纹）；
+#     zetabin             无 _commit pin。
+# - 新增自研包后在这里加一段 [[track]] 即可。
+
+[[track]]
+package = "linxira-artwork"
+repo = "Linxira-OS/linxira-artwork"
+
+[[track]]
+package = "linxira-catalog"
+repo = "Linxira-OS/linxira-catalog"
+
+[[track]]
+package = "linxira-completion-agent"
+repo = "Linxira-OS/linxira-completion-agent"
+
+[[track]]
+package = "linxira-component-manager"
+repo = "Linxira-OS/linxira-component-manager"
+
+[[track]]
+package = "linxira-components"
+repo = "Linxira-OS/linxira-components"
+
+[[track]]
+package = "linxira-config-hub"
+repo = "Linxira-OS/linxira-config-hub"
+
+[[track]]
+package = "linxira-gaming-manager"
+repo = "Linxira-OS/linxira-gaming-manager"
+
+[[track]]
+package = "linxira-hardware-driver-manager"
+repo = "Linxira-OS/linxira-hardware-driver-manager"
+
+[[track]]
+package = "linxira-hooks"
+repo = "Linxira-OS/linxira-hooks"
+
+[[track]]
+package = "linxira-hwd-detector"
+repo = "Linxira-OS/linxira-hwd-detector"
+
+[[track]]
+package = "linxira-kernel-manager"
+repo = "Linxira-OS/linxira-kernel-manager"
+
+[[track]]
+package = "linxira-package-center"
+repo = "Linxira-OS/linxira-package-center"
+
+[[track]]
+package = "linxira-recovery-diagnostics"
+repo = "Linxira-OS/linxira-recovery-diagnostics"
+
+[[track]]
+package = "linxira-update"
+repo = "Linxira-OS/linxira-update"
+
+[[track]]
+package = "linxira-welcome"
+repo = "Linxira-OS/linxira-welcome"

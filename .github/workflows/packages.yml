@@ -109,7 +109,9 @@ jobs:
           if-no-files-found: error
 
   publish:
-    if: github.event_name == 'workflow_dispatch' && inputs.publish
+    if: >-
+      (github.event_name == 'workflow_dispatch' && inputs.publish) ||
+      (github.event_name == 'push' && contains(github.event.head_commit.message, 'chore(bump'))
     needs: [build, system-stack]
     runs-on: ubuntu-latest
     permissions:
@@ -149,3 +151,13 @@ jobs:
       - name: Deploy GitHub Pages
         id: deployment
         uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5
+      - name: Sync signed repo to Linxira-OS/linxira-packages
+        if: github.event_name == 'push'
+        env:
+          LINXIRA_CI_TOKEN: ${{ secrets.LINXIRA_CI_TOKEN }}
+          LINXIRA_GPG_PRIVATE_KEY: ${{ secrets.LINXIRA_GPG_PRIVATE_KEY }}
+          LINXIRA_GPG_FINGERPRINT: ${{ secrets.LINXIRA_GPG_FINGERPRINT }}
+          LINXIRA_GPG_PASSPHRASE: ${{ secrets.LINXIRA_GPG_PASSPHRASE }}
+          GH_TOKEN: ${{ secrets.LINXIRA_CI_TOKEN }}
+        run: |
+          bash scripts/deploy-to-linxira-packages.sh "$(git log -1 --pretty=%s)"
