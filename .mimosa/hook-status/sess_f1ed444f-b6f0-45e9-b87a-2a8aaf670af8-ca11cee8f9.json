@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "mimosa-hook-status/v1",
+  "recordedAt": "2026-09-13T15:14:55.071Z",
+  "sessionId": "sess_f1ed444f-b6f0-45e9-b87a-2a8aaf670af8",
+  "event": "PostToolUse",
+  "toolName": "Edit",
+  "file": "scripts/check-boundaries.sh",
+  "outcome": "clear",
+  "coverage": "complete",
+  "findingCount": 0,
+  "durationMs": 32,
+  "hostState": "hook_complete",
+  "reportHint": ".mimosa/reports/"
+}

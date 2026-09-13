@@ -28,7 +28,7 @@ optdepends=(
 
 _commit=6fe04d1d8f012edce95bbad1d644e0dbaf3b3ed9
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('e32ba1902973532484e5032001d9f18d6f7d7b57961232fd314629670288aafd')
+sha256sums=('4e8bf0fb925e08e43ac07f06b65c360948638e35e54e085117eed56c706bd53b')
 
 check() {
   cd "$srcdir/$pkgname-$_commit"

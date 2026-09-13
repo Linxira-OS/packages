@@ -65,13 +65,13 @@ if [[ -f packages/linxira-welcome/PKGBUILD ]]; then
     echo "linxira-welcome must remain independent and unprivileged" >&2
     exit 1
   fi
-  grep -q '6fe04d1d8f012edce95bbad1d644e0dbaf3b3ed9' packages/linxira-welcome/PKGBUILD
-  grep -q '4e8bf0fb925e08e43ac07f06b65c360948638e35e54e085117eed56c706bd53b' packages/linxira-welcome/PKGBUILD
+  grep -q '79dbdc15a3a1e73ba9eff6c6314773808ea090b9' packages/linxira-welcome/PKGBUILD
+  grep -q 'cdb8330d861f197797ccd22311065478bd37df15ca2478bf4eeac03c2fd74cfc' packages/linxira-welcome/PKGBUILD
 fi
 
 if [[ -f packages/linxira-update/PKGBUILD ]]; then
-  grep -q 'c51f0e35852f79a77539b27503f15150d66c62a1' packages/linxira-update/PKGBUILD
-  grep -q '6d837e8767202b8fa1513f00eb59b7387542c6fece4f47ba129caa4f31d4b9f5' \
+  grep -q '99274af30a40a7cc844eb5c07afd91e62e5ba241' packages/linxira-update/PKGBUILD
+  grep -q '1673c964ea77cc39863986d00fab2b7dab5281755a7a70e50658e2a3aaec22ac' \
     packages/linxira-update/PKGBUILD
   grep -q "conflicts=('arch-update' 'cachy-update')" packages/linxira-update/PKGBUILD
   if grep -q '^replaces=' packages/linxira-update/PKGBUILD; then
@@ -81,12 +81,12 @@ if [[ -f packages/linxira-update/PKGBUILD ]]; then
 fi
 
 if [[ -f packages/linxira-catalog/PKGBUILD ]]; then
-  grep -q '90db15bdeb98740a0004ecf3541da532c83db940' packages/linxira-catalog/PKGBUILD
-  grep -q '86daa3ffb79aa3a17408511ed6207d2288da87c1c0b1ebf2eef8edf825a8aa37' packages/linxira-catalog/PKGBUILD
+  grep -q '9dd16cdac62eb9e764926f8fc4b25fbb078d5d38' packages/linxira-catalog/PKGBUILD
+  grep -q '576664069d61882fae2c8746264f228d2fcc7c33941d57898579cf1a4d84fd6c' packages/linxira-catalog/PKGBUILD
 fi
 
-grep -q 'd07474fb8c286d706e1829abe01598b640832eaf' packages/linxira-components/PKGBUILD
-grep -q 'e765241cf6405d13f28d0d21d2e53b195d925a0b5b7104258633e69f782046ce' packages/linxira-components/PKGBUILD
+grep -q 'cfff5359b0fc0e66ec22ea9a91f2b69d17c7fdf9' packages/linxira-components/PKGBUILD
+grep -q 'f8e0bfe95be79b0866a2572f3cbbdb57e563af2318afa3cf2c2dec6cca82b9e2' packages/linxira-components/PKGBUILD
 grep -q 'scripts/linxira-components-service' packages/linxira-components/PKGBUILD
 grep -q 'scripts/linxira-components-worker' packages/linxira-components/PKGBUILD
 grep -q 'service/linxira-components.service' packages/linxira-components/PKGBUILD
@@ -99,11 +99,11 @@ grep -q '394d2a90abbebc1fec618dd0ca8844167ad74e94' packages/linxira-completion-a
 grep -q '0aa0e5669db982337d08202cb0aa583700522a56afbb48bee915580fe332ea68' \
   packages/linxira-completion-agent/PKGBUILD
 grep -q "depends=.*'linxira-catalog'.*'linxira-components'" packages/linxira-completion-agent/PKGBUILD
-grep -q '1d5b5a611811d498e6e457e680e66b0d15f4fb84' packages/linxira-hwd-detector/PKGBUILD
-grep -q 'ba1b7ad8878ca39c25dc3cd674cfa34aae9102126346133300b3408dad187ba3' \
+grep -q '3b00997b2d0ec8354db3c7770fa6090d7aaafd6e' packages/linxira-hwd-detector/PKGBUILD
+grep -q 'f02f10ee99df01ddbb681523cfc4dd074a93bf415032a071db1ff7e2cfc6831c' \
   packages/linxira-hwd-detector/PKGBUILD
-grep -q '82a0796d4dd1dac50c71a985081fd030e84163f2' packages/linxira-hardware-driver-manager/PKGBUILD
-grep -q '060f0ab7d94b9ee92029dab363986518524326c29a50cd17abd56edaf4167739' \
+grep -q '27698ad385849930ac70e67cb1d03ce715a142fb' packages/linxira-hardware-driver-manager/PKGBUILD
+grep -q '338f36b8c2d17e8e7321d9de45b5f354b3a0090f89fb562da8a9a518fb120f5d' \
   packages/linxira-hardware-driver-manager/PKGBUILD
 grep -q "depends=.*'linxira-hwd-detector'" packages/linxira-hardware-driver-manager/PKGBUILD
 if grep -E -n "depends=.*polkit|install.*systemd/system|install.*polkit" \
