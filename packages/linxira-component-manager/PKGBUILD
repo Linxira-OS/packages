@@ -2,7 +2,7 @@
 
 pkgname=linxira-component-manager
 pkgver=0.1.0
-pkgrel=5
+pkgrel=7
 pkgdesc='Nested capability bundle and component manager for Linxira OS'
 arch=('any')
 groups=('linxira')

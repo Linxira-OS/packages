@@ -2,7 +2,7 @@
 
 pkgname=linxira-package-center
 pkgver=0.2.1
-pkgrel=2
+pkgrel=4
 pkgdesc='Catalog-bound application and capability manager for Linxira OS'
 arch=('any')
 groups=('linxira')
