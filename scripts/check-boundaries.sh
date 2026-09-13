@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# pin 校验失败时不能静默退出：打印失败行号，否则 CI 日志里只有 exit 1 无从排障
+trap 'echo "[boundaries] 校验失败于第 $LINENO 行（pin 过期或出现禁止模式），最后校验的命令见上方 bash -x 输出" >&2' ERR
+
 if grep -R -n -E "(provides|conflicts|replaces)=\([^)]*cachyos-hooks" packages; then
   echo "linxira-hooks must coexist with cachyos-hooks" >&2
   exit 1
@@ -41,7 +44,7 @@ if [[ -f packages/calamares/PKGBUILD ]]; then
   grep -q "0231ff9d671cc590f96b863c69c341a1fca45f260ba79ed246b8a5b95fe0859d" \
     packages/calamares/PKGBUILD
   grep -q "0002-add-linxira-software-viewmodule.patch" packages/calamares/PKGBUILD
-  grep -q "bd47459b58573a992da3f71c549fdac83a9210075076875c91351c12816c73e9" \
+  grep -q "302c6593bda4b220e8b6997aeb36f8d852c68c7b4e86cdc4c4531b1812938454" \
     packages/calamares/PKGBUILD
   grep -q 'install(FILES linxirasoftware.conf' \
     packages/calamares/0002-add-linxira-software-viewmodule.patch
@@ -62,13 +65,13 @@ if [[ -f packages/linxira-welcome/PKGBUILD ]]; then
     echo "linxira-welcome must remain independent and unprivileged" >&2
     exit 1
   fi
-  grep -q '79dbdc15a3a1e73ba9eff6c6314773808ea090b9' packages/linxira-welcome/PKGBUILD
-  grep -q 'cdb8330d861f197797ccd22311065478bd37df15ca2478bf4eeac03c2fd74cfc' packages/linxira-welcome/PKGBUILD
+  grep -q '6fe04d1d8f012edce95bbad1d644e0dbaf3b3ed9' packages/linxira-welcome/PKGBUILD
+  grep -q 'e32ba1902973532484e5032001d9f18d6f7d7b57961232fd314629670288aafd' packages/linxira-welcome/PKGBUILD
 fi
 
 if [[ -f packages/linxira-update/PKGBUILD ]]; then
-  grep -q '99274af30a40a7cc844eb5c07afd91e62e5ba241' packages/linxira-update/PKGBUILD
-  grep -q '1673c964ea77cc39863986d00fab2b7dab5281755a7a70e50658e2a3aaec22ac' \
+  grep -q 'c51f0e35852f79a77539b27503f15150d66c62a1' packages/linxira-update/PKGBUILD
+  grep -q '6d837e8767202b8fa1513f00eb59b7387542c6fece4f47ba129caa4f31d4b9f5' \
     packages/linxira-update/PKGBUILD
   grep -q "conflicts=('arch-update' 'cachy-update')" packages/linxira-update/PKGBUILD
   if grep -q '^replaces=' packages/linxira-update/PKGBUILD; then
@@ -78,12 +81,12 @@ if [[ -f packages/linxira-update/PKGBUILD ]]; then
 fi
 
 if [[ -f packages/linxira-catalog/PKGBUILD ]]; then
-  grep -q '9dd16cdac62eb9e764926f8fc4b25fbb078d5d38' packages/linxira-catalog/PKGBUILD
-  grep -q '576664069d61882fae2c8746264f228d2fcc7c33941d57898579cf1a4d84fd6c' packages/linxira-catalog/PKGBUILD
+  grep -q '90db15bdeb98740a0004ecf3541da532c83db940' packages/linxira-catalog/PKGBUILD
+  grep -q 'acd7dd96bfbfeed8182ef3c930bc7623e42a658e4d2aafb20a5d8091436d6f20' packages/linxira-catalog/PKGBUILD
 fi
 
-grep -q 'cfff5359b0fc0e66ec22ea9a91f2b69d17c7fdf9' packages/linxira-components/PKGBUILD
-grep -q 'f8e0bfe95be79b0866a2572f3cbbdb57e563af2318afa3cf2c2dec6cca82b9e2' packages/linxira-components/PKGBUILD
+grep -q 'd07474fb8c286d706e1829abe01598b640832eaf' packages/linxira-components/PKGBUILD
+grep -q 'e765241cf6405d13f28d0d21d2e53b195d925a0b5b7104258633e69f782046ce' packages/linxira-components/PKGBUILD
 grep -q 'scripts/linxira-components-service' packages/linxira-components/PKGBUILD
 grep -q 'scripts/linxira-components-worker' packages/linxira-components/PKGBUILD
 grep -q 'service/linxira-components.service' packages/linxira-components/PKGBUILD
@@ -96,11 +99,11 @@ grep -q '394d2a90abbebc1fec618dd0ca8844167ad74e94' packages/linxira-completion-a
 grep -q '0aa0e5669db982337d08202cb0aa583700522a56afbb48bee915580fe332ea68' \
   packages/linxira-completion-agent/PKGBUILD
 grep -q "depends=.*'linxira-catalog'.*'linxira-components'" packages/linxira-completion-agent/PKGBUILD
-grep -q '3b00997b2d0ec8354db3c7770fa6090d7aaafd6e' packages/linxira-hwd-detector/PKGBUILD
-grep -q 'f02f10ee99df01ddbb681523cfc4dd074a93bf415032a071db1ff7e2cfc6831c' \
+grep -q '1d5b5a611811d498e6e457e680e66b0d15f4fb84' packages/linxira-hwd-detector/PKGBUILD
+grep -q 'ba1b7ad8878ca39c25dc3cd674cfa34aae9102126346133300b3408dad187ba3' \
   packages/linxira-hwd-detector/PKGBUILD
-grep -q '27698ad385849930ac70e67cb1d03ce715a142fb' packages/linxira-hardware-driver-manager/PKGBUILD
-grep -q '338f36b8c2d17e8e7321d9de45b5f354b3a0090f89fb562da8a9a518fb120f5d' \
+grep -q '82a0796d4dd1dac50c71a985081fd030e84163f2' packages/linxira-hardware-driver-manager/PKGBUILD
+grep -q '060f0ab7d94b9ee92029dab363986518524326c29a50cd17abd56edaf4167739' \
   packages/linxira-hardware-driver-manager/PKGBUILD
 grep -q "depends=.*'linxira-hwd-detector'" packages/linxira-hardware-driver-manager/PKGBUILD
 if grep -E -n "depends=.*polkit|install.*systemd/system|install.*polkit" \

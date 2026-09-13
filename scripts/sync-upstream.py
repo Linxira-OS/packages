@@ -22,7 +22,10 @@ import os
 import re
 import sys
 import tomllib
+import ipaddress
+import socket
 import urllib.error
+import urllib.parse
 import urllib.request
 from pathlib import Path
 
@@ -33,6 +36,57 @@ API_BASE = "https://api.github.com"
 
 # ---------------------------------------------------------------- GitHub API
 
+_ALLOWED_HOSTS = {"api.github.com", "codeload.github.com"}
+
+
+def _repo_path(repo: str) -> str:
+    """校验 owner/name 形态并转义，防止配置或远端数据改写请求路径。"""
+    owner, _, name = repo.partition("/")
+    if not owner or not name or "/" in name or any(
+        ".." in part or not re.fullmatch(r"[A-Za-z0-9._\-]+", part)
+        for part in (owner, name)
+    ):
+        raise ValueError(f"illegal repository identifier: {repo!r}")
+    return f"{urllib.parse.quote(owner, safe='')}/{urllib.parse.quote(name, safe='')}"
+
+
+def _ref_segment(ref: str) -> str:
+    if not ref or ".." in ref:
+        raise ValueError(f"illegal ref: {ref!r}")
+    return urllib.parse.quote(ref, safe="")
+
+
+def _validate_url(url: str) -> None:
+    parsed = urllib.parse.urlsplit(url)
+    if parsed.scheme != "https" or parsed.hostname not in _ALLOWED_HOSTS:
+        raise ValueError(f"request target outside GitHub hosts: {url!r}")
+
+
+def _resolve_ok(hostname: str) -> None:
+    for info in socket.getaddrinfo(hostname, 443):
+        ip = ipaddress.ip_address(info[4][0])
+        if (ip.is_private or ip.is_loopback or ip.is_link_local
+                or ip.is_reserved or ip.is_multicast or ip.is_unspecified):
+            raise ValueError(f"{hostname} resolved to forbidden address: {ip}")
+
+
+class _RevalidatingRedirectHandler(urllib.request.HTTPRedirectHandler):
+    """重定向逐跳重新校验，禁止跳白名单之外的地址。"""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        _validate_url(newurl)
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
+
+
+_OPENER = urllib.request.build_opener(_RevalidatingRedirectHandler())
+
+
+def open_github(url: str, timeout: int, headers: dict[str, str] | None = None):
+    """仅允许 https + GitHub 域名；拒绝解析到私网/环回/链路本地的目标。"""
+    _validate_url(url)
+    _resolve_ok(urllib.parse.urlsplit(url).hostname)
+    return _OPENER.open(urllib.request.Request(url, headers=headers or {}), timeout=timeout)
+
 
 class GitHub:
     def __init__(self, token: str | None):
@@ -40,23 +94,23 @@ class GitHub:
         self.calls = 0
 
     def _get(self, url: str) -> tuple[int, bytes]:
-        req = urllib.request.Request(url, headers={
+        headers = {
             "Accept": "application/vnd.github+json",
             "X-GitHub-Api-Version": "2022-11-28",
             "User-Agent": "linxira-upstream-sync",
-        })
+        }
         if self.token:
-            req.add_header("Authorization", f"Bearer {self.token}")
+            headers["Authorization"] = f"Bearer {self.token}"
         self.calls += 1
         try:
-            with urllib.request.urlopen(req, timeout=30) as resp:
+            with open_github(url, timeout=30, headers=headers) as resp:
                 return resp.status, resp.read()
         except urllib.error.HTTPError as e:
             return e.code, e.read()
 
     def latest_release(self, repo: str) -> tuple[str, str] | None:
         """返回 (tag, 该 tag 指向的 commit SHA)；无正式 release 时 None。"""
-        status, body = self._get(f"{API_BASE}/repos/{repo}/releases/latest")
+        status, body = self._get(f"{API_BASE}/repos/{_repo_path(repo)}/releases/latest")
         if status == 404:
             return None
         if status != 200:
@@ -65,16 +119,15 @@ class GitHub:
         return tag, self.commit_of(repo, tag)
 
     def commit_of(self, repo: str, ref: str) -> str:
-        status, body = self._get(f"{API_BASE}/repos/{repo}/commits/{ref}")
+        status, body = self._get(f"{API_BASE}/repos/{_repo_path(repo)}/commits/{_ref_segment(ref)}")
         if status != 200:
             raise RuntimeError(f"{repo}: 解析 ref {ref!r} HTTP {status}")
         return json.loads(body)["sha"]
 
     def tarball_sha256(self, repo: str, commit: str) -> str:
-        url = f"https://codeload.github.com/{repo}/tar.gz/{commit}"
-        req = urllib.request.Request(url, headers={"User-Agent": "linxira-upstream-sync"})
+        url = f"https://codeload.github.com/{_repo_path(repo)}/tar.gz/{_ref_segment(commit)}"
         h = hashlib.sha256()
-        with urllib.request.urlopen(req, timeout=120) as resp:
+        with open_github(url, timeout=120, headers={"User-Agent": "linxira-upstream-sync"}) as resp:
             while chunk := resp.read(1 << 20):
                 h.update(chunk)
         return h.hexdigest()
