@@ -135,10 +135,12 @@ jobs:
         env:
           LINXIRA_GPG_PRIVATE_KEY: ${{ secrets.LINXIRA_GPG_PRIVATE_KEY }}
           LINXIRA_GPG_FINGERPRINT: ${{ secrets.LINXIRA_GPG_FINGERPRINT }}
+          LINXIRA_GPG_PASSPHRASE: ${{ secrets.LINXIRA_GPG_PASSPHRASE }}
         run: |
           docker run --rm \
             -e LINXIRA_GPG_PRIVATE_KEY \
             -e LINXIRA_GPG_FINGERPRINT \
+            -e LINXIRA_GPG_PASSPHRASE \
             -v "$PWD:/workspace" \
             archlinux:base bash -euxo pipefail -c '
               pacman -Syu --noconfirm gnupg pacman
