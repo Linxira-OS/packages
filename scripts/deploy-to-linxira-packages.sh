@@ -48,8 +48,8 @@ docker run --rm \
     cd /target/x86_64
     rm -f linxira.db linxira.db.tar.* linxira.files linxira.files.tar.*
     repo-add --sign --key "$FP" linxira.db.tar.zst ./*.pkg.tar.zst
-    cp -f linxira.db.tar.zst linxira.db
-    cp -f linxira.files.tar.zst linxira.files
+    cp --remove-destination -f linxira.db.tar.zst linxira.db
+    cp --remove-destination -f linxira.files.tar.zst linxira.files
     for f in linxira.db linxira.db.tar.zst linxira.files linxira.files.tar.zst; do
       sign "$f"
     done
