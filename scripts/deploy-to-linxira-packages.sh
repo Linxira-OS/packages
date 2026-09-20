@@ -53,14 +53,13 @@ docker run --rm \
       base=$(basename "$f" .pkg.tar.zst)
       name=${base%-*-*-*}          # pkgname 不含 '-'; 版本段固定为三段
       rest=${base#"$name"-}        # pkgver-pkgrel-arch
-      verarch=${rest%-*}           # 去掉 -arch
-      ver=${verarch%-*}            # 去掉 -pkgrel(注意: pkgver 含 '.',
-                                   # 必须从最后一个 '-' 截断, 否则 0.7.0-5
-                                   # 会被解析成 "0.7" 导致去重错留旧版)
+      # 比较与记录都用 "pkgver-pkgrel" 全串 —— 只比 pkgver 会把同版本不同
+      # pkgrel 判平, 字母序留下最旧版(实际事故: 0.7.0-5 被错误移除)
+      fullver=${rest%-*}           # pkgver-pkgrel(去 -arch)
       prev=${best_base[$name]:-}
-      if [[ -z $prev ]] || (( $(vercmp "$ver" "${best_ver[$name]}") > 0 )); then
+      if [[ -z $prev ]] || (( $(vercmp "$fullver" "${best_ver[$name]}") > 0 )); then
         best_base[$name]=$base
-        best_ver[$name]=$ver
+        best_ver[$name]=$fullver
       fi
     done
     for f in /target/x86_64/*.pkg.tar.zst; do
