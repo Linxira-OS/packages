@@ -54,7 +54,9 @@ docker run --rm \
       name=${base%-*-*-*}          # pkgname 不含 '-'; 版本段固定为三段
       rest=${base#"$name"-}        # pkgver-pkgrel-arch
       verarch=${rest%-*}           # 去掉 -arch
-      ver=${verarch%%-*}           # 去掉 -pkgrel
+      ver=${verarch%-*}            # 去掉 -pkgrel(注意: pkgver 含 '.',
+                                   # 必须从最后一个 '-' 截断, 否则 0.7.0-5
+                                   # 会被解析成 "0.7" 导致去重错留旧版)
       prev=${best_base[$name]:-}
       if [[ -z $prev ]] || (( $(vercmp "$ver" "${best_ver[$name]}") > 0 )); then
         best_base[$name]=$base
