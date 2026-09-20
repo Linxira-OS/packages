@@ -51,16 +51,20 @@ jobs:
           commit-message: "chore(bump): sync upstream releases"
 
       - name: Auto-merge bump PR
-        # 2026-09-20: bump 链全自动化的最后一环 —— PR 建好即等 checks 全绿,
-        # squash 合并; push 触发 packages.yml 构建, 发布 job 因 commit message
-        # 含 chore(bump) 自动签名发布。仅当本轮确有变更(PR 存在)时执行。
-        if: steps.bump.outputs.pr_number != ''
+        # 2026-09-20: bump 链全自动化的最后一环 —— 等 checks 全绿后 squash 合并;
+        # push 触发 packages.yml 构建, 发布 job 因 commit message 含 chore(bump)
+        # 自动签名发布。按分支查找 PR(不依赖 action outputs)。
         env:
           GH_TOKEN: ${{ secrets.LINXIRA_CI_TOKEN }}
-          PR_NUMBER: ${{ steps.bump.outputs.pr_number }}
         run: |
+          pr=$(gh pr list --head bot/upstream-sync --state open \
+                 --json number --jq '.[0].number')
+          if [ -z "$pr" ]; then
+            echo "no open bump PR; nothing to merge"
+            exit 0
+          fi
           # 等 pull_request 流水线(boundaries+构建)全绿再合, 任一失败则拒绝合并
-          gh pr checks "$PR_NUMBER" --watch --interval 30 --fail-fast
-          gh pr merge "$PR_NUMBER" --squash --delete-branch \
+          gh pr checks "$pr" --watch --interval 30 --fail-fast
+          gh pr merge "$pr" --squash --delete-branch \
             --subject "chore(bump): sync upstream releases" \
             --repo "$GITHUB_REPOSITORY"
