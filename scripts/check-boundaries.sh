@@ -65,8 +65,8 @@ if [[ -f packages/linxira-welcome/PKGBUILD ]]; then
     echo "linxira-welcome must remain independent and unprivileged" >&2
     exit 1
   fi
-  grep -q '6fe04d1d8f012edce95bbad1d644e0dbaf3b3ed9' packages/linxira-welcome/PKGBUILD
-  grep -q '4e8bf0fb925e08e43ac07f06b65c360948638e35e54e085117eed56c706bd53b' packages/linxira-welcome/PKGBUILD
+  grep -q 'd30997cacb11df49ed07b9f4c7286ddc56d0f4ad' packages/linxira-welcome/PKGBUILD
+  grep -q '760558ed947c3b933babbeba981f58773a2a5e958b0b5032c33d29e937c38e34' packages/linxira-welcome/PKGBUILD
 fi
 
 if [[ -f packages/linxira-update/PKGBUILD ]]; then
@@ -81,8 +81,8 @@ if [[ -f packages/linxira-update/PKGBUILD ]]; then
 fi
 
 if [[ -f packages/linxira-catalog/PKGBUILD ]]; then
-  grep -q '90db15bdeb98740a0004ecf3541da532c83db940' packages/linxira-catalog/PKGBUILD
-  grep -q '86daa3ffb79aa3a17408511ed6207d2288da87c1c0b1ebf2eef8edf825a8aa37' packages/linxira-catalog/PKGBUILD
+  grep -q 'e641e8ad1cf37e85f04695cd702363d12ba02944' packages/linxira-catalog/PKGBUILD
+  grep -q 'bc0f93178e916c5ec1ad321c50f56bddbb20d0f3d3519d81dd51dda26fc3dbc0' packages/linxira-catalog/PKGBUILD
 fi
 
 grep -q 'd07474fb8c286d706e1829abe01598b640832eaf' packages/linxira-components/PKGBUILD
@@ -123,9 +123,9 @@ if grep -E -n "depends=.*polkit|install.*systemd/system|install.*polkit" \
   echo "kernel and recovery clients must not package their own privileged service" >&2
   exit 1
 fi
-grep -q 'c785a407493d40ec34d073a05c52ab4e2325f053' packages/linxira-config-hub/PKGBUILD
-grep -q '72ec1c5f98337d8db72ab50852826489f4d74f23bd38d5c816aa2e33b32b2577' packages/linxira-config-hub/PKGBUILD
-grep -q '1deed77b28af46bf2351d0de757ea216c6ce52ff' packages/linxira-component-manager/PKGBUILD
+grep -q '2095e0c9d35d8c4f8e5634098110a5088ac9ca89' packages/linxira-config-hub/PKGBUILD
+grep -q '6b9a77ff0808b04b336947f1e320059b8b9a7125c4deabf2f6bb3b2f28dfad5d' packages/linxira-config-hub/PKGBUILD
+grep -q '626d13cc2889e76d378139dba296bbe57c030c4a' packages/linxira-component-manager/PKGBUILD
 grep -q '72244435fccf888c0c9914731f0efff63b2baa36' packages/linxira-gaming-manager/PKGBUILD
 grep -q 'a80a41fec6611af7f03b9aa9b5cd9a44fe0fbb40479e1be25d92d511ff4d192a' \
   packages/linxira-gaming-manager/PKGBUILD
