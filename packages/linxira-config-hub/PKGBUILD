@@ -33,7 +33,7 @@ sha256sums=('6b9a77ff0808b04b336947f1e320059b8b9a7125c4deabf2f6bb3b2f28dfad5d')
 
 check() {
   cd "$srcdir/$pkgname-$_commit"
-  grep -q 'VERSION="2.2.1"' cli/linxira-config
+  grep -q 'VERSION="2.2.2"' cli/linxira-config
   bash -n cli/linxira-config
   python -m unittest discover -s tests -v
 }
