@@ -44,6 +44,32 @@ docker run --rm \
       sign "/target/x86_64/$(basename "$src")"
     done
 
+    # 1.5) 同名包去重: 每个包名仅保留 vercmp 最新的一个(连 .sig 一起移除被
+    # 取代的旧版)。repo-add 按 shell 字母序逐个入库且后写胜出, 不去重会把
+    # 旧版当成"最新"(实际事故: 3.0.0-22 按字母序排在 2026.09-1 之后, 把
+    # 新版覆盖掉了)。
+    declare -A best_base best_ver
+    for f in /target/x86_64/*.pkg.tar.zst; do
+      base=$(basename "$f" .pkg.tar.zst)
+      name=${base%-*-*-*}          # pkgname 不含 '-'; 版本段固定为三段
+      rest=${base#"$name"-}        # pkgver-pkgrel-arch
+      verarch=${rest%-*}           # 去掉 -arch
+      ver=${verarch%%-*}           # 去掉 -pkgrel
+      prev=${best_base[$name]:-}
+      if [[ -z $prev ]] || (( $(vercmp "$ver" "${best_ver[$name]}") > 0 )); then
+        best_base[$name]=$base
+        best_ver[$name]=$ver
+      fi
+    done
+    for f in /target/x86_64/*.pkg.tar.zst; do
+      base=$(basename "$f" .pkg.tar.zst)
+      name=${base%-*-*-*}
+      if [[ $base != "${best_base[$name]}" ]]; then
+        rm -f "$f" "$f.sig"
+        echo "dropping superseded: $base"
+      fi
+    done
+
     # 2) 全量重建 db/files（显式 .tar.zst 命名，避免 repo-add 扩展名歧义）
     cd /target/x86_64
     rm -f linxira.db linxira.db.tar.* linxira.files linxira.files.tar.*

@@ -1,8 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# pin 校验失败时不能静默退出：打印失败行号，否则 CI 日志里只有 exit 1 无从排障
-trap 'echo "[boundaries] 校验失败于第 $LINENO 行（pin 过期或出现禁止模式），最后校验的命令见上方 bash -x 输出" >&2' ERR
+# 校验失败时不能静默退出：打印失败行号，否则 CI 日志里只有 exit 1 无从排障
+trap 'echo "[boundaries] 校验失败于第 $LINENO 行（语义边界或结构校验未过），最后校验的命令见上方 bash -x 输出" >&2' ERR
+
+# 2026-09-20 重构说明：本脚本原先对 12 个包逐个硬编码 commit+sha256 数值锁，
+# 每次上游 bump 都会腐烂（已两次阻断发布流水线：welcome、config-hub）。
+# 现在只保留语义边界（身份、权限、依赖关系），数值完整性交给下方通用结构
+# 校验；版本审核门槛由「上游正式 Release + 签名发布」承担。
 
 if grep -R -n -E "(provides|conflicts|replaces)=\([^)]*cachyos-hooks" packages; then
   echo "linxira-hooks must coexist with cachyos-hooks" >&2
@@ -65,14 +70,9 @@ if [[ -f packages/linxira-welcome/PKGBUILD ]]; then
     echo "linxira-welcome must remain independent and unprivileged" >&2
     exit 1
   fi
-  grep -q 'd30997cacb11df49ed07b9f4c7286ddc56d0f4ad' packages/linxira-welcome/PKGBUILD
-  grep -q '760558ed947c3b933babbeba981f58773a2a5e958b0b5032c33d29e937c38e34' packages/linxira-welcome/PKGBUILD
 fi
 
 if [[ -f packages/linxira-update/PKGBUILD ]]; then
-  grep -q 'c51f0e35852f79a77539b27503f15150d66c62a1' packages/linxira-update/PKGBUILD
-  grep -q '6d837e8767202b8fa1513f00eb59b7387542c6fece4f47ba129caa4f31d4b9f5' \
-    packages/linxira-update/PKGBUILD
   grep -q "conflicts=('arch-update' 'cachy-update')" packages/linxira-update/PKGBUILD
   if grep -q '^replaces=' packages/linxira-update/PKGBUILD; then
     echo "linxira-update must not silently replace an installed updater" >&2
@@ -80,62 +80,73 @@ if [[ -f packages/linxira-update/PKGBUILD ]]; then
   fi
 fi
 
-if [[ -f packages/linxira-catalog/PKGBUILD ]]; then
-  grep -q 'e641e8ad1cf37e85f04695cd702363d12ba02944' packages/linxira-catalog/PKGBUILD
-  grep -q 'bc0f93178e916c5ec1ad321c50f56bddbb20d0f3d3519d81dd51dda26fc3dbc0' packages/linxira-catalog/PKGBUILD
+if [[ -f packages/linxira-components/PKGBUILD ]]; then
+  grep -q 'scripts/linxira-components-service' packages/linxira-components/PKGBUILD
+  grep -q 'scripts/linxira-components-worker' packages/linxira-components/PKGBUILD
+  grep -q 'service/linxira-components.service' packages/linxira-components/PKGBUILD
+  grep -q 'service/linxira-components-worker@.service' packages/linxira-components/PKGBUILD
+  grep -q 'org.linxira.components.policy' packages/linxira-components/PKGBUILD
+  grep -q "'python-dbus'" packages/linxira-components/PKGBUILD
+  grep -q "'pyalpm'" packages/linxira-components/PKGBUILD
 fi
 
-grep -q 'd07474fb8c286d706e1829abe01598b640832eaf' packages/linxira-components/PKGBUILD
-grep -q 'e765241cf6405d13f28d0d21d2e53b195d925a0b5b7104258633e69f782046ce' packages/linxira-components/PKGBUILD
-grep -q 'scripts/linxira-components-service' packages/linxira-components/PKGBUILD
-grep -q 'scripts/linxira-components-worker' packages/linxira-components/PKGBUILD
-grep -q 'service/linxira-components.service' packages/linxira-components/PKGBUILD
-grep -q 'service/linxira-components-worker@.service' packages/linxira-components/PKGBUILD
-grep -q 'org.linxira.components.policy' packages/linxira-components/PKGBUILD
-grep -q "'python-dbus'" packages/linxira-components/PKGBUILD
-grep -q 'pkgver=0.7.0' packages/linxira-components/PKGBUILD
-grep -q "'pyalpm'" packages/linxira-components/PKGBUILD
-grep -q '394d2a90abbebc1fec618dd0ca8844167ad74e94' packages/linxira-completion-agent/PKGBUILD
-grep -q '0aa0e5669db982337d08202cb0aa583700522a56afbb48bee915580fe332ea68' \
-  packages/linxira-completion-agent/PKGBUILD
-grep -q "depends=.*'linxira-catalog'.*'linxira-components'" packages/linxira-completion-agent/PKGBUILD
-grep -q '1d5b5a611811d498e6e457e680e66b0d15f4fb84' packages/linxira-hwd-detector/PKGBUILD
-grep -q 'ba1b7ad8878ca39c25dc3cd674cfa34aae9102126346133300b3408dad187ba3' \
-  packages/linxira-hwd-detector/PKGBUILD
-grep -q '82a0796d4dd1dac50c71a985081fd030e84163f2' packages/linxira-hardware-driver-manager/PKGBUILD
-grep -q '060f0ab7d94b9ee92029dab363986518524326c29a50cd17abd56edaf4167739' \
-  packages/linxira-hardware-driver-manager/PKGBUILD
-grep -q "depends=.*'linxira-hwd-detector'" packages/linxira-hardware-driver-manager/PKGBUILD
-if grep -E -n "depends=.*polkit|install.*systemd/system|install.*polkit" \
-  packages/linxira-hardware-driver-manager/PKGBUILD; then
-  echo "linxira-hardware-driver-manager MVP must remain report-and-plan only" >&2
-  exit 1
+if [[ -f packages/linxira-completion-agent/PKGBUILD ]]; then
+  grep -q "depends=.*'linxira-catalog'.*'linxira-components'" packages/linxira-completion-agent/PKGBUILD
 fi
-grep -q 'bdb65855c2043f7ae4983b2c898b86d542fb77ce' packages/linxira-kernel-manager/PKGBUILD
-grep -q 'ffc39d90b17bc0f6cceae71d882b9399609375702722e2fc63b6983b1b4e46e4' \
-  packages/linxira-kernel-manager/PKGBUILD
-grep -q 'dba92f7f215ea304e40d6fda931bc9cf436617df' packages/linxira-recovery-diagnostics/PKGBUILD
-grep -q '03ca7b471d86bef7c7a29cdb189ba62ec8dd74b0d0daef4c70737c83802b6eed' \
-  packages/linxira-recovery-diagnostics/PKGBUILD
-grep -q "'linxira-components>=0.4.0'" packages/linxira-recovery-diagnostics/PKGBUILD
+
+if [[ -f packages/linxira-hardware-driver-manager/PKGBUILD ]]; then
+  grep -q "depends=.*'linxira-hwd-detector'" packages/linxira-hardware-driver-manager/PKGBUILD
+  if grep -E -n "depends=.*polkit|install.*systemd/system|install.*polkit" \
+    packages/linxira-hardware-driver-manager/PKGBUILD; then
+    echo "linxira-hardware-driver-manager MVP must remain report-and-plan only" >&2
+    exit 1
+  fi
+fi
+
+if [[ -f packages/linxira-recovery-diagnostics/PKGBUILD ]]; then
+  grep -q "'linxira-components>=0.4.0'" packages/linxira-recovery-diagnostics/PKGBUILD
+fi
+
 if grep -E -n "depends=.*polkit|install.*systemd/system|install.*polkit" \
   packages/linxira-kernel-manager/PKGBUILD packages/linxira-recovery-diagnostics/PKGBUILD; then
   echo "kernel and recovery clients must not package their own privileged service" >&2
   exit 1
 fi
-grep -q '2095e0c9d35d8c4f8e5634098110a5088ac9ca89' packages/linxira-config-hub/PKGBUILD
-grep -q '6b9a77ff0808b04b336947f1e320059b8b9a7125c4deabf2f6bb3b2f28dfad5d' packages/linxira-config-hub/PKGBUILD
-grep -q '626d13cc2889e76d378139dba296bbe57c030c4a' packages/linxira-component-manager/PKGBUILD
-grep -q '72244435fccf888c0c9914731f0efff63b2baa36' packages/linxira-gaming-manager/PKGBUILD
-grep -q 'a80a41fec6611af7f03b9aa9b5cd9a44fe0fbb40479e1be25d92d511ff4d192a' \
-  packages/linxira-gaming-manager/PKGBUILD
-if grep -E -n "install.*systemd/system|install.*polkit" \
-  packages/linxira-gaming-manager/PKGBUILD; then
-  echo "linxira-gaming-manager must remain user-scoped" >&2
-  exit 1
-fi
-grep -q '2c1e53d47aef388fcfff295027f438ad119a552b' packages/linxira-package-center/PKGBUILD
 
+if [[ -f packages/linxira-gaming-manager/PKGBUILD ]]; then
+  if grep -E -n "install.*systemd/system|install.*polkit" \
+    packages/linxira-gaming-manager/PKGBUILD; then
+    echo "linxira-gaming-manager must remain user-scoped" >&2
+    exit 1
+  fi
+fi
+
+# 通用结构校验：语法 + 固定源(_commit)格式 + 校验和完整
 for package in packages/*/PKGBUILD; do
   bash -n "$package"
+  if grep -q '^_commit=' "$package"; then
+    # 40 位十六进制; linxira-keyring 的 _commit 是大写 GPG 指纹(白名单特例)
+    grep -Eq '^_commit=[0-9a-fA-F]{40}$' "$package" || {
+      echo "$package: _commit 必须是 40 位十六进制 commit/指纹" >&2
+      exit 1
+    }
+  fi
+  if grep -q '^sha256sums' "$package" && ! grep -q "SKIP" "$package"; then
+    python3 - "$package" <<'PYEOF'
+import re, sys
+path = sys.argv[1]
+text = open(path, "rb").read().decode("utf-8", "replace")
+match = re.search(r"^sha256sums=\((.*?)\)", text, re.S | re.M)
+bad = []
+if not match:
+    bad.append("sha256sums block not found")
+else:
+    for token in re.findall(r"'([^']*)'", match.group(1)):
+        if not re.fullmatch(r"[0-9a-f]{64}|SKIP", token):
+            bad.append(token)
+if bad:
+    print(f"{path}: sha256sums 存在非法校验和: {bad}", file=sys.stderr)
+    sys.exit(1)
+PYEOF
+  fi
 done

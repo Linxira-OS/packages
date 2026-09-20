@@ -33,7 +33,8 @@ sha256sums=('6b9a77ff0808b04b336947f1e320059b8b9a7125c4deabf2f6bb3b2f28dfad5d')
 
 check() {
   cd "$srcdir/$pkgname-$_commit"
-  grep -q 'VERSION="2.2.2"' cli/linxira-config
+  # 版本一致性由 pkgver 推导, 避免每次 bump 都要手改此处
+  grep -q "VERSION=\"${pkgver}\"" cli/linxira-config
   bash -n cli/linxira-config
   python -m unittest discover -s tests -v
 }
