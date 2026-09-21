@@ -63,12 +63,13 @@ jobs:
             echo "no open bump PR; nothing to merge"
             exit 0
           fi
-          # pull_request 流水线启动需要几十秒: gh 对"无 checks"返回 4,
-          # 轮询等 checks 注册后再等全绿(任一失败则拒绝合并)
-          for attempt in $(seq 1 20); do
-            gh pr checks "$pr" >/dev/null 2>&1 && break
-            code=$?
-            [ "$code" -eq 4 ] || { echo "checks failed (exit $code)"; gh pr checks "$pr" || true; exit 1; }
+          # 等 statusCheckRollup 非空(pull_request 流水线注册需要几十秒),
+          # 再等全绿(任一失败则拒绝合并)
+          rollup=0
+          for attempt in $(seq 1 40); do
+            rollup=$(gh pr view "$pr" --json statusCheckRollup \
+                       --jq '.statusCheckRollup | length' 2>/dev/null || echo 0)
+            [ "${rollup:-0}" -gt 0 ] && break
             sleep 30
           done
           gh pr checks "$pr" --watch --interval 30 --fail-fast
