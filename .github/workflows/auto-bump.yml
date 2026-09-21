@@ -63,7 +63,14 @@ jobs:
             echo "no open bump PR; nothing to merge"
             exit 0
           fi
-          # 等 pull_request 流水线(boundaries+构建)全绿再合, 任一失败则拒绝合并
+          # pull_request 流水线启动需要几十秒: gh 对"无 checks"返回 4,
+          # 轮询等 checks 注册后再等全绿(任一失败则拒绝合并)
+          for attempt in $(seq 1 20); do
+            gh pr checks "$pr" >/dev/null 2>&1 && break
+            code=$?
+            [ "$code" -eq 4 ] || { echo "checks failed (exit $code)"; gh pr checks "$pr" || true; exit 1; }
+            sleep 30
+          done
           gh pr checks "$pr" --watch --interval 30 --fail-fast
           gh pr merge "$pr" --squash --delete-branch \
             --subject "chore(bump): sync upstream releases" \
