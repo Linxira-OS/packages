@@ -23,7 +23,7 @@ build() {
 
 check() {
   cd "$srcdir/$pkgname-$_commit"
-  ./target/release/linxira-bio --version
+  ./target/release/linxira-bio --help > /dev/null
 }
 
 package() {
