@@ -70,12 +70,12 @@ jobs:
               printf "builder ALL=(ALL) NOPASSWD: ALL\n" >/etc/sudoers.d/builder
               packages=(
                 linxira-bio-sdk
+                linxira-bio-sdk
                 linxira-catalog
                 linxira-hwd-detector
                 linxira-components
                 linxira-completion-agent
                 linxira-hardware-driver-manager
-                linxira-kernel-manager
                 linxira-recovery-diagnostics
                 linxira-config-hub
                 linxira-component-manager
@@ -99,7 +99,7 @@ jobs:
             packages/linxira-completion-agent/*.pkg.tar.zst
             packages/linxira-hwd-detector/*.pkg.tar.zst
             packages/linxira-hardware-driver-manager/*.pkg.tar.zst
-            packages/linxira-kernel-manager/*.pkg.tar.zst
+            packages/linxira-bio-sdk/*.pkg.tar.zst
             packages/linxira-recovery-diagnostics/*.pkg.tar.zst
             packages/linxira-config-hub/*.pkg.tar.zst
             packages/linxira-component-manager/*.pkg.tar.zst
