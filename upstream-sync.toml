@@ -42,16 +42,8 @@ package = "linxira-hardware-driver-manager"
 repo = "Linxira-OS/linxira-hardware-driver-manager"
 
 [[track]]
-package = "linxira-hooks"
-repo = "Linxira-OS/linxira-hooks"
-
-[[track]]
 package = "linxira-hwd-detector"
 repo = "Linxira-OS/linxira-hwd-detector"
-
-[[track]]
-package = "linxira-kernel-manager"
-repo = "Linxira-OS/linxira-kernel-manager"
 
 [[track]]
 package = "linxira-package-center"
