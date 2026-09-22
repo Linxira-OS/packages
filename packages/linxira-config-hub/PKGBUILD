@@ -42,5 +42,7 @@ check() {
 package() {
   cd "$srcdir/$pkgname-$_commit"
   install -Dm755 cli/linxira-config "$pkgdir/usr/bin/linxira-config"
+  install -Dm644 data/linxira-config.desktop "$pkgdir/usr/share/applications/linxira-config.desktop"
+  desktop-file-validate data/linxira-config.desktop
   install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 }
