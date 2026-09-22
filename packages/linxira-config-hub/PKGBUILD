@@ -25,7 +25,7 @@ optdepends=(
   'openssh: SSH client and server workflows'
   'ufw: firewall status and configuration'
 )
-checkdepends=('python')
+checkdepends=('python' 'desktop-file-utils')
 
 _commit=08d4755643d702fbf83b536c4884d3112dbfe7d6
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
