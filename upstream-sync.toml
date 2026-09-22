@@ -42,6 +42,10 @@ package = "linxira-hardware-driver-manager"
 repo = "Linxira-OS/linxira-hardware-driver-manager"
 
 [[track]]
+package = "linxira-bio-sdk"
+repo = "Linxira-OS/linxira-bio-sdk"
+
+[[track]]
 package = "linxira-hwd-detector"
 repo = "Linxira-OS/linxira-hwd-detector"
 

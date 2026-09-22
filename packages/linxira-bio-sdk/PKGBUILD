@@ -1,0 +1,32 @@
+# Maintainer: Linxira OS <admin@linxira.org>
+
+pkgname=linxira-bio-sdk
+pkgver=1.0.1
+pkgrel=1
+pkgdesc='Linxira Bio SDK - local-first bioinformatics toolkit (CLI + engine)'
+arch=('x86_64')
+groups=('linxira')
+url='https://github.com/Linxira-OS/linxira-bio-sdk'
+license=('AGPL-3.0-or-later')
+depends=('gcc-libs')
+makedepends=('rust' 'clang' 'mold')
+
+_commit=dcfd512a9a33272c05a5101aa2724abd62658924
+source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
+sha256sums=('b7a613b643f9b350cb9b093de05061a92817c8817b321e092852d33921891eee')
+
+build() {
+  cd "$srcdir/$pkgname-$_commit"
+  export CARGO_TARGET_DIR=target
+  cargo build --release --package linxira-bio-cli
+}
+
+check() {
+  cd "$srcdir/$pkgname-$_commit"
+  ./target/release/linxira-bio --version
+}
+
+package() {
+  cd "$srcdir/$pkgname-$_commit"
+  install -Dm755 target/release/linxira-bio "$pkgdir/usr/bin/linxira-bio"
+}
