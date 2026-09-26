@@ -1,7 +1,7 @@
 # Maintainer: Linxira OS <admin@linxira.org>
 
 pkgname=linxira-config-hub
-pkgver=2.3.2
+pkgver=2.4.0
 pkgrel=1
 pkgdesc='Configuration and diagnostics CLI for Linxira OS'
 arch=('any')
@@ -27,9 +27,9 @@ optdepends=(
 )
 checkdepends=('python' 'desktop-file-utils')
 
-_commit=6f78755c27ca0e9d4fcc237fcff4d2c10ae6f26f
+_commit=0fdbf0e64861bb1a32bee0fca6d3138b93e63a66
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('cbe024957bb951165e7c56607f0368dc0727ca97fa107aa50f5dedb13e3c9074')
+sha256sums=('fd4888398cc3de8c87ba4dc2aded59a166e58016bde89895beff97cc3afe83eb')
 
 check() {
   cd "$srcdir/$pkgname-$_commit"
