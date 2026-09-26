@@ -82,6 +82,7 @@ jobs:
                 linxira-package-center
                 linxira-update
                 linxira-welcome
+                linxira-wiki
               )
               for package in "${packages[@]}"; do
                 chown -R builder:builder "/workspace/packages/$package"
@@ -106,6 +107,7 @@ jobs:
             packages/linxira-package-center/*.pkg.tar.zst
             packages/linxira-update/*.pkg.tar.zst
             packages/linxira-welcome/*.pkg.tar.zst
+            packages/linxira-wiki/*.pkg.tar.zst
           if-no-files-found: error
 
   publish:

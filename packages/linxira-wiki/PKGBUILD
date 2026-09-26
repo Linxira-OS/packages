@@ -1,0 +1,27 @@
+# Maintainer: Linxira OS <admin@linxira.org>
+
+pkgname=linxira-wiki
+pkgver=0.1.0
+pkgrel=1
+pkgdesc='Official Linxira OS system handbook, readable by humans and AI agents'
+arch=('any')
+groups=('linxira')
+url='https://github.com/Linxira-OS/linxira-wiki'
+license=('MIT')
+depends=('bash' 'coreutils' 'grep')
+optdepends=('mkdocs: build the human-readable site from the same sources')
+makedepends=('git')
+
+_commit=d7c6bafad37ec4e74c81029f11dc127ce1dc1b1a
+source=("$pkgname::git+$url.git#commit=$_commit")
+sha256sums=('SKIP')
+
+package() {
+  cd "$srcdir/$pkgname"
+
+  install -Dm755 cli/linxira-wiki "$pkgdir/usr/bin/linxira-wiki"
+  install -d "$pkgdir/usr/share/linxira/wiki"
+  cp -a ai docs "$pkgdir/usr/share/linxira/wiki/"
+  install -Dm644 mkdocs.yml requirements.txt "$pkgdir/usr/share/linxira/wiki/"
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}

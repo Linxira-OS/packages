@@ -20,7 +20,7 @@ sha256sums=('e765241cf6405d13f28d0d21d2e53b195d925a0b5b7104258633e69f782046ce')
 
 check() {
   cd "$srcdir/$pkgname-$_commit"
-  grep -q 'version = "0.7.0"' pyproject.toml
+  grep -q 'version = "0.8.0"' pyproject.toml
   python -m unittest discover -s tests -v
   PYTHONPATH=src dbus-run-session python -m pytest -q tests/test_dbus_service.py
   PYTHONPATH=src python - <<'PY'
@@ -72,6 +72,10 @@ package() {
     "$pkgdir/usr/bin/linxira-components-service"
   install -Dm755 scripts/linxira-components-worker \
     "$pkgdir/usr/bin/linxira-components-worker"
+  install -Dm755 scripts/linxira-components-guard \
+    "$pkgdir/usr/bin/linxira-components-guard"
+  install -Dm755 scripts/linxira-components-guard-timer \
+    "$pkgdir/usr/bin/linxira-components-guard-timer"
   install -d "$pkgdir/usr/lib/linxira-components"
   cp -a src/linxira_components "$pkgdir/usr/lib/linxira-components/"
   find "$pkgdir/usr/lib/linxira-components" -type d -name __pycache__ \
@@ -87,6 +91,10 @@ package() {
     "$pkgdir/usr/lib/systemd/system/linxira-components.service"
   install -Dm644 service/linxira-components-worker@.service \
     "$pkgdir/usr/lib/systemd/system/linxira-components-worker@.service"
+  install -Dm644 service/linxira-workspace-guard-snapshot.service \
+    "$pkgdir/usr/lib/systemd/system/linxira-workspace-guard-snapshot.service"
+  install -Dm644 service/linxira-workspace-guard-snapshot.timer \
+    "$pkgdir/usr/lib/systemd/system/linxira-workspace-guard-snapshot.timer"
   install -Dm644 policy/org.linxira.components.policy.in \
     "$pkgdir/usr/share/polkit-1/actions/org.linxira.components.policy"
   install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"

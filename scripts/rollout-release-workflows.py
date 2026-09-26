@@ -23,6 +23,7 @@ REPOS = {
     "linxira-recovery-diagnostics": ("0.2.0", "main"),
     "linxira-update": ("0.1.0", "main"),
     "linxira-welcome": ("1.0.1", "main"),
+    "linxira-wiki": ("0.1.0", "master"),
 }
 
 WORKFLOW = """name: Release on version bump
