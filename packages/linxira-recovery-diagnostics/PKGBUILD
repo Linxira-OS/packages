@@ -1,8 +1,8 @@
 # Maintainer: Linxira OS <admin@linxira.org>
 
 pkgname=linxira-recovery-diagnostics
-pkgver=0.2.0
-pkgrel=2
+pkgver=0.3.0
+pkgrel=1
 pkgdesc='Read-only recovery readiness, repair planning, and support bundles for Linxira OS'
 arch=('any')
 groups=('linxira')
@@ -20,9 +20,9 @@ optdepends=(
   'timeshift: inspect snapshot configuration and inventory'
 )
 
-_commit=dba92f7f215ea304e40d6fda931bc9cf436617df
+_commit=b57ce487dd39a1c774da472989902776ff6ef5fa
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('03ca7b471d86bef7c7a29cdb189ba62ec8dd74b0d0daef4c70737c83802b6eed')
+sha256sums=('7f043457cec48f23a13fd88a8543072a851e33c3bac90b93e6136fd5a2c545c6')
 
 build() {
   cd "$srcdir/$pkgname-$_commit"
