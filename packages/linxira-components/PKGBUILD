@@ -1,7 +1,7 @@
 # Maintainer: Linxira OS <admin@linxira.org>
 
 pkgname=linxira-components
-pkgver=0.8.0
+pkgver=0.8.2
 pkgrel=1
 pkgdesc='Catalog-bound transaction planning and receipt backend for Linxira OS'
 arch=('any')
@@ -14,9 +14,9 @@ depends=(
 )
 checkdepends=('python-pytest')
 
-_commit=006b00069bb92afcef51668698b04c33753c5908
+_commit=05699516cc24e62b2eea12eefbe6cd1fe0a44dcb
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('a2a9a135e7b6ffbd7debc1bd3f649281c2faea0960a74ac980ee06c1a9af1015')
+sha256sums=('ea78ce5fefd74327e9879bba1cfaf6c11f5ee88e8cd2f1cb6c1956ca57122eca')
 
 check() {
   cd "$srcdir/$pkgname-$_commit"
