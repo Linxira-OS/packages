@@ -156,7 +156,7 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5
       - name: Sync signed repo to Linxira-OS/linxira-packages
-        if: github.event_name == 'push'
+        if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.publish)
         env:
           LINXIRA_CI_TOKEN: ${{ secrets.LINXIRA_CI_TOKEN }}
           LINXIRA_GPG_PRIVATE_KEY: ${{ secrets.LINXIRA_GPG_PRIVATE_KEY }}
