@@ -10,6 +10,7 @@ url='https://github.com/Linxira-OS/linxira-bio-sdk'
 license=('AGPL-3.0-or-later')
 depends=('gcc-libs')
 makedepends=('rust' 'clang' 'mold')
+options=('!strip' '!debug')  # bio-cli 构建产物无调试符号, makepkg strip 索引会报错
 
 _commit=a25484defc3a3bf9f5572c7dfafa530c5c3fc906
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
