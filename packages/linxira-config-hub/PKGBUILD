@@ -27,9 +27,9 @@ optdepends=(
 )
 checkdepends=('python' 'desktop-file-utils')
 
-_commit=94ad1f52775a0138c75a8d470ed1920813dae28f
+_commit=68971468c6aa436d0113230564b03f84015ca4cc
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('ceaac4ab6ba39a27d251cabe6e44adcbd3e9555f6b32109cde2e1db94f1dbfd7')
+sha256sums=('e65b53376f7e46e78b60ce65a5378513e28554167b6d880f84f41578185caf53')
 
 check() {
   cd "$srcdir/$pkgname-$_commit"
