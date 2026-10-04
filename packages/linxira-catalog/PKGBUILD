@@ -10,9 +10,9 @@ url='https://github.com/Linxira-OS/linxira-catalog'
 license=('MIT')
 checkdepends=('python' 'python-jsonschema')
 
-_commit=d013bb87f1e479ece4274273a27c610eabefe54e
+_commit=3781d1454e3571d114b30436239e4ca5fe00287e
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('7baa80ccd7dd037bfedfc5846597e6cc068d87aa47b38c1b165e448735dfd44e')
+sha256sums=('5a5f53ea11090e6fbc1827d771209a1620039ad6e8e6d0be824454ba8b76c27c')
 
 check() {
   cd "$srcdir/$pkgname-$_commit"
