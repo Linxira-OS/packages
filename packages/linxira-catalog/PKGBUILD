@@ -1,7 +1,7 @@
 # Maintainer: Linxira OS <admin@linxira.org>
 
 pkgname=linxira-catalog
-pkgver=3.2.3
+pkgver=3.2.4
 pkgrel=1
 pkgdesc='Reviewed software catalog and schema for Linxira OS'
 arch=('any')
