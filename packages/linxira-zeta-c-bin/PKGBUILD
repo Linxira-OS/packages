@@ -1,0 +1,26 @@
+# Maintainer: Linxira OS <admin@linxira.org>
+# Release-asset repackage: zeta-cli-linux-x64 由 Linxira-OS/linxira-zeta CI
+# 构建上传，本包仅按 upstream-sync(assets 模式) 追踪版本与校验和。
+# sync-upstream 依据 source 目标名在 SHA256SUMS.txt 中匹配校验和。
+
+pkgname=linxira-zeta-c-bin
+pkgver=1.1.26
+pkgrel=1
+pkgdesc='Zeta coding agent CLI (zeta-c) — upstream release binary'
+arch=('x86_64')
+url='https://github.com/Linxira-OS/linxira-zeta'
+license=('MIT')
+options=('!strip' '!debug')  # 上游预编译二进制: 无调试符号可分发, 避免 -debug 拆包 build-id 冲突
+provides=('zetacode')
+conflicts=('zetacode-bin')
+source=("zeta-cli-linux-x64::https://github.com/Linxira-OS/linxira-zeta/releases/download/v${pkgver}/zeta-cli-linux-x64")
+# assets 模式: sha256 由 scripts/sync-upstream.py 从上游 SHA256SUMS.txt 自动回填
+sha256sums=('4eb138fe681961f28fd4eca44b045a6290eb74c9f92c8e50070d5e14dad36b2e')
+
+check() {
+  head -c 4 "$srcdir/zeta-cli-linux-x64" | grep -q $'\x7fELF'
+}
+
+package() {
+  install -Dm755 "$srcdir/zeta-cli-linux-x64" "$pkgdir/usr/bin/zetacode"
+}
