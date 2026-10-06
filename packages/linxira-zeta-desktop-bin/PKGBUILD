@@ -32,6 +32,8 @@ source=("zeta-desktop-${pkgver}-linux-x64.tar.gz::https://github.com/Linxira-OS/
 sha256sums=('a250069c7206cf01a46cff6d26d3cd8bad50add0ef2ad0dc04f05b4be5a77b33')
 
 check() {
+  # 上游 CI 在非 Linux 打包, tar 内执行位丢失 —— 先补再验
+  chmod +x "$srcdir/zeta-desktop"
   [[ -x "$srcdir/zeta-desktop" ]]
   file "$srcdir/zeta-desktop" | grep -q ELF
 }
