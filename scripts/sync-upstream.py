@@ -36,7 +36,8 @@ API_BASE = "https://api.github.com"
 
 # ---------------------------------------------------------------- GitHub API
 
-_ALLOWED_HOSTS = {"api.github.com", "codeload.github.com"}
+_ALLOWED_HOSTS = {"api.github.com", "codeload.github.com",
+                  "objects.githubusercontent.com", "release-assets.githubusercontent.com"}
 
 
 def _repo_path(repo: str) -> str:
@@ -63,6 +64,10 @@ def _validate_url(url: str) -> None:
 
 
 def _resolve_ok(hostname: str) -> None:
+    # 本机开发旁路: hosts 把 GitHub 域名映射到 127.0.0.1(本地反代)的场景,
+    # 设 LINXIRA_SYNC_ALLOW_PRIVATE=1 跳过私网校验。CI 恒为防护开启。
+    if os.environ.get("LINXIRA_SYNC_ALLOW_PRIVATE") == "1":
+        return
     for info in socket.getaddrinfo(hostname, 443):
         ip = ipaddress.ip_address(info[4][0])
         if (ip.is_private or ip.is_loopback or ip.is_link_local
@@ -93,12 +98,15 @@ class GitHub:
         self.token = token
         self.calls = 0
 
-    def _get(self, url: str) -> tuple[int, bytes]:
-        headers = {
+    def _get(self, url: str, headers: dict[str, str] | None = None) -> tuple[int, bytes]:
+        merged = {
             "Accept": "application/vnd.github+json",
             "X-GitHub-Api-Version": "2022-11-28",
             "User-Agent": "linxira-upstream-sync",
         }
+        if headers:
+            merged.update(headers)
+        headers = merged
         if self.token:
             headers["Authorization"] = f"Bearer {self.token}"
         self.calls += 1
@@ -123,6 +131,30 @@ class GitHub:
         if status != 200:
             raise RuntimeError(f"{repo}: 解析 ref {ref!r} HTTP {status}")
         return json.loads(body)["sha"]
+
+    def release_asset_sha(self, repo: str, tag: str, asset_name: str) -> str | None:
+        """从 Release 的 SHA256SUMS.txt 资产里取 asset_name 的 sha256。
+
+        SHA256SUMS.txt 不存在或没有对应行时返回 None（调用方按 skip 处理）。
+        """
+        status, body = self._get(
+            f"{API_BASE}/repos/{_repo_path(repo)}/releases/tags/{_ref_segment(tag)}")
+        if status != 200:
+            raise RuntimeError(f"{repo}: releases/tags/{tag} HTTP {status}")
+        rel = json.loads(body)
+        sums = next((a for a in rel.get("assets", [])
+                     if a.get("name") == "SHA256SUMS.txt"), None)
+        if sums is None:
+            return None
+        # 资产内容必须 octet-stream; 默认 JSON Accept 会拿到元数据而非文件
+        status, data = self._get(sums["url"], headers={"Accept": "application/octet-stream"})
+        if status != 200:
+            raise RuntimeError(f"{repo}: SHA256SUMS.txt 下载 HTTP {status}")
+        for line in data.decode("utf-8", "replace").splitlines():
+            parts = line.split()
+            if len(parts) == 2 and parts[1].lstrip("*") == asset_name:
+                return parts[0]
+        return None
 
     def tarball_sha256(self, repo: str, commit: str) -> str:
         url = f"https://codeload.github.com/{_repo_path(repo)}/tar.gz/{_ref_segment(commit)}"
@@ -239,23 +271,51 @@ def bump_pkgbuild(path: Path, *, pkgver: str, commit: str, sha256: str | None,
             "pkgrel": new_rel, "checksum": sum_note}
 
 
+def bump_assets(path: Path, *, pkgver: str, sha256: str) -> dict:
+    """assets 模式：source URL 含 v${pkgver}，只需改 pkgver/pkgrel/sha256sums。"""
+    text = path.read_text(encoding="utf-8")
+    old_ver = kv_value(text, "pkgver")
+    if old_ver is None:
+        raise ValueError("缺少 pkgver")
+    new_rel = "1" if pkgver != old_ver else str(int(kv_value(text, "pkgrel") or "0") + 1)
+    for key, val in (("pkgver", pkgver), ("pkgrel", new_rel)):
+        text, n = re.subn(rf"(?m)^({key}=).*?$", rf"\g<1>{val}", text, count=1)
+        if n != 1:
+            raise ValueError(f"替换 {key}= 失败")
+    span = block_span(text, "sha256sums")
+    toks = tokens_with_spans(text, *span)
+    if not toks:
+        raise ValueError("sha256sums 为空")
+    text = replace_token(text, *span, 0, f"'{sha256}'")
+    path.write_text(text, encoding="utf-8")
+    return {"old_pkgver": old_ver, "new_pkgver": pkgver, "pkgrel": new_rel,
+            "checksum": "sha256[0] 取自上游 SHA256SUMS.txt"}
+
+
 # ---------------------------------------------------------------------- 主流程
 
 VALID_PKGVER = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._+:~-]*$")
 
 
-def load_track(config: Path, only: str | None) -> list[tuple[str, str]]:
+def load_track(config: Path, only: str | None) -> list[dict]:
     data = tomllib.loads(config.read_text(encoding="utf-8"))
-    track = [(t["package"], t["repo"]) for t in data.get("track", [])]
+    track = []
+    for t in data.get("track", []):
+        track.append({
+            "package": t["package"],
+            "repo": t["repo"],
+            "mode": t.get("mode", "codeload"),
+            "asset": t.get("asset", ""),
+        })
     if only:
-        track = [t for t in track if t[0] == only]
+        track = [t for t in track if t["package"] == only]
         if not track:
             sys.exit(f"upstream-sync.toml 里没有包 {only!r}")
     return track
 
 
 def scan_one(gh: GitHub, package: str, repo: str, pkgbuild: Path,
-             write: bool) -> dict:
+             write: bool, mode: str = "codeload") -> dict:
     """扫描一个包并（可选）写入 bump。返回结果行；异常转成 error 行。"""
     row: dict = {"package": package, "repo": repo}
     try:
@@ -268,6 +328,31 @@ def scan_one(gh: GitHub, package: str, repo: str, pkgbuild: Path,
             return row
 
         tag, commit = rel
+        if mode == "assets":
+            ver = tag[1:] if tag[:1] in ("v", "V") else tag
+            if not ver[:1].isdigit():
+                row.update(status="skip",
+                           reason=f"release tag `{tag}` 不是版本号")
+                return row
+            cur = kv_value(text, "pkgver")
+            if cur == ver:
+                row.update(status="ok", tag=tag, current=cur)
+                return row
+            span = block_span(text, "source")
+            toks = tokens_with_spans(text, *span)
+            if not toks:
+                raise ValueError("source 为空")
+            asset_name = toks[0][0].split("::", 1)[0].replace("${pkgver}", ver)
+            sha = gh.release_asset_sha(repo, tag, asset_name)
+            if sha is None:
+                row.update(status="skip",
+                           reason=f"SHA256SUMS.txt 里还没有 {asset_name}（上游尚未上传）")
+                return row
+            if write:
+                bump_assets(pkgbuild, pkgver=ver, sha256=sha)
+            row.update(status="bump", tag=tag, mode="assets",
+                       old=(cur or "?")[:12], new=ver, applied=bool(write))
+            return row
         # 版本防线：只认 vX.Y.Z / 数字开头的 tag，test-20260804 之类直接跳过
         ver = tag[1:] if tag[:1] in ("v", "V") else tag
         if not ver[:1].isdigit():
@@ -328,8 +413,10 @@ def main() -> int:
     args = ap.parse_args()
 
     gh = GitHub(os.environ.get("GITHUB_TOKEN") or None)
-    rows = [scan_one(gh, pkg, repo, PKGDIR / pkg / "PKGBUILD", args.write)
-            for pkg, repo in load_track(CONFIG_PATH, args.package)]
+    rows = [scan_one(gh, t["package"], t["repo"],
+                     PKGDIR / t["package"] / "PKGBUILD", args.write,
+                     mode=t["mode"])
+            for t in load_track(CONFIG_PATH, args.package)]
 
     for r in rows:
         if args.json:

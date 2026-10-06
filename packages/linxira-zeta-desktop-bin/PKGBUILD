@@ -2,9 +2,11 @@
 # Prebuilt Zeta desktop shell: the Electron app is assembled by
 # Linxira-OS/linxira-zeta CI (electron-builder), so this package fetches the
 # signed release tarball instead of building the ~200k-line web/runtime stack.
+# 2026-10-03: 自 zetabin 改名（pkgver 17.2.12 旧线退役, 1.1.x 起跟随上游）,
+# assets 模式由 upstream-sync 追踪版本与校验和。
 
-pkgname=zetabin
-pkgver=17.2.12
+pkgname=linxira-zeta-desktop-bin
+pkgver=1.1.26
 pkgrel=1
 pkgdesc='Zeta coding agent desktop shell: embedded Web UI + local service (no terminal, no system browser)'
 arch=('x86_64')
@@ -21,17 +23,13 @@ depends=(
   'util-linux'
   'xdg-utils'
 )
-provides=('zeta-desktop')
-conflicts=('zeta-desktop')
+provides=('zeta-desktop' 'zetabin')
+conflicts=('zeta-desktop' 'zetabin')
+replaces=('zetabin')
 
-# The tarball holds the linux-unpacked content at its root: the
-# `zeta-desktop` executable plus `resources/` (app.asar, bundled zeta CLI,
-# Node runtime, standalone Web UI).
 source=("zeta-desktop-${pkgver}-linux-x64.tar.gz::https://github.com/Linxira-OS/linxira-zeta/releases/download/v${pkgver}/zeta-desktop-${pkgver}-linux-x64.tar.gz")
-# Upstream CI publishes SHA256SUMS.txt beside this asset. Pin the checksum
-# here after the first linxira-zeta release produces the artifact (same flow
-# as every other package: pinned source + sha256).
-sha256sums=('SKIP')
+# assets 模式: sha256 由 scripts/sync-upstream.py 从上游 SHA256SUMS.txt 自动回填
+sha256sums=('a250069c7206cf01a46cff6d26d3cd8bad50add0ef2ad0dc04f05b4be5a77b33')
 
 check() {
   [[ -x "$srcdir/zeta-desktop" ]]
@@ -44,9 +42,4 @@ package() {
   install -Dm755 zeta-desktop "$pkgdir/opt/zeta/zeta-desktop"
   install -dm755 "$pkgdir/usr/bin"
   ln -s /opt/zeta/zeta-desktop "$pkgdir/usr/bin/zeta-desktop"
-  install -Dm644 zeta-desktop.desktop \
-    "$pkgdir/usr/share/applications/zeta-desktop.desktop"
-  install -Dm644 zeta-desktop.png \
-    "$pkgdir/usr/share/icons/hicolor/256x256/apps/zeta-desktop.png"
-  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 }

@@ -6,7 +6,13 @@
 # - 不在清单里的包永不自动 bump：
 #     calamares / shelly  外部上游，跨版本可能需要改 patch，保持人工；
 #     linxira-keyring     无版本 pin（_commit 是密钥指纹）；
-#     zetabin             无 _commit pin。
+#     zetabin             已退役：由 linxira-zeta-desktop-bin replaces。
+#
+# mode = "assets" 的条目：不追源码 tag，而是「release 资产重打包」——
+#   pkgver   <- releases/latest 的 tag 名（去 v 前缀）
+#   sha256   <- 同 Release 的 SHA256SUMS.txt 里「source 目标名（展开 ${pkgver}）」
+#              对应的资产行（缺失则当日 skip）
+# 该模式要求 PKGBUILD 的 source 形如 "资产名::下载URL" 且 URL 含 v${pkgver}。
 # - 新增自研包后在这里加一段 [[track]] 即可。
 
 [[track]]
@@ -68,3 +74,13 @@ repo = "Linxira-OS/linxira-welcome"
 [[track]]
 package = "linxira-wiki"
 repo = "Linxira-OS/linxira-wiki"
+
+[[track]]
+package = "linxira-zeta-c-bin"
+repo = "Linxira-OS/linxira-zeta"
+mode = "assets"
+
+[[track]]
+package = "linxira-zeta-desktop-bin"
+repo = "Linxira-OS/linxira-zeta"
+mode = "assets"
