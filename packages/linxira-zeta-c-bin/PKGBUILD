@@ -10,6 +10,7 @@ pkgdesc='Zeta coding agent CLI (zeta-c) — upstream release binary'
 arch=('x86_64')
 url='https://github.com/Linxira-OS/linxira-zeta'
 license=('MIT')
+options=('!strip' '!debug')  # 上游预编译二进制: 无调试符号可分发, 避免 -debug 拆包 build-id 冲突
 provides=('zetacode')
 conflicts=('zetacode-bin')
 source=("zeta-cli-linux-x64::https://github.com/Linxira-OS/linxira-zeta/releases/download/v${pkgver}/zeta-cli-linux-x64")

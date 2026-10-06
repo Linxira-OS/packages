@@ -23,6 +23,7 @@ depends=(
   'util-linux'
   'xdg-utils'
 )
+options=('!strip' '!debug')  # 上游预编译二进制: 无调试符号可分发, 避免 -debug 拆包 build-id 冲突
 provides=('zeta-desktop' 'zetabin')
 conflicts=('zeta-desktop' 'zetabin')
 replaces=('zetabin')
