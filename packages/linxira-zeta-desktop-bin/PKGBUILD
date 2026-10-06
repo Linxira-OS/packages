@@ -31,17 +31,20 @@ source=("zeta-desktop-${pkgver}-linux-x64.tar.gz::https://github.com/Linxira-OS/
 # assets 模式: sha256 由 scripts/sync-upstream.py 从上游 SHA256SUMS.txt 自动回填
 sha256sums=('a250069c7206cf01a46cff6d26d3cd8bad50add0ef2ad0dc04f05b4be5a77b33')
 
+# 1.1.26 起 tar 内条目位于版本化子目录 zeta-desktop-${pkgver}-linux-x64/
+_dir="$srcdir/zeta-desktop-${pkgver}-linux-x64"
+
 check() {
   # 上游 CI 在非 Linux 打包, tar 内执行位丢失 —— 先补再验
-  chmod +x "$srcdir/zeta-desktop"
-  [[ -x "$srcdir/zeta-desktop" ]]
-  file "$srcdir/zeta-desktop" | grep -q ELF
+  chmod +x "$_dir/zeta-desktop"
+  [[ -x "$_dir/zeta-desktop" ]]
+  file "$_dir/zeta-desktop" | grep -q ELF
 }
 
 package() {
   install -d "$pkgdir/opt/zeta"
-  cp -a resources "$pkgdir/opt/zeta/"
-  install -Dm755 zeta-desktop "$pkgdir/opt/zeta/zeta-desktop"
+  cp -a "$_dir/resources" "$pkgdir/opt/zeta/"
+  install -Dm755 "$_dir/zeta-desktop" "$pkgdir/opt/zeta/zeta-desktop"
   install -dm755 "$pkgdir/usr/bin"
   ln -s /opt/zeta/zeta-desktop "$pkgdir/usr/bin/zeta-desktop"
 }
