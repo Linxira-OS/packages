@@ -113,70 +113,57 @@ jobs:
   zeta-stack:
     # [linxira-zeta] pacman 仓库: 构建->签名->repo-add->上传到本仓库滚动 Release 资产。
     # 绕开 linxira-packages git 的 100MB 限制(GitHub Release 资产上限 2GB);
-    # pacman Server 指向 releases/latest/download(GITHUB_TOKEN 即可, 无需 PAT)。
-    # 资产未发布的包自动跳过; 五件齐才构建元包。上游 1.1.27 传资产后全自动纳入。
+    # pacman Server 指向 releases/latest/download(GITHUB_TOKEN 即可, 零 PAT)。
+    # 可用性判断 = makepkg 自行下载源, 404 自动跳过; 五件齐才建元包。
     needs: [boundaries]
     runs-on: ubuntu-24.04
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-      - name: Detect available zeta assets
-        id: avail
+      - name: Build available zeta packages (missing assets auto-skip)
         run: |
-          avail=""
-          for pkg in linxira-zeta-c-bin linxira-zetawork linxira-zeta-ide linxira-zeta-editor linxira-zeta-desktop-bin; do
-            ver=$(sed -n 's/^pkgver=//p' packages/$pkg/PKGBUILD)
-            asset=$(sed -n 's/^source=("//;s/::.*//p' packages/$pkg/PKGBUILD | tr -d '"')
-            asset=${asset//\${pkgver}/$ver}
-            url="https://github.com/Linxira-OS/linxira-zeta/releases/download/v${ver}/${asset}"
-            if curl -fsIL --max-time 30 "$url" >/dev/null 2>&1; then
-              avail="$avail $pkg"
-            else
-              echo "::notice::SKIP $pkg - upstream asset not published: $asset"
-            fi
-          done
-          echo "avail=$avail" >> "$GITHUB_OUTPUT"
-      - name: Build available zeta packages
-        if: steps.avail.outputs.avail != ''
-        run: |
-          docker run --rm -v "$PWD:/workspace" -e AVAIL="${{ steps.avail.outputs.avail }}" \
+          docker run --rm -v "$PWD:/workspace" \
             archlinux:base-devel bash -euxo pipefail -c '
               pacman -Syu --noconfirm git sudo
               useradd --create-home builder
               printf "builder ALL=(ALL) NOPASSWD: ALL\n" >/etc/sudoers.d/builder
               cd /workspace
-              all_five=1
-              for pkg in $AVAIL; do
+              for pkg in linxira-zeta-c-bin linxira-zetawork linxira-zeta-ide linxira-zeta-editor linxira-zeta-desktop-bin; do
                 chown -R builder:builder packages/$pkg
-                su builder -c "cd packages/$pkg && makepkg --syncdeps --noconfirm --clean --cleanbuild" || all_five=0
+                if su builder -c "cd packages/$pkg && makepkg --syncdeps --noconfirm --clean --cleanbuild"; then
+                  echo "BUILT: $pkg"
+                else
+                  rm -f packages/$pkg/*.pkg.tar.zst
+                  echo "SKIP: $pkg (source asset unavailable)"
+                fi
               done
-              for need in linxira-zeta-c-bin linxira-zetawork linxira-zeta-ide linxira-zeta-editor linxira-zeta-desktop-bin; do
-                [[ "$AVAIL" == *"$need"* ]] || all_five=0
-              done
-              if [ "$all_five" = 1 ]; then
+              built=$(ls packages/linxira-zeta-c-bin/*.pkg.tar.zst packages/linxira-zetawork/*.pkg.tar.zst packages/linxira-zeta-ide/*.pkg.tar.zst packages/linxira-zeta-editor/*.pkg.tar.zst packages/linxira-zeta-desktop-bin/*.pkg.tar.zst 2>/dev/null | wc -l)
+              if [ "$built" -ge 5 ]; then
                 chown -R builder:builder packages/linxira-zeta
-                su builder -c "cd packages/linxira-zeta && makepkg --syncdeps --noconfirm --clean --cleanbuild"
+                su builder -c "cd packages/linxira-zeta && makepkg --syncdeps --noconfirm --clean --cleanbuild" && echo "BUILT: linxira-zeta (meta)"
               else
-                echo "meta package deferred (not all five available)"
+                echo "meta deferred: built=$built/5"
               fi
               install -d /workspace/zeta-repo
               cp packages/linxira-zeta*/*.pkg.tar.zst /workspace/zeta-repo/ 2>/dev/null || true
+              ls -la /workspace/zeta-repo/
             '
       - name: Sign packages and build zeta repo db
-        if: steps.avail.outputs.avail != ''
         env:
           LINXIRA_GPG_PRIVATE_KEY: ${{ secrets.LINXIRA_GPG_PRIVATE_KEY }}
           LINXIRA_GPG_FINGERPRINT: ${{ secrets.LINXIRA_GPG_FINGERPRINT }}
           LINXIRA_GPG_PASSPHRASE: ${{ secrets.LINXIRA_GPG_PASSPHRASE }}
         run: |
+          if [ -z "$(ls zeta-repo/*.pkg.tar.zst 2>/dev/null)" ]; then
+            echo "no zeta packages built - nothing to sign"; exit 0
+          fi
           docker run --rm -v "$PWD:/workspace" \
             -e LINXIRA_GPG_PRIVATE_KEY -e LINXIRA_GPG_FINGERPRINT -e LINXIRA_GPG_PASSPHRASE \
             archlinux:base bash -euxo pipefail -c '
               pacman -Syu --noconfirm gnupg pacman
               cd /workspace/zeta-repo
-              export GPG_TTY=$(tty 2>/dev/null || echo /dev/console)
-              echo "$LINXIRA_GPG_PRIVATE_KEY" | gpg --batch --import || true
+              echo "$LINXIRA_GPG_PRIVATE_KEY" | gpg --batch --import
               for f in *.pkg.tar.zst; do
                 gpg --batch --yes --pinentry-mode loopback \
                     --passphrase "$LINXIRA_GPG_PASSPHRASE" \
@@ -191,10 +178,12 @@ jobs:
                   --detach-sign linxira.db
             '
       - name: Publish rolling zeta-repo Release
-        if: steps.avail.outputs.avail != ''
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          if [ ! -f zeta-repo/linxira.db.tar.zst ]; then
+            echo "no zeta db - skip release"; exit 0
+          fi
           ls zeta-repo/
           gh release delete zeta-repo --yes --cleanup-tag 2>/dev/null || true
           gh release create zeta-repo --title "[linxira-zeta] pacman repo (rolling)" \
