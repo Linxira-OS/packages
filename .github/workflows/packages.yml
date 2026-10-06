@@ -138,7 +138,7 @@ jobs:
                   echo "SKIP: $pkg (source asset unavailable)"
                 fi
               done
-              built=$(ls packages/linxira-zeta-c-bin/*.pkg.tar.zst packages/linxira-zetawork/*.pkg.tar.zst packages/linxira-zeta-ide/*.pkg.tar.zst packages/linxira-zeta-editor/*.pkg.tar.zst packages/linxira-zeta-desktop-bin/*.pkg.tar.zst 2>/dev/null | wc -l)
+              built=$(ls packages/linxira-zeta-c-bin/*.pkg.tar.zst packages/linxira-zetawork/*.pkg.tar.zst packages/linxira-zeta-ide/*.pkg.tar.zst packages/linxira-zeta-editor/*.pkg.tar.zst packages/linxira-zeta-desktop-bin/*.pkg.tar.zst 2>/dev/null | wc -l || true)
               if [ "$built" -ge 5 ]; then
                 chown -R builder:builder packages/linxira-zeta
                 su builder -c "cd packages/linxira-zeta && makepkg --syncdeps --noconfirm --clean --cleanbuild" && echo "BUILT: linxira-zeta (meta)"
