@@ -74,8 +74,6 @@ jobs:
                 linxira-hwd-detector
                 linxira-components
                 linxira-completion-agent
-                linxira-zeta-c-bin
-                linxira-zeta-desktop-bin
                 linxira-hardware-driver-manager
                 linxira-recovery-diagnostics
                 linxira-config-hub
@@ -99,8 +97,6 @@ jobs:
             packages/linxira-catalog/*.pkg.tar.zst
             packages/linxira-components/*.pkg.tar.zst
             packages/linxira-completion-agent/*.pkg.tar.zst
-            packages/linxira-zeta-c-bin/*.pkg.tar.zst
-            packages/linxira-zeta-desktop-bin/*.pkg.tar.zst
             packages/linxira-hwd-detector/*.pkg.tar.zst
             packages/linxira-hardware-driver-manager/*.pkg.tar.zst
             packages/linxira-bio-sdk/*.pkg.tar.zst

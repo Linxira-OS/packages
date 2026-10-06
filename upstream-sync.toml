@@ -76,11 +76,6 @@ package = "linxira-wiki"
 repo = "Linxira-OS/linxira-wiki"
 
 [[track]]
-package = "linxira-zeta-c-bin"
-repo = "Linxira-OS/linxira-zeta"
-mode = "assets"
-
-[[track]]
 package = "linxira-zeta-desktop-bin"
 repo = "Linxira-OS/linxira-zeta"
 mode = "assets"
