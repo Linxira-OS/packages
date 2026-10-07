@@ -3,7 +3,7 @@
 # 分发走 [linxira-zeta] 仓库(packages 仓库 Release 资产), 不进 linxira-packages git(100MB 限制)。
 
 pkgname=linxira-zeta-editor
-pkgver=1.1.26
+pkgver=1.1.27
 pkgrel=1
 pkgdesc='Zeta terminal editor (TTT, release binary)'
 arch=('x86_64')
@@ -13,7 +13,7 @@ options=('!strip' '!debug')
 provides=('zetaeditor')
 source=("zeta-editor-linux-x64::https://github.com/Linxira-OS/linxira-zeta/releases/download/v${pkgver}/zeta-editor-linux-x64")
 # assets 模式: sha256 由 sync-upstream.py 自动回填; 资产未上传前为 SKIP(构建跳过)
-sha256sums=('SKIP')
+sha256sums=('4a77860d56a1488947fc10be7d749ab446668631bb223bda80be4640018064b9')
 
 check() {
   chmod +x "$srcdir/zeta-editor-linux-x64"

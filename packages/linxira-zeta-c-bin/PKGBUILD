@@ -4,7 +4,7 @@
 # sync-upstream 依据 source 目标名在 SHA256SUMS.txt 中匹配校验和。
 
 pkgname=linxira-zeta-c-bin
-pkgver=1.1.26
+pkgver=1.1.27
 pkgrel=1
 pkgdesc='Zeta coding agent CLI (zeta-c) — upstream release binary'
 arch=('x86_64')
@@ -15,7 +15,7 @@ provides=('zetacode')
 conflicts=('zetacode-bin')
 source=("zeta-cli-linux-x64::https://github.com/Linxira-OS/linxira-zeta/releases/download/v${pkgver}/zeta-cli-linux-x64")
 # assets 模式: sha256 由 scripts/sync-upstream.py 从上游 SHA256SUMS.txt 自动回填
-sha256sums=('4eb138fe681961f28fd4eca44b045a6290eb74c9f92c8e50070d5e14dad36b2e')
+sha256sums=('22744a71ed3df115d04372df8b1573b6c76fe6d6ab2b4247c2ffc53760fd419c')
 
 check() {
   head -c 4 "$srcdir/zeta-cli-linux-x64" | grep -q $'\x7fELF'

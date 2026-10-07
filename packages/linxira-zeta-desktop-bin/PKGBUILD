@@ -6,7 +6,7 @@
 # assets 模式由 upstream-sync 追踪版本与校验和。
 
 pkgname=linxira-zeta-desktop-bin
-pkgver=1.1.26
+pkgver=1.1.27
 pkgrel=1
 pkgdesc='Zeta coding agent desktop shell: embedded Web UI + local service (no terminal, no system browser)'
 arch=('x86_64')
@@ -30,7 +30,7 @@ replaces=('zetabin')
 
 source=("zeta-desktop-${pkgver}-linux-x64.tar.gz::https://github.com/Linxira-OS/linxira-zeta/releases/download/v${pkgver}/zeta-desktop-${pkgver}-linux-x64.tar.gz")
 # assets 模式: sha256 由 scripts/sync-upstream.py 从上游 SHA256SUMS.txt 自动回填
-sha256sums=('a250069c7206cf01a46cff6d26d3cd8bad50add0ef2ad0dc04f05b4be5a77b33')
+sha256sums=('5ec8ab0150c803c444d57d43e437d02c5d92b48ee6eff9299e960b4547109c6d')
 
 # 1.1.26 起 tar 内条目位于版本化子目录 zeta-desktop-${pkgver}-linux-x64/
 
