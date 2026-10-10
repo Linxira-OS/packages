@@ -76,6 +76,7 @@ jobs:
                 linxira-completion-agent
                 linxira-hardware-driver-manager
                 linxira-recovery-diagnostics
+                linxira-crash-watch
                 linxira-config-hub
                 linxira-component-manager
                 linxira-gaming-manager
@@ -101,6 +102,7 @@ jobs:
             packages/linxira-hardware-driver-manager/*.pkg.tar.zst
             packages/linxira-bio-sdk/*.pkg.tar.zst
             packages/linxira-recovery-diagnostics/*.pkg.tar.zst
+            packages/linxira-crash-watch/*.pkg.tar.zst
             packages/linxira-config-hub/*.pkg.tar.zst
             packages/linxira-component-manager/*.pkg.tar.zst
             packages/linxira-gaming-manager/*.pkg.tar.zst

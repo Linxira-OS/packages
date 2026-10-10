@@ -1,0 +1,44 @@
+# Maintainer: Linxira OS <admin@linxira.org>
+
+pkgname=linxira-crash-watch
+pkgver=0.1.0
+pkgrel=1
+pkgdesc='Crash capture, triage, and user-approved agent wake-up for Linxira OS'
+arch=('any')
+groups=('linxira')
+url='https://github.com/Linxira-OS/linxira-crash-watch'
+license=('MIT')
+depends=('python' 'systemd' 'systemd-coredump' 'libnotify' 'pacman' 'git')
+makedepends=('python-build' 'python-hatchling' 'python-installer')
+checkdepends=('appstream' 'desktop-file-utils' 'python-pytest')
+optdepends=(
+  'linxira-zeta-c-bin: provide the zetacode agent launched on explicit request'
+  'konsole: interactive lane terminal emulator'
+  'cosmic-terminal: interactive lane terminal emulator'
+  'xterm: fallback interactive lane terminal emulator'
+)
+
+_commit=65114836dd48f0b0eba8c29b02ab25cd43a73724
+source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
+sha256sums=('bfa246486b9df69e6415bbe5b425fdd52569794b6fe13b5cc979c99cd41b03e4')
+
+build() {
+  cd "$srcdir/$pkgname-$_commit"
+  python -m build --wheel --no-isolation
+}
+
+check() {
+  cd "$srcdir/$pkgname-$_commit"
+  [[ $(<VERSION) == "$pkgver" ]]
+  PYTHONPATH=src python -m pytest -q
+  python -m compileall -q src tests
+  desktop-file-validate data/org.linxira.CrashWatch.desktop
+  appstreamcli validate --no-net data/org.linxira.CrashWatch.metainfo.xml
+  ! grep -R -E -n 'shell=True|os\.system' src
+}
+
+package() {
+  cd "$srcdir/$pkgname-$_commit"
+  python -m installer --destdir="$pkgdir" dist/*.whl
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}
