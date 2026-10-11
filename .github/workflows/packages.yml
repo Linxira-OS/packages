@@ -76,7 +76,12 @@ jobs:
                 linxira-completion-agent
                 linxira-hardware-driver-manager
                 linxira-recovery-diagnostics
-                linxira-crash-watch
+                # linxira-crash-watch: 2026-10-11 起暂离发布链。原因: auto-bump 会把
+                # _commit 归一化回 v0.1.0 tag 提交(6511483, 树里不含 diagnose-crash 技能
+                # 与 user preset), 而 check() 的 wheel 断言(技能/preset 必须在内)会判其失败
+                # → bot PR 永久红, 连带别的包(如 bio-sdk)发不出去。
+                # 11 月发 v0.1.1(提交含技能+preset)后, 本行与上传清单里那行一起加回。
+                # 端到端打包校验已于 2026-10-11 main run 38113168495(system-stack 绿)完成。
                 linxira-config-hub
                 linxira-component-manager
                 linxira-gaming-manager
@@ -102,8 +107,8 @@ jobs:
             packages/linxira-hardware-driver-manager/*.pkg.tar.zst
             packages/linxira-bio-sdk/*.pkg.tar.zst
             packages/linxira-recovery-diagnostics/*.pkg.tar.zst
-            # linxira-crash-watch: 新增软件, 按 2026-10-11 口径随 11 月 WSL/镜像统一发布;
-            # 构建仍执行(上方 packages= 列表)以保持打包链校验, 11 月发布时把本行加回。
+            # linxira-crash-watch: 构建与上传都已摘下(见上方 packages= 里的说明)。
+            # 11 月发 v0.1.1 后: 本行 + 上方那两行注释一起恢复 = 重新入链并发布。
             packages/linxira-config-hub/*.pkg.tar.zst
             packages/linxira-component-manager/*.pkg.tar.zst
             packages/linxira-gaming-manager/*.pkg.tar.zst
