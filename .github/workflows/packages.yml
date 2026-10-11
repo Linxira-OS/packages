@@ -102,7 +102,8 @@ jobs:
             packages/linxira-hardware-driver-manager/*.pkg.tar.zst
             packages/linxira-bio-sdk/*.pkg.tar.zst
             packages/linxira-recovery-diagnostics/*.pkg.tar.zst
-            packages/linxira-crash-watch/*.pkg.tar.zst
+            # linxira-crash-watch: 新增软件, 按 2026-10-11 口径随 11 月 WSL/镜像统一发布;
+            # 构建仍执行(上方 packages= 列表)以保持打包链校验, 11 月发布时把本行加回。
             packages/linxira-config-hub/*.pkg.tar.zst
             packages/linxira-component-manager/*.pkg.tar.zst
             packages/linxira-gaming-manager/*.pkg.tar.zst

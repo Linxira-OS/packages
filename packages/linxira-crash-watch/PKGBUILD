@@ -18,9 +18,9 @@ optdepends=(
   'xterm: fallback interactive lane terminal emulator'
 )
 
-_commit=65114836dd48f0b0eba8c29b02ab25cd43a73724
+_commit=6ca06ae1adada66b8e31cc0bf7dc80d1587d819b
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('bfa246486b9df69e6415bbe5b425fdd52569794b6fe13b5cc979c99cd41b03e4')
+sha256sums=('5f239169be29554fb76b0631a5b2f2096013611aa7394b657a772ac81255cc16')
 
 build() {
   cd "$srcdir/$pkgname-$_commit"
