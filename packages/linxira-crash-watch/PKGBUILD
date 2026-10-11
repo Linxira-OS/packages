@@ -8,7 +8,7 @@ arch=('any')
 groups=('linxira')
 url='https://github.com/Linxira-OS/linxira-crash-watch'
 license=('MIT')
-depends=('python' 'systemd' 'systemd-coredump' 'libnotify' 'pacman' 'git')
+depends=('python' 'systemd' 'libnotify' 'pacman' 'git')
 makedepends=('python-build' 'python-hatchling' 'python-installer')
 checkdepends=('appstream' 'desktop-file-utils' 'python-pytest')
 optdepends=(
@@ -32,6 +32,8 @@ check() {
   [[ $(<VERSION) == "$pkgver" ]]
   PYTHONPATH=src python -m pytest -q
   python -m compileall -q src tests
+  python -m zipfile -l dist/*.whl | grep -q 'linxira_crash_watch/skills/diagnose-crash/SKILL.md'
+  python -m zipfile -l dist/*.whl | grep -q 'linxira-crash-watch.preset'
   desktop-file-validate data/org.linxira.CrashWatch.desktop
   appstreamcli validate --no-net data/org.linxira.CrashWatch.metainfo.xml
   ! grep -R -E -n 'shell=True|os\.system' src

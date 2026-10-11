@@ -40,6 +40,10 @@ package = "linxira-config-hub"
 repo = "Linxira-OS/linxira-config-hub"
 
 [[track]]
+package = "linxira-crash-watch"
+repo = "Linxira-OS/linxira-crash-watch"
+
+[[track]]
 package = "linxira-gaming-manager"
 repo = "Linxira-OS/linxira-gaming-manager"
 
