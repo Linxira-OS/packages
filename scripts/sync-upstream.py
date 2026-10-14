@@ -348,10 +348,12 @@ def scan_one(gh: GitHub, package: str, repo: str, pkgbuild: Path,
                 row.update(status="skip",
                            reason=f"SHA256SUMS.txt 里还没有 {asset_name}（上游尚未上传）")
                 return row
+            info: dict | None = None
             if write:
-                bump_assets(pkgbuild, pkgver=ver, sha256=sha)
+                info = bump_assets(pkgbuild, pkgver=ver, sha256=sha)
             row.update(status="bump", tag=tag, mode="assets",
-                       old=(cur or "?")[:12], new=ver, applied=bool(write))
+                       old=(cur or "?")[:12], new=ver,
+                       applied=bool(info), **(info or {}))
             return row
         # 版本防线：只认 vX.Y.Z / 数字开头的 tag，test-20260804 之类直接跳过
         ver = tag[1:] if tag[:1] in ("v", "V") else tag
@@ -389,10 +391,16 @@ def render_report(rows: list[dict]) -> str:
              "|---|---|---|"]
     for r in rows:
         if r["status"] == "bump":
-            note = (f"→ `{r['new_pkgver']}` (rel={r['pkgrel']}, "
-                    f"{r['old_commit']}…{r['new_commit']})"
-                    if r.get("applied")
-                    else f"`{r['old']}…` → `{r['new']}`（未写入，dry-run）")
+            if not r.get("applied"):
+                note = (f"`{r.get('old', '?')}…` → `{r.get('new', '?')}`"
+                        f"（未写入，dry-run）")
+            elif "new_commit" in r:
+                # codeload 模式：pkgver + _commit + sha256 三改
+                note = (f"→ `{r['new_pkgver']}` (rel={r['pkgrel']}, "
+                        f"{r['old_commit']}…{r['new_commit']})")
+            else:
+                # assets 模式：只有 pkgver/sha256 变化，没有 _commit 概念
+                note = f"→ `{r['new_pkgver']}` (rel={r['pkgrel']}, 资产模式)"
             url = f"https://github.com/{r['repo']}/releases/tag/{r['tag']}"
             lines.append(f"| {r['package']} | [`{r['tag']}`]({url}) | {note} |")
         elif r["status"] == "ok":
