@@ -11,9 +11,13 @@ url='https://github.com/Linxira-OS/linxira-zeta'
 license=('MIT')
 options=('!strip' '!debug')
 provides=('zetaide')
-source=("zeta-ide-linux-x64::https://github.com/Linxira-OS/linxira-zeta/releases/download/v${pkgver}/zeta-ide-linux-x64")
+source=("zeta-ide-linux-x64::https://github.com/Linxira-OS/linxira-zeta/releases/download/v${pkgver}/zeta-ide-linux-x64"
+"LICENSE::https://github.com/Linxira-OS/linxira-zeta/releases/download/v${pkgver}/LICENSE"
+)
 # assets 模式: sha256 由 sync-upstream.py 自动回填; 资产未上传前为 SKIP(构建跳过)
-sha256sums=('b4375e5bd8bf76d845946b7ab990fc7e6ddc91b5998e40e5d07e1ec167cd51dc')
+sha256sums=('b4375e5bd8bf76d845946b7ab990fc7e6ddc91b5998e40e5d07e1ec167cd51dc'
+'dc4eb64d767658a18fc64ea98344ac86365564196f61df33b76c5871fe3a844f'
+)
 
 check() {
   chmod +x "$srcdir/zeta-ide-linux-x64"
@@ -21,5 +25,6 @@ check() {
 }
 
 package() {
+  install -Dm644 "$srcdir/LICENSE" "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
   install -Dm755 "$srcdir/zeta-ide-linux-x64" "$pkgdir/usr/bin/zetaide"
 }

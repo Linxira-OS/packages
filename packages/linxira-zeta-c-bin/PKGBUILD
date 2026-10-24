@@ -13,14 +13,19 @@ license=('MIT')
 options=('!strip' '!debug')  # 上游预编译二进制: 无调试符号可分发, 避免 -debug 拆包 build-id 冲突
 provides=('zetacode')
 conflicts=('zetacode-bin')
-source=("zeta-cli-linux-x64::https://github.com/Linxira-OS/linxira-zeta/releases/download/v${pkgver}/zeta-cli-linux-x64")
+source=("zeta-cli-linux-x64::https://github.com/Linxira-OS/linxira-zeta/releases/download/v${pkgver}/zeta-cli-linux-x64"
+"LICENSE::https://github.com/Linxira-OS/linxira-zeta/releases/download/v${pkgver}/LICENSE"
+)
 # assets 模式: sha256 由 scripts/sync-upstream.py 从上游 SHA256SUMS.txt 自动回填
-sha256sums=('9ba45eb4de99c663985144677265a7edf14b669680e6d036941e8eea317d9c91')
+sha256sums=('9ba45eb4de99c663985144677265a7edf14b669680e6d036941e8eea317d9c91'
+'dc4eb64d767658a18fc64ea98344ac86365564196f61df33b76c5871fe3a844f'
+)
 
 check() {
   head -c 4 "$srcdir/zeta-cli-linux-x64" | grep -q $'\x7fELF'
 }
 
 package() {
+  install -Dm644 "$srcdir/LICENSE" "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
   install -Dm755 "$srcdir/zeta-cli-linux-x64" "$pkgdir/usr/bin/zetacode"
 }
