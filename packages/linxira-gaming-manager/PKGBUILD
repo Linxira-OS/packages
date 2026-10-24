@@ -2,7 +2,7 @@
 
 pkgname=linxira-gaming-manager
 pkgver=0.3.0
-pkgrel=2
+pkgrel=3
 pkgdesc='User-level game library and compatibility manager for Linxira OS'
 arch=('any')
 groups=('linxira')
@@ -22,9 +22,9 @@ optdepends=(
   'winetricks: reviewed Wine prefix operations'
 )
 
-_commit=72244435fccf888c0c9914731f0efff63b2baa36
+_commit=03de32f27fa7b7a0efd0a199df4b2f7d0a7cd49a
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('a80a41fec6611af7f03b9aa9b5cd9a44fe0fbb40479e1be25d92d511ff4d192a')
+sha256sums=('03f172c7740b7d0a1eb69064db80eb342ea08db19df198237c01ff7467ae1fa8')
 
 build() {
   cd "$srcdir/$pkgname-$_commit"
