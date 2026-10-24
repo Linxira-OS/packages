@@ -61,7 +61,7 @@ prepare() {
   if [[ -f LICENSE ]]; then
     install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
   fi
-  install -Dm644 "$srcdir/UPSTREAM.md" "$pkgdir/usr/share/doc/$pkgname/UPSTREAM.md"
+  install -Dm644 "${startdir}/UPSTREAM.md" "$pkgdir/usr/share/doc/$pkgname/UPSTREAM.md"
   git apply --no-index --ignore-space-change "${srcdir}/linxira-safety-policy.patch"
 
   ! grep -R -q -E 'RunPrivilegedSystemCommandAsync|RemoveDbLockAsync|rm_db_lock_button|rm -f /var/lib/pacman/db\.lck' \

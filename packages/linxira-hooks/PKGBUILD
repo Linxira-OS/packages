@@ -18,7 +18,10 @@ sha256sums=('SKIP')
 package() {
   cd "$srcdir/$pkgname"
 
-  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+  # LICENSE 随 v1.1.1 起进入源码; 旧 pin 的提交里还没有, 缺省不阻断构建
+  if [[ -f LICENSE ]]; then
+    install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+  fi
 
   install -Dm755 linxira-branding "$pkgdir/usr/share/libalpm/scripts/linxira-branding"
   install -Dm755 linxira-reboot-required "$pkgdir/usr/share/libalpm/scripts/linxira-reboot-required"

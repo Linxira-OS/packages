@@ -32,6 +32,10 @@ package() {
   install -Dm755 target/release/linxira-bio "$pkgdir/usr/bin/linxira-bio"
   # 2026-10-24(审计 G5): AGPL 文本、第三方依赖与字体(OFL)声明必须随包分发
   install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
-  install -Dm644 THIRD_PARTY.md "$pkgdir/usr/share/licenses/$pkgname/THIRD_PARTY.md"
-  cp -a licenses "$pkgdir/usr/share/licenses/$pkgname/licenses"
+  if [[ -f THIRD_PARTY.md ]]; then
+    install -Dm644 THIRD_PARTY.md "$pkgdir/usr/share/licenses/$pkgname/THIRD_PARTY.md"
+  fi
+  if [[ -d licenses ]]; then
+    cp -a licenses "$pkgdir/usr/share/licenses/$pkgname/licenses"
+  fi
 }
