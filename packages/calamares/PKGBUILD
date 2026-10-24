@@ -6,7 +6,7 @@ pkgrel=17
 pkgdesc='Distribution-independent graphical system installer framework'
 arch=('x86_64')
 url='https://calamares.io/'
-license=('BSD-2-Clause' 'CC-BY-SA-4.0' 'GPL-3.0-or-later' 'LGPL-2.1-or-later')
+license=('BSD-2-Clause' 'CC0-1.0' 'CC-BY-4.0' 'GPL-3.0-or-later' 'LGPL-3.0-or-later' 'LGPL-2.1-only' 'MIT')
 depends=(
   'boost-libs'
   'hwinfo'
@@ -108,8 +108,10 @@ check() {
 package() {
   DESTDIR="$pkgdir" cmake --install build
   rm -f "$pkgdir/usr/share/applications/calamares.desktop"
-  install -Dm644 "calamares-${pkgver}/LICENSES/BSD-2-Clause.txt" \
-    "$pkgdir/usr/share/licenses/$pkgname/BSD-2-Clause.txt"
+  # 2026-10-24(审计 G2): 上游是 REUSE 多许可, 之前只装 BSD-2-Clause 一份, 且 license=
+  # 漏项/错项(CC-BY-SA-4.0 实为 CC-BY-4.0; LGPL-2.1-or-later 实为 LGPL-2.1-only;
+  # 漏 MIT/CC0-1.0/LGPL-3.0-or-later)。改为整目录分发, 与 LICENSES/ 保持一致。
+  cp -a "calamares-${pkgver}/LICENSES" "$pkgdir/usr/share/licenses/$pkgname/"
 
   local module_dir="$pkgdir/usr/lib/calamares/modules/linxirasoftware"
   test -s "$module_dir/libcalamares_viewmodule_linxirasoftware.so"

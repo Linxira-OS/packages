@@ -18,6 +18,8 @@ sha256sums=('SKIP')
 package() {
   cd "$srcdir/$pkgname"
 
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+
   install -Dm755 linxira-branding "$pkgdir/usr/share/libalpm/scripts/linxira-branding"
   install -Dm755 linxira-reboot-required "$pkgdir/usr/share/libalpm/scripts/linxira-reboot-required"
   install -Dm755 linxira-update-initramfs "$pkgdir/usr/bin/linxira-update-initramfs"

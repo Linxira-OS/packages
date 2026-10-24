@@ -7,7 +7,9 @@ pkgdesc='Canonical artwork and visual identity for Linxira OS'
 arch=('any')
 groups=('linxira')
 url='https://github.com/Linxira-OS/linxira-artwork'
-license=('GPL-3.0-or-later')
+# 2026-10-24(审计 G6): 品牌资产是"保留权利 + 仅随未修改的 Linxira 镜像/包再分发",
+# 不是 GPL。之前这里写 GPL-3.0-or-later 与 LICENSE/TRADEMARKS 冲突, 改为自定义许可。
+license=('custom:Linxira-Brand')
 
 _commit=fa84ae6eded9a5fd019412b2dd7667ae72d0c9e7
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
