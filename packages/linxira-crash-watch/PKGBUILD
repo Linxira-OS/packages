@@ -1,7 +1,7 @@
 # Maintainer: Linxira OS <admin@linxira.org>
 
 pkgname=linxira-crash-watch
-pkgver=0.1.1
+pkgver=0.1.0
 pkgrel=1
 pkgdesc='Crash capture, triage, and user-approved agent wake-up for Linxira OS'
 arch=('any')
@@ -18,9 +18,9 @@ optdepends=(
   'xterm: fallback interactive lane terminal emulator'
 )
 
-_commit=b822bc6cd9c28b6de67d472bcde7ec507923b273
+_commit=65114836dd48f0b0eba8c29b02ab25cd43a73724
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('313d1e3558073ac46d456f64ff038567e4f57a96c4131d77f584d1a8ae7391c9')
+sha256sums=('bfa246486b9df69e6415bbe5b425fdd52569794b6fe13b5cc979c99cd41b03e4')
 
 build() {
   cd "$srcdir/$pkgname-$_commit"

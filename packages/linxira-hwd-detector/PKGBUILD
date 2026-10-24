@@ -10,7 +10,7 @@
 
 pkgname=linxira-hwd-detector
 pkgver=1.23.0
-pkgrel=2
+pkgrel=3
 pkgdesc='Linxira hardware detection and driver configuration tool (full CHWD port)'
 arch=('x86_64')
 groups=('linxira')
@@ -21,9 +21,9 @@ makedepends=('rust' 'clang' 'pciutils' 'libusb')
 checkdepends=('python')
 options=('!debug')
 
-_commit=1d5b5a611811d498e6e457e680e66b0d15f4fb84
+_commit=52eeac0a0162a7c94166f3047a246745a822866f
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('ba1b7ad8878ca39c25dc3cd674cfa34aae9102126346133300b3408dad187ba3')
+sha256sums=('b9bc84a4aec5279a1f603aeb02ae52a2a2ebb14cc5294b5f174d81bbd568f5f3')
 
 build() {
   cd "$srcdir/$pkgname-$_commit"
