@@ -1,7 +1,7 @@
 # Maintainer: Linxira OS <admin@linxira.org>
 
 pkgname=linxira-artwork
-pkgver=1.1.2
+pkgver=1.1.3
 pkgrel=1
 pkgdesc='Canonical artwork and visual identity for Linxira OS'
 arch=('any')
@@ -11,9 +11,9 @@ url='https://github.com/Linxira-OS/linxira-artwork'
 # 不是 GPL。之前这里写 GPL-3.0-or-later 与 LICENSE/TRADEMARKS 冲突, 改为自定义许可。
 license=('custom:Linxira-Brand')
 
-_commit=bdd893e8947c8b2a8f5f39ec8dfe4d0ed8981611
+_commit=1bdd15113151d2813b875e8ea539c145ab9f3738
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('c0ff16bcdd83a919dc41b899e3b1e83d9884e0852eb27b4b013afd32a0fbf9a5')
+sha256sums=('8d596401bc9ebac31e26ba4e02cf83088d38ef5c5c5ca13e1b784b19c2ddffe1')
 
 package() {
   cd "$srcdir/$pkgname-$_commit"
