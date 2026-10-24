@@ -108,3 +108,11 @@ mode = "assets"
 package = "linxira-zeta-desktop-bin"
 repo = "Linxira-OS/linxira-zeta"
 mode = "assets"
+
+[[track]]
+package = "linxira-hooks"
+repo = "Linxira-OS/linxira-hooks"
+
+[[track]]
+package = "linxira-kernel-manager"
+repo = "Linxira-OS/linxira-kernel-manager"
