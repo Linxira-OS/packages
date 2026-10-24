@@ -15,6 +15,7 @@ source=(linxira.gpg)
 sha256sums=('99196cbbc98883d9c080e6b44f456df6453803786f6950f7f3bae12248b17ab5')
 
 package() {
+  install -Dm644 "${startdir}/LICENSE" "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
   install -Dm644 linxira.gpg "$pkgdir/usr/share/keyrings/linxira.gpg"
   printf '%s\n' "${_commit}" > "$pkgdir/usr/share/keyrings/linxira-release-fingerprint"
 }
