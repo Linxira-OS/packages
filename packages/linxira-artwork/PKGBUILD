@@ -19,11 +19,11 @@ package() {
   cp -a usr "$pkgdir/"
   install -Dm644 assets/logo/linxira-l.svg \
     "$pkgdir/usr/share/linxira/linxira-logo.svg"
-  install -Dm644 assets/logo/linxira-l.svg \
+  install -Dm644 assets/logo/linxira-icon.svg \
     "$pkgdir/usr/share/linxira/linxira-icon.svg"
   install -Dm644 "$srcdir/linxira-logo-braille60.ansi" \
     "$pkgdir/usr/share/linxira/linxira-logo-braille60.ansi"
-  install -Dm644 assets/logo/linxira-l.svg \
+  install -Dm644 assets/logo/linxira-icon.svg \
     "$pkgdir/usr/share/icons/hicolor/scalable/apps/linxira.svg"
   install -Dm644 TRADEMARKS.md \
     "$pkgdir/usr/share/doc/linxira-artwork/TRADEMARKS.md"
