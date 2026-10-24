@@ -101,7 +101,10 @@ def main() -> int:
     linxira = [p for p in packages if p["builtBy"] == "linxira"]
     missing_dirs = [p["name"] for p in linxira if not p["licensesDir"]]
     non_free = [p for p in packages if p["name"] in NON_FREE]
-    version = args.version or (root / "etc/linxira-release").read_text().strip() if (root / "etc/linxira-release").exists() else ""
+    version = args.version
+    if not version:
+        marker = root / "etc/linxira-release"
+        version = marker.read_text().strip() if marker.exists() else ""
 
     out = args.out or root / "usr/share/doc/linxira"
     out.mkdir(parents=True, exist_ok=True)
