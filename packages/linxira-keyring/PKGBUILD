@@ -2,7 +2,7 @@
 
 pkgname=linxira-keyring
 pkgver=20260804
-pkgrel=2
+pkgrel=3
 pkgdesc='Linxira OS package signing keyring (trusted release key)'
 arch=('any')
 groups=('linxira')
