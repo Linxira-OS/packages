@@ -158,3 +158,12 @@ Required secrets for the automatic publish leg:
 
 Caveat: GitHub disables scheduled workflows after ~60 days without repository
 activity; run `auto-bump.yml` manually once if it gets disabled.
+
+## Licensing and release evidence
+
+- 每个 PKGBUILD 的 `license=` 必须与上游/本仓声明一致；分发二进制必须安装
+  `/usr/share/licenses/<pkg>/`（`scripts/check-boundaries.sh` 不替代这件事）。
+- 构建期由 `scripts/generate-notices.py` 生成 `THIRD-PARTY-NOTICES.md`、
+  `SOURCE-OFFER`、`license-manifest.json`，写入镜像的 `/usr/share/doc/linxira/`。
+- 发布 manifest 必须绑定这三份文件的路径与 SHA-256（见 `linxira-os/docs/RELEASE_STANDARD.md`）。
+- 修改过上游代码的包，必须在该包 `UPSTREAM.md` 写明上游、提交与本地改动。
