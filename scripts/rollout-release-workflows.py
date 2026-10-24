@@ -8,7 +8,7 @@ import subprocess
 import sys
 
 REPOS = {
-    "linxira-artwork": ("1.0.3", "main"),
+    "linxira-artwork": ("1.1.0", "master"),
     "linxira-catalog": ("3.1.0", "main"),
     "linxira-completion-agent": ("0.1.1", "main"),
     "linxira-component-manager": ("0.1.1", "main"),
@@ -32,7 +32,9 @@ WORKFLOW = """name: Release on version bump
 # [linxira] 包仓库的 auto-bump 每日扫描正式 Release 并自动 bump/合并/发布。
 on:
   push:
-    branches: [BRANCH]
+    # 同时监听 main/master: 硬编码单一分支名时, 默认分支一改整条发布链就静默死亡
+    # (linxira-artwork 2026-10 即因此停在 1.0.3, 见 CI 链路审计)。
+    branches: [main, master]
     paths: ["VERSION"]
   workflow_dispatch:
 
@@ -101,9 +103,15 @@ for repo in only:
     try:
         put_file(repo, branch, "VERSION", version + "\n",
                  f"chore(release): record version {version} in VERSION file")
-        wf = WORKFLOW.replace("BRANCH", branch)
-        put_file(repo, branch, ".github/workflows/release.yml", wf,
+        put_file(repo, branch, ".github/workflows/release.yml", WORKFLOW,
                  "ci: auto-create GitHub Release when VERSION file bumps")
+        # 两次 PUT = 两个 commit ⇒ release.yml 上线那次提交不含 VERSION 变更, 不匹配
+        # paths:["VERSION"], 首次铺开永远不会自动触发(2026-08 rollout 的 5 个仓因此
+        # 无 Release)。补一次 dispatch; 工作流对已存在的 tag 幂等跳过。
+        gh_api("POST",
+               f"/repos/Linxira-OS/{repo}/actions/workflows/release.yml/dispatches",
+               {"ref": branch})
+        print("  dispatched release workflow")
     except Exception as exc:
         failed.append(repo)
         print(f"  !! FAILED: {exc}")
