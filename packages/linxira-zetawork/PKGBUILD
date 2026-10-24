@@ -3,7 +3,7 @@
 # 分发走 [linxira-zeta] 仓库(packages 仓库 Release 资产), 不进 linxira-packages git(100MB 限制)。
 
 pkgname=linxira-zetawork
-pkgver=1.4.0
+pkgver=1.4.1
 pkgrel=1
 pkgdesc='Zeta workbench: nested-terminal workspace (release binary)'
 arch=('x86_64')
@@ -13,7 +13,7 @@ options=('!strip' '!debug')
 provides=('zetawork')
 source=("zeta-work-linux-x64::https://github.com/Linxira-OS/linxira-zeta/releases/download/v${pkgver}/zeta-work-linux-x64")
 # assets 模式: sha256 由 sync-upstream.py 自动回填; 资产未上传前为 SKIP(构建跳过)
-sha256sums=('b272ac99b3e02a627048ede61f7d2af4ad8fad6ad494ecaaaa5c024ee1ae36a0')
+sha256sums=('8dd126307dd8f2e0ba56a30f301e907c64eabc9e409e5a064cf16d80125616b7')
 
 check() {
   chmod +x "$srcdir/zeta-work-linux-x64"
