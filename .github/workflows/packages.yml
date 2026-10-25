@@ -120,9 +120,11 @@ jobs:
           if-no-files-found: error
 
   zeta-stack:
+    # PR 只验证构建, 不发布滚动仓库(否则任何人都能通过 PR 改动发布内容)
+    if: github.event_name != 'pull_request'
     # [linxira-zeta] pacman 仓库: 构建->签名->repo-add->上传到本仓库滚动 Release 资产。
     # 绕开 linxira-packages git 的 100MB 限制(GitHub Release 资产上限 2GB);
-    # pacman Server 指向 releases/latest/download(GITHUB_TOKEN 即可, 零 PAT)。
+    # pacman Server 指向 releases/download/zeta-repo(固定 tag, 不随最新 release 漂移)。
     # 可选件(CLI/IDE)上游缺资产时自动跳过; 完整版(linxira-zeta)构建失败则 job 失败。
     needs: [boundaries]
     runs-on: ubuntu-24.04
@@ -138,6 +140,10 @@ jobs:
               useradd --create-home builder
               printf "builder ALL=(ALL) NOPASSWD: ALL\n" >/etc/sudoers.d/builder
               cd /workspace
+              # 源文件下载到独立目录: 完整版的源资产名与产出一致, 放在当前目录
+              # 会被 makepkg 当成"包已构建"(实际事故: exit 13)。
+              export SRCDEST=/tmp/srcdest
+              mkdir -p "$SRCDEST"
               # 可选件: 上游没发对应资产时跳过, 不阻断仓库发布
               for pkg in linxira-zeta-c-bin linxira-zeta-ide; do
                 chown -R builder:builder packages/$pkg
@@ -192,10 +198,18 @@ jobs:
             echo "no zeta db - skip release"; exit 0
           fi
           ls zeta-repo/
-          gh release delete zeta-repo --yes --cleanup-tag 2>/dev/null || true
-          gh release create zeta-repo --title "[linxira-zeta] pacman repo (rolling)" \
-            --notes "Rolling pacman repo for the Zeta suite. Server: https://github.com/Linxira-OS/packages/releases/latest/download"
-          gh release upload zeta-repo zeta-repo/* --clobber
+          # 不删除旧 release: 直接覆盖资产。中途失败时旧的可用文件仍在, 不会出现
+          # "仓库整个消失"的窗口; 旧版本包文件也被保留(可按版本重装)。
+          if ! gh release view zeta-repo >/dev/null 2>&1; then
+            gh release create zeta-repo --title "[linxira-zeta] pacman repo (rolling)" \
+              --notes "Rolling pacman repo for the Zeta suite. Server: https://github.com/Linxira-OS/packages/releases/download/zeta-repo"
+          fi
+          # 先传包文件, 最后传索引: 顺序反了会出现索引指向尚未上传的文件
+          gh release upload zeta-repo zeta-repo/*.pkg.tar.zst zeta-repo/*.pkg.tar.zst.sig --clobber
+          gh release upload zeta-repo zeta-repo/linxira.files zeta-repo/linxira.files.tar.zst \
+            zeta-repo/linxira.files.sig zeta-repo/linxira.files.tar.zst.sig \
+            zeta-repo/linxira.db zeta-repo/linxira.db.tar.zst zeta-repo/linxira.db.sig \
+            zeta-repo/linxira.db.tar.zst.sig --clobber
 
   publish:
     if: >-
