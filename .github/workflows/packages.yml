@@ -183,18 +183,20 @@ jobs:
                     --local-user "$LINXIRA_GPG_FINGERPRINT" \
                     --detach-sign -o "$f.sig" "$f"
               done
-              repo-add linxira.db.tar.zst *.pkg.tar.zst
-              ln -sf linxira.db.tar.zst linxira.db
+              # 仓库段名必须与库文件名一致(pacman 按段名取 <段名>.db): 目标系统
+              # 用 [linxira-zeta] 段, 所以这里必须是 linxira-zeta.db*, 不能叫 linxira.db。
+              repo-add linxira-zeta.db.tar.zst *.pkg.tar.zst
+              ln -sf linxira-zeta.db.tar.zst linxira-zeta.db
               gpg --batch --yes --pinentry-mode loopback \
                   --passphrase "$LINXIRA_GPG_PASSPHRASE" \
                   --local-user "$LINXIRA_GPG_FINGERPRINT" \
-                  --detach-sign linxira.db
+                  --detach-sign linxira-zeta.db
             '
       - name: Publish rolling zeta-repo Release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if [ ! -f zeta-repo/linxira.db.tar.zst ]; then
+          if [ ! -f zeta-repo/linxira-zeta.db.tar.zst ]; then
             echo "no zeta db - skip release"; exit 0
           fi
           ls zeta-repo/
@@ -210,9 +212,9 @@ jobs:
           ((${#pkgs[@]})) && gh release upload zeta-repo "${pkgs[@]}" --clobber
           # 2) 再传索引(索引最后落地, 避免指向尚未上传的文件)
           idx=()
-          for f in linxira.files linxira.files.tar.zst linxira.db linxira.db.tar.zst \
-                   linxira.db.sig linxira.db.tar.zst.sig linxira.files.sig \
-                   linxira.files.tar.zst.sig; do
+          for f in linxira-zeta.files linxira-zeta.files.tar.zst linxira-zeta.db \
+                   linxira-zeta.db.tar.zst linxira-zeta.db.sig linxira-zeta.db.tar.zst.sig \
+                   linxira-zeta.files.sig linxira-zeta.files.tar.zst.sig; do
             [[ -e "zeta-repo/$f" ]] && idx+=("zeta-repo/$f")
           done
           ((${#idx[@]})) && gh release upload zeta-repo "${idx[@]}" --clobber
