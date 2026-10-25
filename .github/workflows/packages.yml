@@ -143,7 +143,7 @@ jobs:
               # 源文件下载到独立目录: 完整版的源资产名与产出一致, 放在当前目录
               # 会被 makepkg 当成"包已构建"(实际事故: exit 13)。
               export SRCDEST=/tmp/srcdest
-              mkdir -p "$SRCDEST"
+              install -d -o builder -g builder "$SRCDEST"
               # 可选件: 上游没发对应资产时跳过, 不阻断仓库发布
               for pkg in linxira-zeta-c-bin linxira-zeta-ide; do
                 chown -R builder:builder packages/$pkg
