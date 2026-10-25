@@ -3,7 +3,7 @@
 # 分发走 [linxira-zeta] 仓库(packages 仓库 Release 资产), 不进 linxira-packages git(100MB 限制)。
 
 pkgname=linxira-zeta-ide
-pkgver=1.4.1
+pkgver=1.4.2
 pkgrel=1
 pkgdesc='Zeta terminal IDE (TermIDE, release binary)'
 arch=('x86_64')
@@ -15,7 +15,7 @@ source=("zeta-ide-linux-x64::https://github.com/Linxira-OS/linxira-zeta/releases
 "LICENSE::https://github.com/Linxira-OS/linxira-zeta/releases/download/v${pkgver}/LICENSE"
 )
 # assets 模式: sha256 由 sync-upstream.py 自动回填; 资产未上传前为 SKIP(构建跳过)
-sha256sums=('b4375e5bd8bf76d845946b7ab990fc7e6ddc91b5998e40e5d07e1ec167cd51dc'
+sha256sums=('db4d28d6d58f39f8fdc34c94bba28acb732f496b9250d14e9a11d86818ef2d77'
 'dc4eb64d767658a18fc64ea98344ac86365564196f61df33b76c5871fe3a844f'
 )
 
