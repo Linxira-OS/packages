@@ -198,18 +198,26 @@ jobs:
             echo "no zeta db - skip release"; exit 0
           fi
           ls zeta-repo/
-          # 不删除旧 release: 直接覆盖资产。中途失败时旧的可用文件仍在, 不会出现
-          # "仓库整个消失"的窗口; 旧版本包文件也被保留(可按版本重装)。
+          # 不删除旧 release: 直接覆盖资产。中途失败时旧文件仍在, 不会出现
+          # "仓库整个消失"的窗口; 旧版本包文件也保留(可按版本重装)。
           if ! gh release view zeta-repo >/dev/null 2>&1; then
             gh release create zeta-repo --title "[linxira-zeta] pacman repo (rolling)" \
               --notes "Rolling pacman repo for the Zeta suite. Server: https://github.com/Linxira-OS/packages/releases/download/zeta-repo"
           fi
-          # 先传包文件, 最后传索引: 顺序反了会出现索引指向尚未上传的文件
-          gh release upload zeta-repo zeta-repo/*.pkg.tar.zst zeta-repo/*.pkg.tar.zst.sig --clobber
-          gh release upload zeta-repo zeta-repo/linxira.files zeta-repo/linxira.files.tar.zst \
-            zeta-repo/linxira.files.sig zeta-repo/linxira.files.tar.zst.sig \
-            zeta-repo/linxira.db zeta-repo/linxira.db.tar.zst zeta-repo/linxira.db.sig \
-            zeta-repo/linxira.db.tar.zst.sig --clobber
+          shopt -s nullglob
+          # 1) 先传包文件
+          pkgs=(zeta-repo/*.pkg.tar.zst zeta-repo/*.pkg.tar.zst.sig)
+          ((${#pkgs[@]})) && gh release upload zeta-repo "${pkgs[@]}" --clobber
+          # 2) 再传索引(索引最后落地, 避免指向尚未上传的文件)
+          idx=(zeta-repo/linxira.files zeta-repo/linxira.files.tar.zst \
+               zeta-repo/linxira.db zeta-repo/linxira.db.tar.zst \
+               zeta-repo/linxira.db.sig zeta-repo/linxira.db.tar.zst.sig)
+          ((${#idx[@]})) && gh release upload zeta-repo "${idx[@]}" --clobber
+          # 3) 清理本轮不再产出的旧资产(例如退役的 zetawork), 保持索引与文件一致
+          keep=" $(cd zeta-repo && ls -1 | tr '\n' ' ') "
+          for name in $(gh release view zeta-repo --json assets -q '.assets[].name'); do
+            case "$keep" in *" $name "*) ;; *) echo "drop stale asset: $name"; gh release delete-asset zeta-repo "$name" -y ;; esac
+          done
 
   publish:
     if: >-
