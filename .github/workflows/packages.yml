@@ -123,7 +123,7 @@ jobs:
     # [linxira-zeta] pacman 仓库: 构建->签名->repo-add->上传到本仓库滚动 Release 资产。
     # 绕开 linxira-packages git 的 100MB 限制(GitHub Release 资产上限 2GB);
     # pacman Server 指向 releases/latest/download(GITHUB_TOKEN 即可, 零 PAT)。
-    # 可用性判断 = makepkg 自行下载源, 404 自动跳过; 五件齐才建元包。
+    # 可选件(CLI/IDE)上游缺资产时自动跳过; 完整版(linxira-zeta)构建失败则 job 失败。
     needs: [boundaries]
     runs-on: ubuntu-24.04
     permissions:
@@ -138,7 +138,8 @@ jobs:
               useradd --create-home builder
               printf "builder ALL=(ALL) NOPASSWD: ALL\n" >/etc/sudoers.d/builder
               cd /workspace
-              for pkg in linxira-zeta-c-bin linxira-zetawork linxira-zeta-ide linxira-zeta-editor linxira-zeta-desktop-bin; do
+              # 可选件: 上游没发对应资产时跳过, 不阻断仓库发布
+              for pkg in linxira-zeta-c-bin linxira-zeta-ide; do
                 chown -R builder:builder packages/$pkg
                 if su builder -c "cd packages/$pkg && makepkg --syncdeps --noconfirm --clean --cleanbuild"; then
                   echo "BUILT: $pkg"
@@ -147,18 +148,10 @@ jobs:
                   echo "SKIP: $pkg (source asset unavailable)"
                 fi
               done
-              built=$(ls packages/linxira-zeta-c-bin/*.pkg.tar.zst packages/linxira-zetawork/*.pkg.tar.zst packages/linxira-zeta-ide/*.pkg.tar.zst packages/linxira-zeta-editor/*.pkg.tar.zst packages/linxira-zeta-desktop-bin/*.pkg.tar.zst 2>/dev/null | wc -l || true)
-              if [ "$built" -ge 5 ]; then
-                pacman -U --noconfirm packages/linxira-zeta-c-bin/*.pkg.tar.zst \
-                  packages/linxira-zetawork/*.pkg.tar.zst \
-                  packages/linxira-zeta-ide/*.pkg.tar.zst \
-                  packages/linxira-zeta-editor/*.pkg.tar.zst \
-                  packages/linxira-zeta-desktop-bin/*.pkg.tar.zst
-                chown -R builder:builder packages/linxira-zeta
-                su builder -c "cd packages/linxira-zeta && makepkg --syncdeps --noconfirm --clean --cleanbuild" && echo "BUILT: linxira-zeta (meta)"
-              else
-                echo "meta deferred: built=$built/5"
-              fi
+              # 完整版是仓库的主产物: 构建失败必须让整个 job 失败, 不能静默跳过
+              chown -R builder:builder packages/linxira-zeta
+              su builder -c "cd packages/linxira-zeta && makepkg --syncdeps --noconfirm --clean --cleanbuild"
+              echo "BUILT: linxira-zeta (complete)"
               install -d /workspace/zeta-repo
               cp packages/linxira-zeta*/*.pkg.tar.zst /workspace/zeta-repo/ 2>/dev/null || true
               ls -la /workspace/zeta-repo/

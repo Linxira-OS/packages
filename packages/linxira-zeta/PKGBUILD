@@ -1,26 +1,37 @@
 # Maintainer: Linxira OS <admin@linxira.org>
-# Zeta 套件元包: 五件全装(work/ide/editor/c/desktop)。随 zeta-stack job 构建,
-# 分发走 [linxira-zeta] 仓库(packages 仓库 Release 资产)。
+#
+# 完整版 Zeta: 直接重打包上游发布的 Arch 包(工作台 TUI + GUI, 单一二进制
+# zetawork + 桌面项)。上游包 .PKGINFO 声明 AGPL-3.0-only, 许可文本随包分发
+# (/usr/share/licenses/linxira-zeta/LICENSE), 源码见上游仓库。
+#
+# 为什么不进主仓库: 包体 208MB, 超过 GitHub 单文件 100MB 上限; 本包发布到
+# 独立滚动仓库(GitHub Release 资产, 单文件上限 2GB)。
+#
+# 上游包名与本包同名(linxira-zeta), 因此旧的"五件套元包"已废弃: 本包即完整
+# 版, 不再依赖 zeta 套件的各个分包, 并取代旧的 linxira-zetawork(同路径冲突)。
 
 pkgname=linxira-zeta
-pkgver=1.1.27
+pkgver=1.4.2
 pkgrel=1
-pkgdesc='Zeta terminal workbench suite (meta: workbench + IDE + editor + coding agent + desktop)'
-arch=('any')
+pkgdesc='Zeta complete workbench (TUI + GUI) — upstream Arch package repacked'
+arch=('x86_64')
 url='https://github.com/Linxira-OS/linxira-zeta'
-license=('MIT')
-depends=(
-  'linxira-zetawork'
-  'linxira-zeta-ide'
-  'linxira-zeta-editor'
-  'linxira-zeta-c-bin'
-  'linxira-zeta-desktop-bin'
-)
+license=('AGPL-3.0-only')
+depends=('glibc' 'gcc-libs' 'libglvnd' 'libxkbcommon' 'libx11' 'wayland' 'vulkan-icd-loader')
+provides=('zetawork')
+conflicts=('linxira-zetawork')
+replaces=('linxira-zetawork')
+# 上游已编译: 不 strip、不拆 debug(拆出的 debug 包不可复现且体积翻倍)
+options=('!strip' '!debug')
+
+_asset="linxira-zeta-${pkgver}-1-x86_64.pkg.tar.zst"
+source=("${_asset}::https://github.com/Linxira-OS/linxira-zeta/releases/download/v${pkgver}/${_asset}")
+sha256sums=('dc512bacd1eaecdbf2b3c635ae4933590e72baef72b9925b672963dae955e4d5')
 
 package() {
-  install -d "$pkgdir/usr/share/doc/linxira-zeta"
-  cat > "$pkgdir/usr/share/doc/linxira-zeta/README.md" <<'EOF'
-# Zeta Suite
-zeta --help / zeta doctor 查看套件状态; 各工具可独立 --help。
-EOF
+  cd "$srcdir"
+  # 上游已是合法 Arch 包: 只取载荷, 元数据(.PKGINFO/.BUILDINFO/.MTREE)由本
+  # PKGBUILD 重新生成, 保证许可证/依赖/冲突声明以我们的为准。
+  bsdtar -xpf "$_asset" -C "$pkgdir" \
+    --exclude '.PKGINFO' --exclude '.BUILDINFO' --exclude '.MTREE' --exclude '.INSTALL'
 }
