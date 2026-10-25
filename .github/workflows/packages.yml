@@ -209,9 +209,12 @@ jobs:
           pkgs=(zeta-repo/*.pkg.tar.zst zeta-repo/*.pkg.tar.zst.sig)
           ((${#pkgs[@]})) && gh release upload zeta-repo "${pkgs[@]}" --clobber
           # 2) 再传索引(索引最后落地, 避免指向尚未上传的文件)
-          idx=(zeta-repo/linxira.files zeta-repo/linxira.files.tar.zst \
-               zeta-repo/linxira.db zeta-repo/linxira.db.tar.zst \
-               zeta-repo/linxira.db.sig zeta-repo/linxira.db.tar.zst.sig)
+          idx=()
+          for f in linxira.files linxira.files.tar.zst linxira.db linxira.db.tar.zst \
+                   linxira.db.sig linxira.db.tar.zst.sig linxira.files.sig \
+                   linxira.files.tar.zst.sig; do
+            [[ -e "zeta-repo/$f" ]] && idx+=("zeta-repo/$f")
+          done
           ((${#idx[@]})) && gh release upload zeta-repo "${idx[@]}" --clobber
           # 3) 清理本轮不再产出的旧资产(例如退役的 zetawork), 保持索引与文件一致
           keep=" $(cd zeta-repo && ls -1 | tr '\n' ' ') "
