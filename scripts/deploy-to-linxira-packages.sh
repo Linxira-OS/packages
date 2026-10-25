@@ -71,6 +71,20 @@ docker run --rm \
       fi
     done
 
+    # 1.6) 清理孤儿包: 本轮构建不再产出的包名(已停用的 -debug 拆分包、改名前的
+    # 旧包)必须从仓库删掉。只做"同名保留最新"不会清理它们, 旧字节会永久滞留并
+    # 被 db 收录(实际事故: linxira-bio-sdk-debug 1.1.0-2、改名前的 chwd-detector)。
+    find /workspace/artifacts -type f -name "*.pkg.tar.zst" -print0 \
+      | xargs -0 -r -n1 pacman -Qp | awk "{print \$1}" | sort -u > /tmp/built-names
+    [[ -s /tmp/built-names ]] || { echo "artifacts 为空, 拒绝清理" >&2; exit 1; }
+    for f in /target/x86_64/*.pkg.tar.zst; do
+      name=$(pacman -Qp "$f" | awk "{print \$1}")
+      if ! grep -qx "$name" /tmp/built-names; then
+        rm -f "$f" "$f.sig"
+        echo "dropping orphan: $(basename "$f")"
+      fi
+    done
+
     # 2) 全量重建 db/files（显式 .tar.zst 命名，避免 repo-add 扩展名歧义）
     cd /target/x86_64
     rm -f linxira.db linxira.db.tar.* linxira.files linxira.files.tar.*
