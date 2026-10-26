@@ -2,7 +2,7 @@
 
 pkgname=calamares
 pkgver=3.3.14
-pkgrel=17
+pkgrel=18
 pkgdesc='Distribution-independent graphical system installer framework'
 arch=('x86_64')
 url='https://calamares.io/'
@@ -118,6 +118,12 @@ package() {
   test -s "$module_dir/libcalamares_viewmodule_linxirasoftware.so"
   test -s "$module_dir/module.desc"
   test -s "$pkgdir/usr/share/calamares/modules/linxirasoftware.conf"
+  # 2026-10-26: Calamares 要求 appData(/etc/calamares)下存在 qml/, 缺失即
+  # initQmlModulesDir FATAL -> 启动 SIGABRT(134)。包内直接提供符号链接,
+  # 不再依赖 live 镜像的开机 tmpfiles 时序。
+  install -d "$pkgdir/etc/calamares"
+  ln -sfn /usr/share/calamares/qml "$pkgdir/etc/calamares/qml"
+  test -L "$pkgdir/etc/calamares/qml"
   grep -Fxq 'load: "libcalamares_viewmodule_linxirasoftware.so"' "$module_dir/module.desc"
   grep -Fxq 'catalogPath: "/usr/share/linxira/catalog/catalog-v3.json"' \
     "$pkgdir/usr/share/calamares/modules/linxirasoftware.conf"
