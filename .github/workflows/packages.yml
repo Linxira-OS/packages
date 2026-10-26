@@ -266,6 +266,8 @@ jobs:
               cd /workspace
               scripts/publish-repo.sh public
             '
+      - name: Fix public directory ownership
+        run: sudo chown -R "$(id -u):$(id -g)" public
       - name: Include zeta repo in Pages
         env:
           GH_TOKEN: ${{ github.token }}
