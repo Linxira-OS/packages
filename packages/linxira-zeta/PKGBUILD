@@ -11,7 +11,7 @@
 # 版, 不再依赖 zeta 套件的各个分包, 并取代旧的 linxira-zetawork(同路径冲突)。
 
 pkgname=linxira-zeta
-pkgver=1.4.2
+pkgver=1.4.3
 pkgrel=1
 pkgdesc='Zeta complete workbench (TUI + GUI) — upstream Arch package repacked'
 arch=('x86_64')
@@ -24,9 +24,8 @@ replaces=('linxira-zetawork')
 # 上游已编译: 不 strip、不拆 debug(拆出的 debug 包不可复现且体积翻倍)
 options=('!strip' '!debug')
 
-_asset="linxira-zeta-${pkgver}-1-x86_64.pkg.tar.zst"
-source=("${_asset}::https://github.com/Linxira-OS/linxira-zeta/releases/download/v${pkgver}/${_asset}")
-sha256sums=('dc512bacd1eaecdbf2b3c635ae4933590e72baef72b9925b672963dae955e4d5')
+source=("linxira-zeta-${pkgver}-1-x86_64.pkg.tar.zst::https://github.com/Linxira-OS/linxira-zeta/releases/download/v${pkgver}/linxira-zeta-${pkgver}-1-x86_64.pkg.tar.zst")
+sha256sums=('3b835de399b0328aac9bb71cbb241d4bea99acc516606fab9250f0602143fdea')
 
 package() {
   cd "$srcdir"
