@@ -12,7 +12,7 @@
 
 pkgname=linxira-zeta
 pkgver=1.4.3
-pkgrel=1
+pkgrel=2
 pkgdesc='Zeta complete workbench (TUI + GUI) — upstream Arch package repacked'
 arch=('x86_64')
 url='https://github.com/Linxira-OS/linxira-zeta'
@@ -28,9 +28,15 @@ source=("linxira-zeta-${pkgver}-1-x86_64.pkg.tar.zst::https://github.com/Linxira
 sha256sums=('3b835de399b0328aac9bb71cbb241d4bea99acc516606fab9250f0602143fdea')
 
 package() {
-  cd "$srcdir"
+  local upstream="$srcdir/linxira-zeta-${pkgver}-1-x86_64.pkg.tar.zst"
   # 上游已是合法 Arch 包: 只取载荷, 元数据(.PKGINFO/.BUILDINFO/.MTREE)由本
   # PKGBUILD 重新生成, 保证许可证/依赖/冲突声明以我们的为准。
-  bsdtar -xpf "$_asset" -C "$pkgdir" \
+  [[ -f $upstream ]] || { echo "missing upstream package: $upstream" >&2; exit 1; }
+  bsdtar -xpf "$upstream" -C "$pkgdir" \
     --exclude '.PKGINFO' --exclude '.BUILDINFO' --exclude '.MTREE' --exclude '.INSTALL'
+  # 空载荷必须让构建失败: 1.4.3-1 曾因变量未定义解出 0 文件, 发布成 2.9KB 空包。
+  if [[ -z $(find "$pkgdir" -type f -print -quit) ]]; then
+    echo "upstream package extracted to an empty payload" >&2
+    exit 1
+  fi
 }
