@@ -1,7 +1,7 @@
 # Maintainer: Linxira OS <admin@linxira.org>
 
 pkgname=linxira-hooks
-pkgver=1.1.1
+pkgver=1.1.2
 pkgrel=1
 pkgdesc='Pacman hooks for Linxira OS system identification'
 arch=('any')
@@ -11,7 +11,7 @@ license=('GPL-3.0-or-later')
 depends=('bash')
 makedepends=('git')
 
-_commit=0ee43e478c60acdc8081adad5c344dd91d46b19f
+_commit=0cc63f414219e35550d21e55945ff77a6bdcde58
 source=("$pkgname::git+$url.git#commit=$_commit")
 sha256sums=('SKIP')
 
