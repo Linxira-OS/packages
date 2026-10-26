@@ -343,6 +343,11 @@ def scan_one(gh: GitHub, package: str, repo: str, pkgbuild: Path,
             if not toks:
                 raise ValueError("source 为空")
             asset_name = toks[0][0].split("::", 1)[0].replace("${pkgver}", ver)
+            # 资产名里还有 ${...} 说明 PKGBUILD 用了脚本无法展开的间接变量;
+            # 以前这种情况会 "SHA256SUMS 里没有" 而静默 skip, 日报仍是绿的
+            # (实际事故: linxira-zeta 的 _asset 间接层导致 1.4.3 两个月没进仓)。
+            if "${" in asset_name or "$(" in asset_name:
+                raise ValueError(f"source 资产名未展开(pkgver={ver}): {asset_name}")
             sha = gh.release_asset_sha(repo, tag, asset_name)
             if sha is None:
                 row.update(status="skip",
