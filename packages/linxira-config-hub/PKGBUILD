@@ -43,6 +43,8 @@ package() {
   cd "$srcdir/$pkgname-$_commit"
   install -Dm755 cli/linxira-config "$pkgdir/usr/bin/linxira-config"
   install -Dm644 data/linxira-config.desktop "$pkgdir/usr/share/applications/linxira-config.desktop"
+  install -Dm644 agent/capabilities.json "$pkgdir/usr/share/linxira/agent/capabilities.json"
+  install -Dm644 agent/skills/linxira-config/SKILL.md "$pkgdir/usr/share/linxira/agent/skills/linxira-config/SKILL.md"
   desktop-file-validate data/linxira-config.desktop
   install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 }
