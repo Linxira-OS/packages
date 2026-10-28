@@ -1,0 +1,42 @@
+name: Notify packages sync
+
+# 可复用工作流：任意上游仓库在发布 Release 后调用本文件，立即触发
+# packages 仓库的 upstream sync，而不必等每日 20:00 的定时扫描。
+#
+# 调用方（放在上游仓库 .github/workflows/notify-packages.yml）：
+#
+#   name: Notify packages
+#   on:
+#     release:
+#       types: [published]
+#     workflow_dispatch:
+#   jobs:
+#     notify:
+#       uses: Linxira-OS/packages/.github/workflows/notify-sync.yml@main
+#       secrets: inherit
+#
+# 需要的 secret：PACKAGES_SYNC_TOKEN
+#   fine-grained PAT，仅授予 Linxira-OS/packages 的 Contents: read/write；
+#   建议配置为组织级 secret 并对全部上游仓库可见，这样新仓库只需加调用文件。
+#
+# 为什么不在调用方直接跑同步：workflow_call 的并发组按调用方仓库隔离，
+# 多个上游同时发布时无法串行；而 repository_dispatch 落到 packages 后，
+# 由 auto-bump.yml 的 concurrency: upstream-sync 统一串行。
+
+on:
+  workflow_call:
+    secrets:
+      PACKAGES_SYNC_TOKEN:
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Dispatch upstream sync to packages
+        env:
+          GH_TOKEN: ${{ secrets.PACKAGES_SYNC_TOKEN }}
+        run: gh api repos/Linxira-OS/packages/dispatches -f event_type=upstream-sync
