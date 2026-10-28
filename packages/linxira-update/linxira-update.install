@@ -1,0 +1,43 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# Route pacman downloads through linxira-pacman-fetch so GitHub-backed
+# repositories (the zeta suite) get a measured accelerator and resumable
+# downloads.  The adapter is inert unless this XferCommand is present.
+
+_configure_pacman_fetch() {
+	local conf="${PACMAN_CONF:-/etc/pacman.conf}"
+	[ -f "${conf}" ] || return 0
+	grep -qE '^[[:space:]]*XferCommand[[:space:]]*=' "${conf}" && return 0
+	grep -q '^\[options\]' "${conf}" || return 0
+
+	cp -a "${conf}" "${conf}.linxira-update.bak"
+	awk '
+		/^\[options\]/ {
+			print
+			if (!seen) {
+				print "XferCommand = /usr/bin/linxira-pacman-fetch %u %o"
+				seen = 1
+			}
+			next
+		}
+		{ print }
+	' "${conf}" > "${conf}.tmp" && mv "${conf}.tmp" "${conf}"
+}
+
+_remove_pacman_fetch() {
+	local conf="${PACMAN_CONF:-/etc/pacman.conf}"
+	[ -f "${conf}" ] || return 0
+	sed -i '\|^XferCommand = /usr/bin/linxira-pacman-fetch %u %o$|d' "${conf}"
+}
+
+post_install() {
+	_configure_pacman_fetch
+}
+
+post_upgrade() {
+	_configure_pacman_fetch
+}
+
+pre_remove() {
+	_remove_pacman_fetch
+}

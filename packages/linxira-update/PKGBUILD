@@ -42,6 +42,7 @@ optdepends=(
   'yay: explicitly enabled AUR update support'
 )
 conflicts=('arch-update' 'cachy-update')
+install=linxira-update.install
 
 _commit=8cd8dffd5df93addea9a0122349edd16887488a3
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
@@ -73,6 +74,7 @@ package() {
 
   local required=(
     usr/bin/linxira-update
+    usr/bin/linxira-pacman-fetch
     usr/share/linxira-update/lib/common.sh
     usr/share/linxira-update/lib/tray.py
     usr/share/linxira-update/lib/tray_utils.py
