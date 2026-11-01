@@ -1,7 +1,7 @@
 # Maintainer: Linxira OS <admin@linxira.org>
 
 pkgname=linxira-update
-pkgver=0.1.12
+pkgver=0.1.13
 pkgrel=1
 pkgdesc='System update notifier and maintenance assistant for Linxira OS'
 arch=('any')
@@ -44,9 +44,9 @@ optdepends=(
 conflicts=('arch-update' 'cachy-update')
 install=linxira-update.install
 
-_commit=298e4ebc5a132c17dcba759b5e21e9be61f3f3c1
+_commit=cac9fc9bb8b3405cc228c5db26de8eee399fd56d
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('5a2462ce5165d6f6f94b43bea9711b048e961d23eb20f0a2ed33021c8fbad182')
+sha256sums=('64c9917977dadb7f489c7d5d9b36ac7dd709d6083ab36f15006b3c484ba8cd69')
 
 prepare() {
   cd "$srcdir/$pkgname-$_commit"
