@@ -1,7 +1,7 @@
 # Maintainer: Linxira OS <admin@linxira.org>
 
 pkgname=linxira-bio-sdk
-pkgver=1.1.4
+pkgver=1.1.5
 pkgrel=1
 pkgdesc='Linxira Bio SDK - local-first bioinformatics toolkit (CLI + engine)'
 arch=('x86_64')
@@ -12,9 +12,9 @@ depends=('gcc-libs')
 makedepends=('rust' 'clang' 'mold')
 options=('!strip' '!debug')  # bio-cli 构建产物无调试符号, makepkg strip 索引会报错
 
-_commit=18906c828fa6cc9578a4bbdc7f080cd96be341ea
+_commit=b43fc885fc8e74a8cb5a239a970b08cff543b2c3
 source=("$pkgname-$_commit.tar.gz::https://codeload.github.com/Linxira-OS/$pkgname/tar.gz/$_commit")
-sha256sums=('2edd4937e2510ea60d06e5eefefa562a7127f64c0f4675bc58d9f4d4a10712eb')
+sha256sums=('74f07eb6330b4d5acf42482553c5ff6e6335d412142cc8622e1b2f749b0fbda4')
 
 build() {
   cd "$srcdir/$pkgname-$_commit"
