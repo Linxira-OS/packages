@@ -1,7 +1,7 @@
 # Maintainer: Linxira OS <admin@linxira.org>
 
 pkgname=linxira-wiki
-pkgver=0.1.0
+pkgver=0.1.1
 pkgrel=1
 pkgdesc='Official Linxira OS system handbook, readable by humans and AI agents'
 arch=('any')
@@ -12,7 +12,7 @@ depends=('bash' 'coreutils' 'grep')
 optdepends=('mkdocs: build the human-readable site from the same sources')
 makedepends=('git')
 
-_commit=d7c6bafad37ec4e74c81029f11dc127ce1dc1b1a
+_commit=32405051ad5ab31876acc37ca4aa9c192de08eb9
 source=("$pkgname::git+$url.git#commit=$_commit")
 sha256sums=('SKIP')
 
