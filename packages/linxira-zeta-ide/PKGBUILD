@@ -16,7 +16,7 @@ source=("zeta-ide-linux-x64::https://github.com/Linxira-OS/linxira-zeta/releases
 )
 # assets 模式: sha256 由 sync-upstream.py 自动回填; 资产未上传前为 SKIP(构建跳过)
 sha256sums=('06582aa039c0c209aaf78b65f9bd119125b560b41ea760ed81e4325a6c6b7d6a'
-'dc4eb64d767658a18fc64ea98344ac86365564196f61df33b76c5871fe3a844f'
+'49cc81b4d6bbe6a25b7b5a5942759775e42cbf71d688fbaf08b5d06733236c32'
 )
 
 check() {

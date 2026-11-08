@@ -18,7 +18,7 @@ source=("zeta-cli-linux-x64::https://github.com/Linxira-OS/linxira-zeta/releases
 )
 # assets 模式: sha256 由 scripts/sync-upstream.py 从上游 SHA256SUMS.txt 自动回填
 sha256sums=('d66d2d2f23f06817d4e37be21463c5e7afb602c1f17e87163ea6d674be508287'
-'dc4eb64d767658a18fc64ea98344ac86365564196f61df33b76c5871fe3a844f'
+'49cc81b4d6bbe6a25b7b5a5942759775e42cbf71d688fbaf08b5d06733236c32'
 )
 
 check() {
