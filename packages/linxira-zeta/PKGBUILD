@@ -1,42 +1,79 @@
 # Maintainer: Linxira OS <admin@linxira.org>
 #
-# 完整版 Zeta: 直接重打包上游发布的 Arch 包(工作台 TUI + GUI, 单一二进制
-# zetawork + 桌面项)。上游包 .PKGINFO 声明 AGPL-3.0-only, 许可文本随包分发
-# (/usr/share/licenses/linxira-zeta/LICENSE), 源码见上游仓库。
+# Zeta 桌面壳(Electron): 内嵌 Work Studio 渲染器 + 本地 zeta serve 服务,
+# 目标机无需 Node/Bun/浏览器。上游 release 的 linux-x64 tar.gz 重打包。
 #
-# 为什么不进主仓库: 包体 208MB, 超过 GitHub 单文件 100MB 上限; 本包发布到
-# 独立滚动仓库(GitHub Release 资产, 单文件上限 2GB)。
+# 2026-11-10: 上游换了桌面(旧 zetawork TUI+GUI 的 Arch 包资产已停产,
+# v1.5.0 起改为 zeta-desktop-<ver>-linux-x64.tar.gz)。本包随之切换资产,
+# pkgname 不变 —— 已装机(r2 预装 1.4.10)经 pacman -Syu 直接换到新桌面。
+# 旧版提供的 zetawork 不再随包分发; CLI(zetacode)/IDE 仍是独立按需包。
 #
-# 上游包名与本包同名(linxira-zeta), 因此旧的"五件套元包"已废弃: 本包即完整
-# 版, 不再依赖 zeta 套件的各个分包, 并取代旧的 linxira-zetawork(同路径冲突)。
+# 许可: 上游分层许可(见随包 legal/LICENSE)——desktop/ 与 packages/coding-agent
+# 均 MIT, 本包只含 MIT 部分; AGPL 的 main/(zetawork)不在本资产内。
+#
+# 为什么不进主仓库: 包体远超 GitHub 单文件 100MB 上限; 本包发布到
+# 独立滚动仓库([linxira-zeta], GitHub Release 资产, 单文件上限 2GB)。
 
 pkgname=linxira-zeta
-pkgver=1.4.10
+pkgver=1.5.0
 pkgrel=1
-pkgdesc='Zeta complete workbench (TUI + GUI) — upstream Arch package repacked'
+pkgdesc='Zeta desktop shell (embedded Work Studio + local agent service) — upstream release repacked'
 arch=('x86_64')
 url='https://github.com/Linxira-OS/linxira-zeta'
-license=('AGPL-3.0-only')
-depends=('glibc' 'gcc-libs' 'libglvnd' 'libxkbcommon' 'libx11' 'wayland' 'vulkan-icd-loader')
-provides=('zetawork')
+license=('MIT')
+# Electron 运行时: 与上游 deb 的 Depends 对齐, 另加音频/键盘/GPU 运行库
+# (mesa 保证 Hyper-V 无 GPU 的 llvmpipe 路径也有软件 GL)。
+depends=('gtk3' 'nss' 'alsa-lib' 'libxss' 'libxtst' 'xdg-utils' 'at-spi2-core'
+         'util-linux-libs' 'libsecret' 'libnotify' 'libxkbcommon' 'libdrm'
+         'mesa' 'libglvnd' 'glibc' 'gcc-libs')
+optdepends=('libappindicator-gtk3: tray icon support')
 conflicts=('linxira-zetawork')
 replaces=('linxira-zetawork')
-# 上游已编译: 不 strip、不拆 debug(拆出的 debug 包不可复现且体积翻倍)
+# 上游已编译: 不 strip、不拆 debug(Electron 拆包不可复现且体积翻倍)
 options=('!strip' '!debug')
 
-source=("linxira-zeta-${pkgver}-1-x86_64.pkg.tar.zst::https://github.com/Linxira-OS/linxira-zeta/releases/download/v${pkgver}/linxira-zeta-${pkgver}-1-x86_64.pkg.tar.zst")
-sha256sums=('278a4d098b8d8a92dbcbbb58f7fc6297c1272c6be4679348b3418fda1f77aea8')
+source=("zeta-desktop-${pkgver}-linux-x64.tar.gz::https://github.com/Linxira-OS/linxira-zeta/releases/download/v${pkgver}/zeta-desktop-${pkgver}-linux-x64.tar.gz")
+# assets 模式: sha256 由 scripts/sync-upstream.py 从上游 SHA256SUMS.txt 自动回填
+sha256sums=('628b064b5b4d9b12437d39e9ac7720e08aedb02b6fceb150e96fa10904cb88b0')
+
+check() {
+  head -c 4 "$srcdir/zeta-desktop-${pkgver}-linux-x64/zeta-desktop" | grep -q $'\x7fELF'
+}
 
 package() {
-  local upstream="$srcdir/linxira-zeta-${pkgver}-1-x86_64.pkg.tar.zst"
-  # 上游已是合法 Arch 包: 只取载荷, 元数据(.PKGINFO/.BUILDINFO/.MTREE)由本
-  # PKGBUILD 重新生成, 保证许可证/依赖/冲突声明以我们的为准。
-  [[ -f $upstream ]] || { echo "missing upstream package: $upstream" >&2; exit 1; }
-  bsdtar -xpf "$upstream" -C "$pkgdir" \
-    --exclude '.PKGINFO' --exclude '.BUILDINFO' --exclude '.MTREE' --exclude '.INSTALL'
-  # 空载荷必须让构建失败: 1.4.3-1 曾因变量未定义解出 0 文件, 发布成 2.9KB 空包。
-  if [[ -z $(find "$pkgdir" -type f -print -quit) ]]; then
-    echo "upstream package extracted to an empty payload" >&2
+  local unpacked="$srcdir/zeta-desktop-${pkgver}-linux-x64"
+  [[ -x $unpacked/zeta-desktop ]] || { echo "missing desktop executable: $unpacked/zeta-desktop" >&2; exit 1; }
+
+  install -d "$pkgdir/opt/linxira-zeta"
+  cp -a "$unpacked/." "$pkgdir/opt/linxira-zeta/"
+  # 空载荷必须让构建失败(1.4.3-1 曾发布成 2.9KB 空包)。
+  if [[ -z $(find "$pkgdir/opt/linxira-zeta" -type f -print -quit) ]]; then
+    echo "upstream archive extracted to an empty payload" >&2
     exit 1
   fi
+  # Chromium 沙箱要求 SUID root(fakeroot 下 chmod 会被 pacman 记录)。
+  chmod 4755 "$pkgdir/opt/linxira-zeta/chrome-sandbox"
+
+  install -d "$pkgdir/usr/bin"
+  ln -s /opt/linxira-zeta/zeta-desktop "$pkgdir/usr/bin/zeta-desktop"
+
+  install -Dm644 "$unpacked/resources/icon.png" \
+    "$pkgdir/usr/share/icons/hicolor/512x512/apps/linxira-zeta.png"
+  install -Dm644 /dev/stdin "$pkgdir/usr/share/applications/linxira-zeta.desktop" <<'EOF'
+[Desktop Entry]
+Name=Zeta
+Comment=Zeta coding agent desktop
+Exec=zeta-desktop %U
+Terminal=false
+Type=Application
+Icon=linxira-zeta
+StartupWMClass=zeta-desktop
+Categories=Development;
+MimeType=x-scheme-handler/zeta;
+EOF
+
+  install -Dm644 "$unpacked/resources/legal/LICENSE" \
+    "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+  install -Dm644 "$unpacked/resources/legal/THIRD-PARTY-NOTICES.txt" \
+    "$pkgdir/usr/share/licenses/$pkgname/THIRD-PARTY-NOTICES.txt"
 }

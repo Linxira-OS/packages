@@ -132,12 +132,14 @@ official upstream releases:
 
 - `upstream-sync.toml`: allowlist mapping each package to its source
   repository. Packages absent from the list are never bumped automatically
-  (`calamares`, `shelly` are external; `linxira-keyring`, `zetabin` have no
-  version pin).
+  (`calamares`, `shelly` are external; `linxira-keyring` has no version pin).
 - `scripts/sync-upstream.py`: reads GitHub `releases/latest` for every tracked
   repository, skips draft/prerelease releases and non-version tags, rewrites
   `pkgver` / `_commit` / the matching `sha256sums` entry, resets `pkgrel=1`
-  on version changes. Run it locally in check mode with
+  on version changes. Entries with `mode = "assets"` (the Zeta suite) instead
+  repack release assets: every `source` entry's checksum is refreshed from
+  the release's `SHA256SUMS.txt`, and same-version checksum drift (upstream
+  re-upload) bumps `pkgrel`. Run it locally in check mode with
   `python3 scripts/sync-upstream.py`.
 - `.github/workflows/auto-bump.yml`: cron (`0 20 * * *` UTC) plus manual
   dispatch; opens one grouped bump PR when pins lag behind releases.

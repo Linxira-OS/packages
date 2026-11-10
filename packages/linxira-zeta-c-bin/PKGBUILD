@@ -5,7 +5,7 @@
 
 pkgname=linxira-zeta-c-bin
 pkgver=1.5.0
-pkgrel=1
+pkgrel=2
 pkgdesc='Zeta coding agent CLI (zeta-c) — upstream release binary'
 arch=('x86_64')
 url='https://github.com/Linxira-OS/linxira-zeta'
@@ -18,7 +18,7 @@ source=("zeta-cli-linux-x64::https://github.com/Linxira-OS/linxira-zeta/releases
 )
 # assets 模式: sha256 由 scripts/sync-upstream.py 从上游 SHA256SUMS.txt 自动回填
 sha256sums=('1952fbc229755d6522b9694143a3d7ab9abc076375e971fd6a19f7abe4e9a895'
-'dc4eb64d767658a18fc64ea98344ac86365564196f61df33b76c5871fe3a844f'
+'49cc81b4d6bbe6a25b7b5a5942759775e42cbf71d688fbaf08b5d06733236c32'
 )
 
 check() {

@@ -220,6 +220,25 @@ def detect_source(text: str) -> tuple[int, str]:
     raise ValueError("source 里没有 codeload URL 或 #commit=$_commit 的可跟踪条目")
 
 
+def source_asset_names(text: str, ver: str) -> list[str]:
+    """source 每个条目的上游资产名(``name::url`` 取 name, 否则取 URL 文件名)。
+
+    assets 模式的 source 全部来自同一个 release，每个条目在 SHA256SUMS.txt 里
+    都有一行；校验和必须逐条回填，不能只处理 [0]。
+    """
+    span = block_span(text, "source")
+    if span is None:
+        raise ValueError("没有 source=( 数组")
+    names = []
+    for tok, _start, _end in tokens_with_spans(text, *span):
+        name = tok.split("::", 1)[0] if "::" in tok else tok.rsplit("/", 1)[-1]
+        name = name.replace("${pkgver}", ver).replace("$pkgver", ver)
+        if "${" in name or "$(" in name:
+            raise ValueError(f"source 资产名未展开(pkgver={ver}): {name}")
+        names.append(name)
+    return names
+
+
 def replace_token(text: str, lo: int, hi: int, index: int, new_raw: str) -> str:
     toks = tokens_with_spans(text, lo, hi)
     _, s, e = toks[index]
@@ -271,8 +290,12 @@ def bump_pkgbuild(path: Path, *, pkgver: str, commit: str, sha256: str | None,
             "pkgrel": new_rel, "checksum": sum_note}
 
 
-def bump_assets(path: Path, *, pkgver: str, sha256: str) -> dict:
-    """assets 模式：source URL 含 v${pkgver}，只需改 pkgver/pkgrel/sha256sums。"""
+def bump_assets(path: Path, *, pkgver: str, shas: list[str]) -> dict:
+    """assets 模式：source 全部来自同一 release，重写 pkgver/pkgrel 与每条校验和。
+
+    以前只回填 sha256sums[0]，LICENSE 之类的附加资产永远停在旧版本 —— 实际事故：
+    zeta 的 LICENSE 在 1.4.11 变更后，zeta-c-bin / zeta-ide 一直校验失败被静默跳过。
+    """
     text = path.read_text(encoding="utf-8")
     old_ver = kv_value(text, "pkgver")
     if old_ver is None:
@@ -283,13 +306,17 @@ def bump_assets(path: Path, *, pkgver: str, sha256: str) -> dict:
         if n != 1:
             raise ValueError(f"替换 {key}= 失败")
     span = block_span(text, "sha256sums")
+    if span is None:
+        raise ValueError("没有 sha256sums=( 数组")
     toks = tokens_with_spans(text, *span)
-    if not toks:
-        raise ValueError("sha256sums 为空")
-    text = replace_token(text, *span, 0, f"'{sha256}'")
+    if len(toks) != len(shas):
+        raise ValueError(f"sha256sums {len(toks)} 条与 source {len(shas)} 条不一致")
+    for idx, sha in enumerate(shas):
+        span = block_span(text, "sha256sums")  # 每次替换后偏移会移动，逐条重算
+        text = replace_token(text, *span, idx, f"'{sha}'")
     path.write_text(text, encoding="utf-8")
     return {"old_pkgver": old_ver, "new_pkgver": pkgver, "pkgrel": new_rel,
-            "checksum": "sha256[0] 取自上游 SHA256SUMS.txt"}
+            "checksum": "sha256[*] 取自上游 SHA256SUMS.txt"}
 
 
 # ---------------------------------------------------------------------- 主流程
@@ -335,27 +362,26 @@ def scan_one(gh: GitHub, package: str, repo: str, pkgbuild: Path,
                            reason=f"release tag `{tag}` 不是版本号")
                 return row
             cur = kv_value(text, "pkgver")
-            if cur == ver:
+            # 版本没变也要核对校验和: 上游可能在同一 tag 下重建/替换资产。
+            # 实际事故: v1.4.10 的 pkg.tar.zst 上传后又被替换, PKGBUILD 里的旧
+            # sha 让 zeta-stack 每次构建都失败; 旧逻辑见 cur == ver 就报 ok。
+            shas = []
+            for asset_name in source_asset_names(text, ver):
+                sha = gh.release_asset_sha(repo, tag, asset_name)
+                if sha is None:
+                    row.update(status="skip",
+                               reason=f"SHA256SUMS.txt 里还没有 {asset_name}（上游尚未上传）")
+                    return row
+                shas.append(sha)
+            sums_span = block_span(text, "sha256sums")
+            cur_sums = ([tok[0] for tok in tokens_with_spans(text, *sums_span)]
+                        if sums_span else [])
+            if cur == ver and cur_sums == shas:
                 row.update(status="ok", tag=tag, current=cur)
-                return row
-            span = block_span(text, "source")
-            toks = tokens_with_spans(text, *span)
-            if not toks:
-                raise ValueError("source 为空")
-            asset_name = toks[0][0].split("::", 1)[0].replace("${pkgver}", ver)
-            # 资产名里还有 ${...} 说明 PKGBUILD 用了脚本无法展开的间接变量;
-            # 以前这种情况会 "SHA256SUMS 里没有" 而静默 skip, 日报仍是绿的
-            # (实际事故: linxira-zeta 的 _asset 间接层导致 1.4.3 两个月没进仓)。
-            if "${" in asset_name or "$(" in asset_name:
-                raise ValueError(f"source 资产名未展开(pkgver={ver}): {asset_name}")
-            sha = gh.release_asset_sha(repo, tag, asset_name)
-            if sha is None:
-                row.update(status="skip",
-                           reason=f"SHA256SUMS.txt 里还没有 {asset_name}（上游尚未上传）")
                 return row
             info: dict | None = None
             if write:
-                info = bump_assets(pkgbuild, pkgver=ver, sha256=sha)
+                info = bump_assets(pkgbuild, pkgver=ver, shas=shas)
             row.update(status="bump", tag=tag, mode="assets",
                        old=(cur or "?")[:12], new=ver,
                        applied=bool(info), **(info or {}))
