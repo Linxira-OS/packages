@@ -15,8 +15,8 @@
 # 独立滚动仓库([linxira-zeta], GitHub Release 资产, 单文件上限 2GB)。
 
 pkgname=linxira-zeta
-pkgver=1.5.12
-pkgrel=2
+pkgver=1.5.13
+pkgrel=1
 pkgdesc='Zeta desktop shell (embedded Work Studio + local agent service) — upstream release repacked'
 arch=('x86_64')
 url='https://github.com/Linxira-OS/linxira-zeta'
@@ -34,7 +34,7 @@ options=('!strip' '!debug')
 
 source=("zeta-desktop-${pkgver}-linux-x64.tar.gz::https://github.com/Linxira-OS/linxira-zeta/releases/download/v${pkgver}/zeta-desktop-${pkgver}-linux-x64.tar.gz")
 # assets 模式: sha256 由 scripts/sync-upstream.py 从上游 SHA256SUMS.txt 自动回填
-sha256sums=('165fb5dfee61b712dbe9983b3a012b15f6489022c29c5582e1f138788a85d907')
+sha256sums=('87d4532cbdd1eba76ac919967d6634dbf9fdb7c107a7e959b73d8b3b14dd96b9')
 
 check() {
   head -c 4 "$srcdir/zeta-desktop-${pkgver}-linux-x64/zeta-desktop" | grep -q $'\x7fELF'
