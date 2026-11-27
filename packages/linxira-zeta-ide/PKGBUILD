@@ -4,7 +4,7 @@
 
 pkgname=linxira-zeta-ide
 pkgver=1.5.15
-pkgrel=1
+pkgrel=2
 pkgdesc='Zeta terminal IDE (TermIDE, release binary)'
 arch=('x86_64')
 url='https://github.com/Linxira-OS/linxira-zeta'
