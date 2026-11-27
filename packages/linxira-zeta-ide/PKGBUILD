@@ -4,7 +4,7 @@
 
 pkgname=linxira-zeta-ide
 pkgver=1.5.15
-pkgrel=1
+pkgrel=2
 pkgdesc='Zeta terminal IDE (TermIDE, release binary)'
 arch=('x86_64')
 url='https://github.com/Linxira-OS/linxira-zeta'
@@ -15,7 +15,7 @@ source=("zeta-ide-linux-x64::https://github.com/Linxira-OS/linxira-zeta/releases
 "LICENSE::https://github.com/Linxira-OS/linxira-zeta/releases/download/v${pkgver}/LICENSE"
 )
 # assets 模式: sha256 由 sync-upstream.py 自动回填; 资产未上传前为 SKIP(构建跳过)
-sha256sums=('c15abf877df54b9eba13cfc3cc0343c10225d70755c5bb865d9bb8aac555e1ff'
+sha256sums=('665f272d8ea4e7b2f452a18e36020fb02181e10aebef39685eb486f7f1b05199'
 '6fb7a5b7454a988650145069544a36d17aa67a47021b8edd01e3f71d6f1ee5e0'
 )
 
