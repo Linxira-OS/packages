@@ -9,13 +9,13 @@
 # pacman transaction from mixing suite releases.
 
 pkgname=linxira-zeta
-pkgver=1.5.14
-pkgrel=2
+pkgver=1.5.15
+pkgrel=1
 pkgdesc='Linxira Zeta suite: zetacode, zetaide and Zeta Terminal'
 arch=('any')
 url='https://github.com/Linxira-OS/linxira-zeta'
 license=('MIT')
-depends=('linxira-zeta-c-bin>=1.5.14' 'linxira-zeta-ide>=1.5.14')
+depends=('linxira-zeta-c-bin>=1.5.15' 'linxira-zeta-ide>=1.5.15')
 optdepends=('linxira-zeta-terminal: Zeta Terminal (AppImage/pacman)')
 # Old surfaces this name replaces on pacman -Syu. `linxira-zeta` itself is the
 # same package id, so the old desktop payload is removed by the normal upgrade.
