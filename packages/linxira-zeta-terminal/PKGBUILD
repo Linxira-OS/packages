@@ -1,0 +1,44 @@
+# Maintainer: Linxira OS <admin@linxira.org>
+# Release-asset repackage: the AppImage is built from terminal/ on the Zeta
+# release line. Until that asset exists, zeta-stack skips this package.
+pkgname=linxira-zeta-terminal
+pkgver=1.5.15
+pkgrel=1
+pkgdesc='Zeta Terminal — TSP presentation surface for Linxira Zeta'
+arch=('x86_64')
+url='https://github.com/Linxira-OS/linxira-zeta'
+license=('Apache-2.0')
+depends=('fuse2')
+provides=('zeta-terminal')
+conflicts=('waveterm')
+source=("linxira-zeta-terminal-${pkgver}-linux-x64.AppImage::https://github.com/Linxira-OS/linxira-zeta/releases/download/v${pkgver}/linxira-zeta-terminal-${pkgver}-linux-x64.AppImage")
+sha256sums=('SKIP')
+
+check() {
+  head -c 4 "$srcdir/linxira-zeta-terminal-${pkgver}-linux-x64.AppImage" | grep -q $'\x7fELF'
+}
+
+package() {
+  install -d "$pkgdir/opt/linxira-zeta-terminal"
+  install -Dm755 "$srcdir/linxira-zeta-terminal-${pkgver}-linux-x64.AppImage" \
+    "$pkgdir/opt/linxira-zeta-terminal/zeta-terminal.AppImage"
+  install -d "$pkgdir/usr/bin"
+  ln -s /opt/linxira-zeta-terminal/zeta-terminal.AppImage "$pkgdir/usr/bin/zeta-terminal"
+
+  install -Dm644 /dev/stdin "$pkgdir/usr/share/applications/linxira-zeta-terminal.desktop" <<'DESKTOP'
+[Desktop Entry]
+Name=Zeta Terminal
+Comment=Zeta Terminal — TSP presentation surface
+Exec=zeta-terminal %U
+Terminal=false
+Type=Application
+Icon=utilities-terminal
+Categories=Development;Utility;TerminalEmulator;
+StartupWMClass=Zeta Terminal
+DESKTOP
+
+  install -Dm644 /dev/stdin "$pkgdir/usr/share/licenses/$pkgname/LICENSE" <<'LICENSE'
+Zeta Terminal is distributed under the Apache License 2.0.
+See https://github.com/Linxira-OS/linxira-zeta/blob/main/terminal/LICENSE
+LICENSE
+}

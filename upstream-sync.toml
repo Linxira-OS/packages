@@ -90,6 +90,11 @@ repo = "Linxira-OS/linxira-zeta"
 mode = "assets"
 
 [[track]]
+package = "linxira-zeta-terminal"
+repo = "Linxira-OS/linxira-zeta"
+mode = "assets"
+
+[[track]]
 package = "linxira-hooks"
 repo = "Linxira-OS/linxira-hooks"
 
@@ -97,9 +102,5 @@ repo = "Linxira-OS/linxira-hooks"
 package = "linxira-kernel-manager"
 repo = "Linxira-OS/linxira-kernel-manager"
 
-# 桌面壳 tar.gz 重打包(MIT)。pkgname 保持 linxira-zeta: 旧装机(r2 预装
-# 1.4.10 旧桌面)经 pacman -Syu 换到新桌面; 上游旧 Arch 包资产已停产。
-[[track]]
-package = "linxira-zeta"
-repo = "Linxira-OS/linxira-zeta"
-mode = "assets"
+# linxira-zeta is now the suite meta package (no upstream asset). Its version
+# moves with the Zeta release line, not an upstream desktop tarball.
